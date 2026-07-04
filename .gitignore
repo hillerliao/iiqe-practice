@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# prisma generated client (由 prisma generate 产生)
+/lib/generated/prisma
+
+# sqlite dev database
+*.db
+*.db-journal

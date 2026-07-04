@@ -1,0 +1,86 @@
+// IIQE 刷題應用資料模型
+// Prisma 7 不再於 schema 中寫 datasource url,改在 prisma.config.ts 設定
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Paper {
+  id        String     @id @default(cuid())
+  code      String     @unique
+  name      String
+  questions Question[]
+  attempts  Attempt[]
+  createdAt DateTime   @default(now())
+}
+
+model Question {
+  id          String     @id @default(cuid())
+  paperId     String
+  paper       Paper      @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  number      Int
+  ref         String
+  question    String
+  options     String
+  answer      String
+  explanation String?
+  page        Int?
+  source      String
+  sourceLabel String?
+  createdAt   DateTime   @default(now())
+
+  answers   Answer[]
+  favorites Favorite[]
+
+  @@unique([paperId, number, source])
+  @@index([paperId, source])
+}
+
+model Attempt {
+  id          String    @id @default(cuid())
+  sessionId   String
+  paperId     String
+  paper       Paper     @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  mode        String
+  source      String?
+  startedAt   DateTime  @default(now())
+  finishedAt  DateTime?
+  durationSec Int?
+  totalQ      Int
+  correct     Int       @default(0)
+  answers     Answer[]
+
+  @@index([sessionId])
+  @@index([paperId])
+}
+
+model Answer {
+  id          String   @id @default(cuid())
+  attemptId   String
+  attempt     Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId  String
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  userAnswer  String
+  isCorrect   Boolean
+  timeSpentMs Int?
+  createdAt   DateTime @default(now())
+
+  @@unique([attemptId, questionId])
+  @@index([questionId])
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  sessionId  String
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([sessionId, questionId])
+  @@index([sessionId])
+}
