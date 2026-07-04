@@ -48,6 +48,7 @@ function PaperSetupInner() {
   const [durationMin, setDurationMin] = useState(60);
   const [shuffle, setShuffle] = useState(false);
   const [limit, setLimit] = useState(50);
+  const [startFrom, setStartFrom] = useState(1); // 從第幾題開始(1-indexed)
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [unfinished, setUnfinished] = useState<UnfinishedAttempt | null>(null);
@@ -114,8 +115,9 @@ function PaperSetupInner() {
     }
 
     try {
+      const offset = shuffle ? 0 : Math.max(0, startFrom - 1);
       const qsRes = await fetch(
-        `/api/questions?paperCode=${code}&source=${source}&shuffle=${shuffle ? 1 : 0}&limit=${limit}`
+        `/api/questions?paperCode=${code}&source=${source}&shuffle=${shuffle ? 1 : 0}&limit=${limit}&offset=${offset}`
       );
       if (!qsRes.ok) throw new Error("載入題目失敗");
       const qsData = await qsRes.json();

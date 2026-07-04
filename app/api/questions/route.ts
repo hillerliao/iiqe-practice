@@ -1,4 +1,5 @@
-// GET /api/questions?paperCode=P1&source=exam&shuffle=1&limit=348
+// GET /api/questions?paperCode=P1&source=exam&shuffle=1&limit=348&offset=50
+// offset = 從第幾題開始(0-indexed),僅在非 shuffle 時生效
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
@@ -8,6 +9,7 @@ export async function GET(req: NextRequest) {
   const source = url.searchParams.get("source") ?? "exam";
   const shuffle = url.searchParams.get("shuffle") === "1";
   const limit = parseInt(url.searchParams.get("limit") ?? "9999", 10);
+  const offset = Math.max(0, parseInt(url.searchParams.get("offset") ?? "0", 10));
 
   if (!code) {
     return NextResponse.json({ error: "paperCode 必填" }, { status: 400 });
@@ -18,9 +20,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Paper not found" }, { status: 404 });
   }
 
+  // shuffle 模式下 offset 無意義,忽略
+  const effectiveOffset = shuffle ? 0 : offset;
+
   const questions = await prisma.question.findMany({
     where: { paperId: paper.id, source },
     orderBy: { number: "asc" },
+    skip: effectiveOffset,
     take: limit,
   });
 
@@ -38,6 +44,7 @@ export async function GET(req: NextRequest) {
     paper: { id: paper.id, code: paper.code, name: paper.name },
     source,
     total: questions.length,
+    offset: effectiveOffset,
     questions: ordered.map((q) => ({
       id: q.id,
       number: q.number,
