@@ -58,7 +58,26 @@ export async function GET(req: NextRequest) {
         answers: { select: { questionId: true, userAnswer: true } },
       },
     });
-    return NextResponse.json({ attempt });
+
+    // 額外撈出此 session 在此 paper/source 曾經作答過的最大題目序號,
+    // 作為新開 session 的「從第幾題開始」欄位預設值
+    let latestAnsweredNumber: number | null = null;
+    if (paperId) {
+      const latest = await prisma.answer.findFirst({
+        where: {
+          attempt: {
+            sessionId,
+            paperId,
+            ...(source ? { source } : {}),
+          },
+        },
+        orderBy: { question: { number: "desc" } },
+        select: { question: { select: { number: true } } },
+      });
+      latestAnsweredNumber = latest?.question.number ?? null;
+    }
+
+    return NextResponse.json({ attempt, latestAnsweredNumber });
   }
 
   const attempts = await prisma.attempt.findMany({

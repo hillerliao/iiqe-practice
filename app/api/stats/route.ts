@@ -62,7 +62,12 @@ export async function GET(req: NextRequest) {
     take: 10,
     include: {
       paper: true,
-      answers: { select: { isCorrect: true } },
+      answers: {
+        select: {
+          isCorrect: true,
+          question: { select: { number: true } },
+        },
+      },
     },
   });
   // 統計未交卷的 session 數(給前端提示用)
@@ -82,6 +87,10 @@ export async function GET(req: NextRequest) {
     })),
     recentAttempts: recent.map((a) => {
       const liveCorrect = a.answers.filter((x) => x.isCorrect).length;
+      // 取得這個 session 作答過的題目序號(去重並由小到大)
+      const questionNumbers = Array.from(
+        new Set(a.answers.map((x) => x.question.number))
+      ).sort((x, y) => x - y);
       return {
         id: a.id,
         paperName: a.paper.name,
@@ -91,6 +100,7 @@ export async function GET(req: NextRequest) {
         totalQ: a.totalQ,
         answeredCount: a.answers.length, // 實際已作答題數
         correct: liveCorrect, // 即時算,不再讀 Attempt.correct
+        questionNumbers,
         startedAt: a.startedAt,
         finishedAt: a.finishedAt,
       };

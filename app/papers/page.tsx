@@ -66,7 +66,7 @@ function PaperSetupInner() {
         if (p?.code === "P1") setDurationMin(60);
         if (p?.code === "P3") setDurationMin(75);
 
-        // 檢查是否有未完成的 attempt
+        // 檢查是否有未完成的 attempt,並取得此 session 曾答過的最大題目序號
         if (p) {
           const sessionId = getSessionId();
           fetch(
@@ -82,6 +82,11 @@ function PaperSetupInner() {
                   source: d.attempt.source,
                   answers: d.attempt.answers,
                 });
+              }
+              // 若有歷史作答,把「從第幾題開始」預設為「最新答過的題目序號 +1」
+              if (typeof d.latestAnsweredNumber === "number" && d.latestAnsweredNumber > 0) {
+                const max = p.bySource[source] ?? Infinity;
+                setStartFrom(Math.min(max, d.latestAnsweredNumber + 1));
               }
             });
         }
@@ -243,6 +248,11 @@ function PaperSetupInner() {
               ) : (
                 <p className="text-xs text-zinc-500">
                   1 ~ {sourceCount} · 例如設為 51 即從第 51 題開始
+                </p>
+              )}
+              {!shuffle && startFrom > 1 && (
+                <p className="text-xs text-blue-600">
+                  預設為「最新答過的題目序號 +1」({startFrom}),可手動調整
                 </p>
               )}
             </div>

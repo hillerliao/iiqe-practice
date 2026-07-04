@@ -1,9 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Play, FileText } from "lucide-react";
 import { getSessionId } from "@/lib/session";
+
+// 把題目序號陣列壓縮成區段字串,例如 [110,111,118,119,120,126] → "110~111, 118~120, 126"
+function formatQuestionRanges(nums: number[]): string {
+  if (!nums || nums.length === 0) return "—";
+  const sorted = [...nums].sort((a, b) => a - b);
+  const ranges: string[] = [];
+  let start = sorted[0];
+  let prev = sorted[0];
+  for (let i = 1; i < sorted.length; i++) {
+    const n = sorted[i];
+    if (n === prev + 1) {
+      prev = n;
+    } else {
+      ranges.push(start === prev ? `${start}` : `${start}~${prev}`);
+      start = prev = n;
+    }
+  }
+  ranges.push(start === prev ? `${start}` : `${start}~${prev}`);
+  return ranges.join(", ");
+}
 
 type Stats = {
   total: number;
@@ -18,6 +41,7 @@ type Stats = {
     totalQ: number;
     answeredCount: number;
     correct: number;
+    questionNumbers: number[];
     startedAt: string;
     finishedAt: string | null;
   }[];
@@ -207,12 +231,14 @@ export default function StatsPage() {
                   ? Math.max(a.answeredCount, 1)
                   : a.totalQ;
                 const pct = a.answeredCount > 0 ? (a.correct / denom) * 100 : 0;
+                const nums = a.questionNumbers ?? [];
+                const rangeLabel = formatQuestionRanges(nums);
                 return (
                   <div
                     key={a.id}
-                    className="flex items-center justify-between p-3 border rounded-lg"
+                    className="flex items-center justify-between p-3 border rounded-lg gap-4"
                   >
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <p className="font-medium">{a.paperName}</p>
                         {isUnfinished && (
@@ -224,21 +250,44 @@ export default function StatsPage() {
                       <p className="text-xs text-zinc-500 mt-0.5">
                         {new Date(a.startedAt).toLocaleString("zh-HK")}
                       </p>
+                      <p
+                        className="text-xs text-zinc-600 mt-1 font-mono truncate"
+                        title={`題目序號: ${nums.join(", ") || "(無)"}`}
+                      >
+                        題目: {rangeLabel}
+                      </p>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">
-                        {a.correct} / {isUnfinished ? a.answeredCount : a.totalQ}
-                        {isUnfinished && a.answeredCount < a.totalQ && (
-                          <span className="text-xs text-zinc-400 ml-1">
-                            (共 {a.totalQ})
-                          </span>
-                        )}
-                      </p>
-                      <p className="text-xs text-zinc-500">
-                        {a.answeredCount > 0
-                          ? `${pct.toFixed(0)}%${isUnfinished ? " · 已答中" : ""}`
-                          : "-"}
-                      </p>
+                    <div className="text-right shrink-0 flex flex-col items-end gap-2">
+                      <div>
+                        <p className="font-medium">
+                          {a.correct} / {isUnfinished ? a.answeredCount : a.totalQ}
+                          {isUnfinished && a.answeredCount < a.totalQ && (
+                            <span className="text-xs text-zinc-400 ml-1">
+                              (共 {a.totalQ})
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-xs text-zinc-500">
+                          {a.answeredCount > 0
+                            ? `${pct.toFixed(0)}%${isUnfinished ? " · 已答中" : ""}`
+                            : "-"}
+                        </p>
+                      </div>
+                      {isUnfinished ? (
+                        <Button asChild size="sm" variant="default">
+                          <Link href={`/practice?id=${a.id}`}>
+                            <Play className="w-3.5 h-3.5 mr-1" />
+                            繼續作答
+                          </Link>
+                        </Button>
+                      ) : (
+                        <Button asChild size="sm" variant="outline">
+                          <Link href={`/result?id=${a.id}`}>
+                            <FileText className="w-3.5 h-3.5 mr-1" />
+                            查看結果
+                          </Link>
+                        </Button>
+                      )}
                     </div>
                   </div>
                 );
