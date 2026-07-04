@@ -34,7 +34,7 @@ export function QuestionActions({
   const [copied, setCopied] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  const query = buildSearchQuery({ question, options });
+  const query = buildSearchQuery({ question, options, ref });
   const encoded = encodeURIComponent(query);
   const googleUrl = `https://www.google.com/search?q=${encoded}`;
   const baiduUrl = `https://www.baidu.com/s?wd=${encoded}`;

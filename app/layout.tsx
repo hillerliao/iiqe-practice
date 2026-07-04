@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
-import { Home, BarChart3, BookOpen, Star } from "lucide-react";
+import { Home, BarChart3, BookOpen, Star, Settings } from "lucide-react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -67,6 +67,13 @@ export default function RootLayout({
               >
                 <Star className="w-4 h-4" />
                 收藏
+              </Link>
+              <Link
+                href="/settings"
+                className="px-3 py-1.5 rounded-md hover:bg-zinc-100 flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+              >
+                <Settings className="w-4 h-4" />
+                設定
               </Link>
             </nav>
           </div>
