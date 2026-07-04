@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 import { getSessionId } from "@/lib/session";
-import { CopyQuestionButton } from "@/components/CopyQuestionButton";
-import { QuestionSearchButtons } from "@/components/QuestionSearchButtons";
+import { QuestionActions } from "@/components/QuestionActions";
 
 type FavItem = {
   questionId: string;

@@ -13,8 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSessionId } from "@/lib/session";
-import { CopyQuestionButton } from "@/components/CopyQuestionButton";
-import { QuestionSearchButtons } from "@/components/QuestionSearchButtons";
+import { QuestionActions } from "@/components/QuestionActions";
 
 type WrongItem = {
   questionId: string;
@@ -66,16 +65,11 @@ function WrongItemCard({ item }: { item: WrongItem }) {
             </Badge>
           )}
           <div className="ml-auto flex items-center gap-1.5">
-            <CopyQuestionButton
+            <QuestionActions
               number={q.number}
               question={q.question}
               options={q.options}
               ref={q.ref || undefined}
-              size="xs"
-            />
-            <QuestionSearchButtons
-              question={q.question}
-              options={q.options}
               size="xs"
             />
             {picked != null && (

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type QuestionSearchButtonsProps = {
@@ -22,7 +22,7 @@ export function buildSearchQuery(opts: {
   options: Record<string, string>;
 }): string {
   const { question, options } = opts;
-  const parts: string[] = ["（香港保險中介人考試相關題目）", question.trim()];
+  const parts: string[] = ["（香港保險中介人資格考試相關題目）", question.trim()];
   for (const letter of ["a", "b", "c", "d"] as const) {
     const text = options[letter];
     if (text) parts.push(`${letter.toUpperCase()}. ${text.trim()}`);
@@ -40,6 +40,7 @@ export function QuestionSearchButtons({
   const encoded = encodeURIComponent(query);
   const googleUrl = `https://www.google.com/search?q=${encoded}`;
   const baiduUrl = `https://www.baidu.com/s?wd=${encoded}`;
+  const chatgptUrl = `https://chatgpt.com/?q=${encoded}&hints=search&ref=ext`;
   const iconSize = size === "xs" ? "w-3 h-3" : "w-3.5 h-3.5";
 
   return (
@@ -66,6 +67,18 @@ export function QuestionSearchButtons({
         <a href={baiduUrl} target="_blank" rel="noopener noreferrer">
           <Search className={cn(iconSize, "mr-1")} />
           百度
+        </a>
+      </Button>
+      <Button
+        asChild
+        variant="ghost"
+        size={size}
+        title="用 ChatGPT 查這題"
+        className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+      >
+        <a href={chatgptUrl} target="_blank" rel="noopener noreferrer">
+          <MessageCircle className={cn(iconSize, "mr-1")} />
+          ChatGPT
         </a>
       </Button>
     </div>

@@ -17,8 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSessionId } from "@/lib/session";
-import { CopyQuestionButton } from "@/components/CopyQuestionButton";
-import { QuestionSearchButtons } from "@/components/QuestionSearchButtons";
+import { QuestionActions } from "@/components/QuestionActions";
 
 type Question = {
   id: string;
@@ -409,20 +408,14 @@ function PracticeInner() {
               <span className="text-zinc-400 mr-2">#{currentQ.number}</span>
               {currentQ.question}
             </CardTitle>
-            <div className="flex items-center gap-1 shrink-0 mt-0.5">
-              <CopyQuestionButton
-                number={currentQ.number}
-                question={currentQ.question}
-                options={currentQ.options}
-                ref={currentQ.ref || undefined}
-                size="xs"
-              />
-              <QuestionSearchButtons
-                question={currentQ.question}
-                options={currentQ.options}
-                size="xs"
-              />
-            </div>
+            <QuestionActions
+              number={currentQ.number}
+              question={currentQ.question}
+              options={currentQ.options}
+              ref={currentQ.ref || undefined}
+              size="xs"
+              className="shrink-0 mt-0.5"
+            />
           </div>
         </CardHeader>
         <CardContent className="space-y-3">

@@ -33,7 +33,7 @@ export function formatQuestionText(opts: {
   ref?: string;
 }): string {
   const { number, question, options, ref } = opts;
-  const lines: string[] = ["（香港保險中介人考試相關題目）"];
+  const lines: string[] = ["（香港保險中介人資格考試相關題目）"];
   const header = [
     number != null ? `#${number}` : "",
     ref ? `[${ref}]` : "",

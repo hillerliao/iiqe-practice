@@ -217,17 +217,54 @@ function PaperSetupInner() {
             </div>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="limit">作答題數(從頭開始取 N 題)</Label>
-            <Input
-              id="limit"
-              type="number"
-              min={1}
-              max={sourceCount}
-              value={limit}
-              onChange={(e) => setLimit(parseInt(e.target.value, 10) || 1)}
-            />
-            <p className="text-xs text-zinc-500">最大 {sourceCount} 題</p>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor="startFrom">從第幾題開始</Label>
+              <Input
+                id="startFrom"
+                type="number"
+                min={1}
+                max={sourceCount}
+                value={startFrom}
+                disabled={shuffle}
+                onChange={(e) =>
+                  setStartFrom(
+                    Math.min(
+                      sourceCount,
+                      Math.max(1, parseInt(e.target.value, 10) || 1)
+                    )
+                  )
+                }
+              />
+              {shuffle ? (
+                <p className="text-xs text-zinc-400">
+                  打亂順序時此項不生效
+                </p>
+              ) : (
+                <p className="text-xs text-zinc-500">
+                  1 ~ {sourceCount} · 例如設為 51 即從第 51 題開始
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="limit">作答題數</Label>
+              <Input
+                id="limit"
+                type="number"
+                min={1}
+                max={sourceCount}
+                value={limit}
+                onChange={(e) => setLimit(parseInt(e.target.value, 10) || 1)}
+              />
+              {!shuffle && (
+                <p className="text-xs text-zinc-500">
+                  將取第 {startFrom} ~{" "}
+                  {Math.min(startFrom + limit - 1, sourceCount)} 題,共{" "}
+                  {Math.min(limit, sourceCount - startFrom + 1)} 題
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
