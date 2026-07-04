@@ -99,16 +99,11 @@ export default function FavoritesPage() {
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <CopyQuestionButton
+                    <QuestionActions
                       number={it.question.number}
                       question={it.question.question}
                       options={it.question.options}
                       ref={it.question.ref || undefined}
-                      size="sm"
-                    />
-                    <QuestionSearchButtons
-                      question={it.question.question}
-                      options={it.question.options}
                       size="sm"
                     />
                     <Button

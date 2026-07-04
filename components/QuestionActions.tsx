@@ -81,7 +81,22 @@ export function QuestionActions({
   }
 
   return (
-    <div ref={wrapRef} className={cn("relative inline-block", className)}>
+    <div ref={wrapRef} className={cn("relative inline-flex items-center gap-0.5", className)}>
+      {/* 預設 Google 搜尋入口 */}
+      <Button
+        asChild
+        variant="ghost"
+        size={size}
+        title="用 Google 搜尋這題"
+        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+      >
+        <a href={googleUrl} target="_blank" rel="noopener noreferrer">
+          <Search className={cn(iconSize, "mr-1")} />
+          Google
+        </a>
+      </Button>
+
+      {/* 更多操作(複製 / 百度 / ChatGPT) */}
       <Button
         type="button"
         variant="ghost"
@@ -89,9 +104,9 @@ export function QuestionActions({
         onClick={() => setOpen((v) => !v)}
         title="更多操作"
         aria-expanded={open}
+        className="px-1.5"
       >
-        <MoreHorizontal className={cn(iconSize, "mr-0.5")} />
-        {copied ? "已複製" : ""}
+        <MoreHorizontal className={iconSize} />
       </Button>
 
       {open && (
@@ -106,18 +121,8 @@ export function QuestionActions({
             ) : (
               <Copy className={itemIconSize} />
             )}
-            複製題目
+            {copied ? "已複製" : "複製題目"}
           </button>
-          <a
-            href={googleUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50"
-          >
-            <Search className={itemIconSize} />
-            Google 搜尋
-          </a>
           <a
             href={baiduUrl}
             target="_blank"
