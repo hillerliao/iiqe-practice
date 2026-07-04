@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSessionId } from "@/lib/session";
+import { CopyQuestionButton } from "@/components/CopyQuestionButton";
+import { QuestionSearchButtons } from "@/components/QuestionSearchButtons";
 
 type Question = {
   id: string;
@@ -83,9 +85,18 @@ function PracticeInner() {
         return r.json();
       })
       .then((data) => {
-        if (!stored) {
-          setQuestions(data.attempt.answers.map((a: any) => a.question));
-        }
+        // 以 API(資料庫最新)更新每題內容,但保留 stored 的 shuffle 順序;
+        // 不存在 stored 時用後端 allQuestions 兜底(預設順序)。
+        const latestById = new Map<string, any>();
+        for (const a of data.attempt.answers) latestById.set(a.question.id, a.question);
+        for (const q of data.attempt.allQuestions) latestById.set(q.id, q);
+        const qs: Question[] = stored
+          ? (JSON.parse(stored) as Question[]).map(
+              (q) => latestById.get(q.id) ?? q
+            )
+          : (data.attempt.allQuestions as Question[]);
+        setQuestions(qs);
+        sessionStorage.setItem(`attempt:${attemptId}:questions`, JSON.stringify(qs));
         setAttempt({
           id: data.attempt.id,
           durationSec: data.attempt.durationSec,
@@ -97,6 +108,16 @@ function PracticeInner() {
           if (a.userAnswer) ans[a.questionId] = a.userAnswer;
         });
         setAnswers(ans);
+        // 繼續上次進度:跳到第一個尚未作答的題目
+        // findIndex 找不到時回傳 -1,此時若已有作答記錄則跳到最後一題
+        let firstUnanswered = qs.findIndex((q) => !ans[q.id]);
+        if (firstUnanswered === -1 && Object.keys(ans).length > 0) {
+          firstUnanswered = qs.length - 1;
+        }
+        if (firstUnanswered > 0) {
+          setCurrentIdx(firstUnanswered);
+          setShowFeedback(false);
+        }
         // 同步收藏狀態
         const sessionId = getSessionId();
         fetch(`/api/favorites?sessionId=${sessionId}`)
@@ -147,7 +168,7 @@ function PracticeInner() {
     const timeSpentMs = Date.now() - questionStartRef.current;
     setAnswers((prev) => ({ ...prev, [qId]: ans }));
     setShowFeedback(true);
-    await fetch("/api/attempt", {
+    const res = await fetch("/api/attempt", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -158,6 +179,11 @@ function PracticeInner() {
         timeSpentMs,
       }),
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: "未知錯誤" }));
+      console.error("[submitAnswer] 儲存失敗:", err);
+      setLoadError(`答案儲存失敗: ${err.error ?? res.status}`);
+    }
     // 答對且非最後一題 → 延遲自動跳下一題
     const correct = ans === currentQ.answer;
     if (correct && currentIdx < questions.length - 1) {
@@ -252,7 +278,13 @@ function PracticeInner() {
         } else {
           goNext();
         }
-      } else if (["1", "2", "3", "4", "a", "b", "c", "d"].includes(key) && !isAnswered) {
+      } else if (
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey &&
+        ["1", "2", "3", "4", "a", "b", "c", "d"].includes(key) &&
+        !isAnswered
+      ) {
         const letter =
           ["1", "2", "3", "4"].includes(key)
             ? ["a", "b", "c", "d"][parseInt(key, 10) - 1]
@@ -372,10 +404,26 @@ function PracticeInner() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base leading-relaxed">
-            <span className="text-zinc-400 mr-2">#{currentQ.number}</span>
-            {currentQ.question}
-          </CardTitle>
+          <div className="flex items-start justify-between gap-2">
+            <CardTitle className="text-base leading-relaxed">
+              <span className="text-zinc-400 mr-2">#{currentQ.number}</span>
+              {currentQ.question}
+            </CardTitle>
+            <div className="flex items-center gap-1 shrink-0 mt-0.5">
+              <CopyQuestionButton
+                number={currentQ.number}
+                question={currentQ.question}
+                options={currentQ.options}
+                ref={currentQ.ref || undefined}
+                size="xs"
+              />
+              <QuestionSearchButtons
+                question={currentQ.question}
+                options={currentQ.options}
+                size="xs"
+              />
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {(["a", "b", "c", "d"] as const).map((letter) => {

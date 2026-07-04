@@ -88,33 +88,18 @@ def parse_file(text_path: str) -> list[dict]:
         next_start = tag_indices[i + 1] if i + 1 < len(tag_indices) else len(cleaned)
         start = tag["idx"]
 
-        # --- 找本題 a) 的位置 ---
-        # a) 在本題題號行之前;但前題的 c/d 也在本題題號行之前。
-        # 用反向搜尋:從 start-1 往 prev_end 方向找第一個「a)」開頭的行
-        a_idx = None
-        for k in range(start - 1, prev_end, -1):
-            _, ln = cleaned[k]
-            m_opt = OPTION_RE.match(ln)
-            if m_opt and m_opt.group(1) == "a":
-                a_idx = k
-                break
-
-        # --- 題幹 = (prev_end+1) ~ (a_idx - 1),過濾掉前題的 c) d) 殘留 ---
-        # prev_end 題號行的 c 應該在 prev_end+1,d 在 prev_end+2(如果兩者都存在)
-        # 但偶爾 c 跟 d 會被夾在題號行同行的 ref 後,或漏一個。
-        # 安全做法:把所有 c) d) 開頭的行從「題幹範圍」內剔除。
-        # 同時,前一個題的「題號行」殘留(若有 ref)也要跳過。
+        # --- 題幹 = (prev_end+1) ~ (start-1),過濾掉選項行與前題題號行殘留 ---
+        # 題號行之前的所有「非選項行」均屬本題題幹;前題遺留的 a)b)c)d)
+        # (不論是布局1的 c)d) 還是布局2的全部選項)都會被 OPTION_RE 過濾。
         prev_ref_str = tags[i - 1]["ref"] if i > 0 else None
         stem_lines: list[str] = []
-        scan_end = a_idx if a_idx is not None else start
-        for k in range(prev_end + 1, scan_end):
+        for k in range(prev_end + 1, start):
             _, ln = cleaned[k]
             # 過濾:選項行
             if OPTION_RE.match(ln):
                 continue
             # 過濾:包含前題 ref 號碼的「題號行殘留」(如 "3 1.1.2b b)...")
             if prev_ref_str and re.search(r"\b" + re.escape(prev_ref_str) + r"\b", ln):
-                # 跳過這整行
                 continue
             stem_lines.append(ln)
 
@@ -139,12 +124,15 @@ def parse_file(text_path: str) -> list[dict]:
         stem = re.sub(r"\s+", " ", stem).strip()
 
         # --- 選項 + 答案 ---
+        # 兩種布局:
+        #   布局1: 題幹 a) b) [題號行] c) d)   -> a)b) 在題號行前
+        #   布局2: 題幹 [題號行] a) b) c) d)   -> 全部選項在題號行後
+        # 先從題號行之後到下題題號行收集 a)b)c)d);若有缺漏,再從題號行
+        # 往前取「連續選項塊」補齊(遇到非選項行即停,避免誤採前題遺留)。
         options: dict[str, str] = {}
         answer: str | None = None
 
-        scan_start = a_idx if a_idx is not None else start
-
-        for k in range(scan_start, next_start):
+        for k in range(start, next_start):
             _, ln = cleaned[k]
             # 題號行(本題):b/c/d 中可能夾帶選項文字+答案
             # 真實例子: "b)損失防範  B" / "              A" / "c)開支  D"
@@ -177,6 +165,34 @@ def parse_file(text_path: str) -> list[dict]:
                 else:
                     options[letter] = txt
             # 非選項行忽略(下一題的題幹)
+
+        # 補齊缺漏選項:從題號行往前取「連續選項塊」(遇到非選項行即停)
+        # 此分支僅在布局1(a)b)在題號行前)時觸發;布局2已在上方找齊。
+        if any(l not in options for l in "abcd"):
+            block: list[str] = []
+            for k in range(start - 1, prev_end, -1):
+                _, ln = cleaned[k]
+                if OPTION_RE.match(ln):
+                    block.append(ln)
+                else:
+                    break
+            # block 為倒序(靠近題號行 → 遠),反轉後按 a)b)順序處理
+            for ln in reversed(block):
+                m_opt = OPTION_RE.match(ln)
+                if not m_opt:
+                    continue
+                letter, txt = m_opt.groups()
+                if letter in options:
+                    continue
+                txt = txt.strip()
+                m_text_ans = ANSWER_TAIL_RE.match(txt)
+                if m_text_ans:
+                    body, ans = m_text_ans.groups()
+                    options[letter] = body.strip()
+                    if answer is None:
+                        answer = ans
+                else:
+                    options[letter] = txt
 
         missing = [k for k in "abcd" if k not in options]
 

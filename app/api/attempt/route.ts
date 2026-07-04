@@ -22,9 +22,24 @@ export async function GET(req: NextRequest) {
   if (!attempt) {
     return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
   }
+  // 查詢完整題目列表(用於跨 session 恢復進度時,不依賴瀏覽器存儲)
+  const allQuestions = await prisma.question.findMany({
+    where: { paperId: attempt.paperId, source: attempt.source ?? "exam" },
+    orderBy: { number: "asc" },
+  });
   return NextResponse.json({
     attempt: {
       ...attempt,
+      allQuestions: allQuestions.map((q) => ({
+        id: q.id,
+        number: q.number,
+        ref: q.ref,
+        question: q.question,
+        options: JSON.parse(q.options),
+        answer: q.answer?.toLowerCase() ?? "",
+        explanation: q.explanation,
+        page: q.page,
+      })),
       answers: attempt.answers.map((a) => ({
         id: a.id,
         questionId: a.questionId,
@@ -58,27 +73,35 @@ export async function PATCH(req: NextRequest) {
     if (!questionId) {
       return NextResponse.json({ error: "questionId 必填" }, { status: 400 });
     }
-    const question = await prisma.question.findUnique({ where: { id: questionId } });
-    if (!question) {
-      return NextResponse.json({ error: "Question not found" }, { status: 404 });
+    try {
+      const question = await prisma.question.findUnique({ where: { id: questionId } });
+      if (!question) {
+        return NextResponse.json({ error: "Question not found" }, { status: 404 });
+      }
+      const isCorrect = (userAnswer ?? "").toUpperCase() === question.answer.toUpperCase();
+      const answer = await prisma.answer.upsert({
+        where: { attemptId_questionId: { attemptId: id, questionId } },
+        create: {
+          attemptId: id,
+          questionId,
+          userAnswer: userAnswer ?? "",
+          isCorrect,
+          timeSpentMs: timeSpentMs ?? null,
+        },
+        update: {
+          userAnswer: userAnswer ?? "",
+          isCorrect,
+          timeSpentMs: timeSpentMs ?? null,
+        },
+      });
+      return NextResponse.json({ answer, isCorrect });
+    } catch (e) {
+      console.error("[PATCH /api/attempt answer] 寫入失敗:", e);
+      return NextResponse.json(
+        { error: e instanceof Error ? e.message : "寫入答案失敗" },
+        { status: 500 }
+      );
     }
-    const isCorrect = (userAnswer ?? "").toUpperCase() === question.answer.toUpperCase();
-    const answer = await prisma.answer.upsert({
-      where: { attemptId_questionId: { attemptId: id, questionId } },
-      create: {
-        attemptId: id,
-        questionId,
-        userAnswer: userAnswer ?? "",
-        isCorrect,
-        timeSpentMs: timeSpentMs ?? null,
-      },
-      update: {
-        userAnswer: userAnswer ?? "",
-        isCorrect,
-        timeSpentMs: timeSpentMs ?? null,
-      },
-    });
-    return NextResponse.json({ answer, isCorrect });
   }
 
   if (action === "finish") {

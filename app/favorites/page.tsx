@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 import { getSessionId } from "@/lib/session";
+import { CopyQuestionButton } from "@/components/CopyQuestionButton";
+import { QuestionSearchButtons } from "@/components/QuestionSearchButtons";
 
 type FavItem = {
   questionId: string;
@@ -97,14 +99,28 @@ export default function FavoritesPage() {
                       {it.question.sourceLabel}
                     </span>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => remove(it.questionId)}
-                  >
-                    <Star className="w-4 h-4 mr-1 fill-yellow-400 text-yellow-400" />
-                    移除
-                  </Button>
+                  <div className="flex items-center gap-1.5">
+                    <CopyQuestionButton
+                      number={it.question.number}
+                      question={it.question.question}
+                      options={it.question.options}
+                      ref={it.question.ref || undefined}
+                      size="sm"
+                    />
+                    <QuestionSearchButtons
+                      question={it.question.question}
+                      options={it.question.options}
+                      size="sm"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => remove(it.questionId)}
+                    >
+                      <Star className="w-4 h-4 mr-1 fill-yellow-400 text-yellow-400" />
+                      移除
+                    </Button>
+                  </div>
                 </div>
                 <CardTitle className="text-base leading-relaxed mt-2">
                   {it.question.question}

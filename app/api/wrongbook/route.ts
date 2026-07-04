@@ -18,6 +18,12 @@ export async function GET(req: NextRequest) {
     orderBy: { createdAt: "desc" },
   });
 
+  // 統計每題在此 session 下的錯誤次數(跨多次 attempt 累積)
+  const wrongCountMap = new Map<string, number>();
+  for (const a of answers) {
+    wrongCountMap.set(a.questionId, (wrongCountMap.get(a.questionId) ?? 0) + 1);
+  }
+
   // 去重(同題以最新一次為準)
   const seen = new Set<string>();
   const unique: typeof answers = [];
@@ -27,28 +33,35 @@ export async function GET(req: NextRequest) {
     unique.push(a);
   }
 
+  const items = unique.map((a) => ({
+    questionId: a.questionId,
+    userAnswer: a.userAnswer,
+    correctAnswer: a.question.answer?.toLowerCase() ?? "",
+    lastWrongAt: a.createdAt,
+    wrongCount: wrongCountMap.get(a.questionId) ?? 1,
+    paperCode: a.question.paper.code,
+    paperName: a.question.paper.name,
+    question: {
+      id: a.question.id,
+      number: a.question.number,
+      ref: a.question.ref,
+      question: a.question.question,
+      options: JSON.parse(a.question.options),
+      answer: a.question.answer?.toLowerCase() ?? "",
+      explanation: a.question.explanation,
+      page: a.question.page,
+      source: a.question.source,
+      sourceLabel: a.question.sourceLabel,
+    },
+  }));
+
+  // 反覆錯(≥2 次)的題排前面,且按錯誤次數降序
+  items.sort((a, b) => b.wrongCount - a.wrongCount);
+
   return NextResponse.json({
-    count: unique.length,
-    items: unique.map((a) => ({
-      questionId: a.questionId,
-      userAnswer: a.userAnswer,
-      correctAnswer: a.question.answer?.toLowerCase() ?? "",
-      lastWrongAt: a.createdAt,
-      paperCode: a.question.paper.code,
-      paperName: a.question.paper.name,
-      question: {
-        id: a.question.id,
-        number: a.question.number,
-        ref: a.question.ref,
-        question: a.question.question,
-        options: JSON.parse(a.question.options),
-        answer: a.question.answer?.toLowerCase() ?? "",
-        explanation: a.question.explanation,
-        page: a.question.page,
-        source: a.question.source,
-        sourceLabel: a.question.sourceLabel,
-      },
-    })),
+    count: items.length,
+    repeatedCount: items.filter((it) => it.wrongCount >= 2).length,
+    items,
   });
 }
 

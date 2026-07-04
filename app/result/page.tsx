@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { CopyQuestionButton } from "@/components/CopyQuestionButton";
+import { QuestionSearchButtons } from "@/components/QuestionSearchButtons";
 
 type AnswerData = {
   id: string;
@@ -150,6 +152,20 @@ function ResultInner() {
                       {a.question.ref}
                     </Badge>
                   )}
+                  <div className="ml-auto flex items-center gap-1">
+                    <CopyQuestionButton
+                      number={a.question.number}
+                      question={a.question.question}
+                      options={a.question.options}
+                      ref={a.question.ref || undefined}
+                      size="xs"
+                    />
+                    <QuestionSearchButtons
+                      question={a.question.question}
+                      options={a.question.options}
+                      size="xs"
+                    />
+                  </div>
                 </div>
                 <p className="text-sm text-zinc-800 mb-2 leading-relaxed">
                   {a.question.question}
