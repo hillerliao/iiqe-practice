@@ -20,6 +20,7 @@ import { getSessionId } from "@/lib/session";
 import { QuestionActions } from "@/components/QuestionActions";
 import { buildSearchQuery } from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
+import { useToast, ToastContainer } from "@/components/useToast";
 
 type Question = {
   id: string;
@@ -51,6 +52,7 @@ function PracticeInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const attemptId = searchParams.get("id") ?? "";
+  const { toast, toasts } = useToast();
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [attempt, setAttempt] = useState<AttemptMeta | null>(null);
@@ -313,7 +315,10 @@ function PracticeInner() {
           options: currentQ.options,
           ref: currentQ.ref || undefined,
         });
-        navigator.clipboard?.writeText(text).catch(() => {});
+        navigator.clipboard
+          ?.writeText(text)
+          .then(() => toast("已複製題目"))
+          .catch(() => {});
       } else if (
         (key === "s" || key === "S") &&
         !e.ctrlKey &&
@@ -570,6 +575,8 @@ function PracticeInner() {
         <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">X</kbd> 複製</span>
         <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">S</kbd> Google 搜尋</span>
       </div>
+
+      <ToastContainer toasts={toasts} />
     </div>
   );
 }
