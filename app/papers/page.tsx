@@ -47,7 +47,7 @@ function PaperSetupInner() {
   const [enableTimer, setEnableTimer] = useState(false);
   const [durationMin, setDurationMin] = useState(60);
   const [shuffle, setShuffle] = useState(false);
-  const [limit, setLimit] = useState(50);
+  const [limit, setLimit] = useState(10);
   const [startFrom, setStartFrom] = useState(1); // 從第幾題開始(1-indexed)
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);

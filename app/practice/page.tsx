@@ -18,6 +18,8 @@ import {
 import { cn } from "@/lib/utils";
 import { getSessionId } from "@/lib/session";
 import { QuestionActions } from "@/components/QuestionActions";
+import { buildSearchQuery } from "@/components/QuestionSearchButtons";
+import { formatQuestionText } from "@/components/CopyQuestionButton";
 
 type Question = {
   id: string;
@@ -298,6 +300,37 @@ function PracticeInner() {
       } else if (key === "g" || key === "G") {
         e.preventDefault();
         setShowJumpPanel((v) => !v);
+      } else if (
+        (key === "x" || key === "X") &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey
+      ) {
+        e.preventDefault();
+        const text = formatQuestionText({
+          number: currentQ.number,
+          question: currentQ.question,
+          options: currentQ.options,
+          ref: currentQ.ref || undefined,
+        });
+        navigator.clipboard?.writeText(text).catch(() => {});
+      } else if (
+        (key === "s" || key === "S") &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey
+      ) {
+        e.preventDefault();
+        const q = buildSearchQuery({
+          question: currentQ.question,
+          options: currentQ.options,
+          ref: currentQ.ref || undefined,
+        });
+        window.open(
+          `https://www.google.com/search?q=${encodeURIComponent(q)}`,
+          "_blank",
+          "noopener,noreferrer"
+        );
       } else if (key === "Enter" && currentIdx >= questions.length - 1) {
         e.preventDefault();
         handleFinish();
@@ -534,6 +567,8 @@ function PracticeInner() {
         <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">1-4 / A-D</kbd> 選答</span>
         <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">F</kbd> 收藏</span>
         <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">G</kbd> 跳題</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">X</kbd> 複製</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">S</kbd> Google 搜尋</span>
       </div>
     </div>
   );
