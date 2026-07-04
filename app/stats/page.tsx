@@ -16,10 +16,12 @@ type Stats = {
     paperName: string;
     paperCode: string;
     totalQ: number;
+    answeredCount: number;
     correct: number;
     startedAt: string;
     finishedAt: string | null;
   }[];
+  unfinishedCount: number;
 };
 
 export default function StatsPage() {
@@ -184,36 +186,63 @@ export default function StatsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>最近的作答 session</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>最近的作答 session</span>
+            {stats.unfinishedCount > 0 && (
+              <Badge variant="outline" className="text-amber-700 border-amber-300 bg-amber-50">
+                {stats.unfinishedCount} 個未交卷
+              </Badge>
+            )}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {stats.recentAttempts.length === 0 ? (
             <p className="text-zinc-500 text-sm">尚無紀錄</p>
           ) : (
             <div className="space-y-2">
-              {stats.recentAttempts.map((a) => (
-                <div
-                  key={a.id}
-                  className="flex items-center justify-between p-3 border rounded-lg"
-                >
-                  <div>
-                    <p className="font-medium">{a.paperName}</p>
-                    <p className="text-xs text-zinc-500 mt-0.5">
-                      {new Date(a.startedAt).toLocaleString("zh-HK")}
-                    </p>
+              {stats.recentAttempts.map((a) => {
+                const isUnfinished = a.finishedAt == null;
+                // 已交卷:用 correct/totalQ;未交卷:用 correct/answeredCount(已答中的正確率)
+                const denom = isUnfinished
+                  ? Math.max(a.answeredCount, 1)
+                  : a.totalQ;
+                const pct = a.answeredCount > 0 ? (a.correct / denom) * 100 : 0;
+                return (
+                  <div
+                    key={a.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{a.paperName}</p>
+                        {isUnfinished && (
+                          <Badge variant="outline" className="text-amber-700 border-amber-300 bg-amber-50 text-[10px]">
+                            未交卷
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-zinc-500 mt-0.5">
+                        {new Date(a.startedAt).toLocaleString("zh-HK")}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">
+                        {a.correct} / {isUnfinished ? a.answeredCount : a.totalQ}
+                        {isUnfinished && a.answeredCount < a.totalQ && (
+                          <span className="text-xs text-zinc-400 ml-1">
+                            (共 {a.totalQ})
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-xs text-zinc-500">
+                        {a.answeredCount > 0
+                          ? `${pct.toFixed(0)}%${isUnfinished ? " · 已答中" : ""}`
+                          : "-"}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium">
-                      {a.correct} / {a.totalQ}
-                    </p>
-                    <p className="text-xs text-zinc-500">
-                      {a.totalQ > 0
-                        ? `${((a.correct / a.totalQ) * 100).toFixed(0)}%`
-                        : "-"}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>

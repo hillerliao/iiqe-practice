@@ -55,12 +55,18 @@ export async function GET(req: NextRequest) {
   }
 
   // 最近 10 次 attempts
+  // 即時從 Answer 表聚合 correct(避免未交卷 attempt 的 Attempt.correct=0 誤判)
   const recent = await prisma.attempt.findMany({
     where: { sessionId },
     orderBy: { startedAt: "desc" },
     take: 10,
-    include: { paper: true },
+    include: {
+      paper: true,
+      answers: { select: { isCorrect: true } },
+    },
   });
+  // 統計未交卷的 session 數(給前端提示用)
+  const unfinishedCount = recent.filter((a) => a.finishedAt == null).length;
 
   return NextResponse.json({
     total,
@@ -74,16 +80,21 @@ export async function GET(req: NextRequest) {
       correct: v.correct,
       accuracy: v.total > 0 ? v.correct / v.total : 0,
     })),
-    recentAttempts: recent.map((a) => ({
-      id: a.id,
-      paperName: a.paper.name,
-      paperCode: a.paper.code,
-      mode: a.mode,
-      source: a.source,
-      totalQ: a.totalQ,
-      correct: a.correct,
-      startedAt: a.startedAt,
-      finishedAt: a.finishedAt,
-    })),
+    recentAttempts: recent.map((a) => {
+      const liveCorrect = a.answers.filter((x) => x.isCorrect).length;
+      return {
+        id: a.id,
+        paperName: a.paper.name,
+        paperCode: a.paper.code,
+        mode: a.mode,
+        source: a.source,
+        totalQ: a.totalQ,
+        answeredCount: a.answers.length, // 實際已作答題數
+        correct: liveCorrect, // 即時算,不再讀 Attempt.correct
+        startedAt: a.startedAt,
+        finishedAt: a.finishedAt,
+      };
+    }),
+    unfinishedCount,
   });
 }
