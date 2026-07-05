@@ -15,7 +15,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "IIQE 刷題",
+  title: {
+    default: "IIQE 刷題",
+    template: "%s · IIQE 刷題",
+  },
   description: "香港保險業監管局 IIQE 考試刷題應用",
 };
 

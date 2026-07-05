@@ -5,15 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  CheckCircle2,
-  XCircle,
   RotateCcw,
   Eye,
   EyeOff,
+  Play,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSessionId } from "@/lib/session";
 import { QuestionActions } from "@/components/QuestionActions";
+import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
+import { RedoPractice, type RedoItem } from "@/components/RedoPractice";
 
 type WrongItem = {
   questionId: string;
@@ -111,45 +112,16 @@ function WrongItemCard({ item }: { item: WrongItem }) {
           {(["a", "b", "c", "d"] as const).map((letter) => {
             const optText = q.options[letter];
             if (!optText) return null;
-            const isPicked = picked === letter;
-            const isCorrect = correctLetter === letter;
-            const showResult = picked != null;
-
             return (
-              <button
+              <PracticeOption
                 key={letter}
-                disabled={picked != null}
-                onClick={() => setPicked(letter)}
-                className={cn(
-                  "w-full text-left p-3 rounded-lg border-2 transition-colors flex items-start gap-3",
-                  !showResult &&
-                    "border-zinc-200 hover:border-blue-400 hover:bg-blue-50/50",
-                  showResult && isCorrect && "border-green-500 bg-green-50",
-                  showResult && isPicked && !isCorrect && "border-red-500 bg-red-50",
-                  showResult && !isPicked && !isCorrect && "border-zinc-200 opacity-60"
-                )}
-              >
-                <span
-                  className={cn(
-                    "shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-medium text-sm",
-                    !showResult && "bg-zinc-100 text-zinc-700",
-                    showResult && isCorrect && "bg-green-600 text-white",
-                    showResult && isPicked && !isCorrect && "bg-red-600 text-white",
-                    showResult && !isPicked && !isCorrect && "bg-zinc-100 text-zinc-500"
-                  )}
-                >
-                  {letter.toUpperCase()}
-                </span>
-                <span className="flex-1 text-sm leading-relaxed pt-0.5">
-                  {optText}
-                </span>
-                {showResult && isCorrect && (
-                  <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0 mt-1" />
-                )}
-                {showResult && isPicked && !isCorrect && (
-                  <XCircle className="w-5 h-5 text-red-600 shrink-0 mt-1" />
-                )}
-              </button>
+                letter={letter}
+                text={optText}
+                isPicked={picked === letter}
+                correctLetter={correctLetter}
+                showResult={picked != null}
+                onPick={setPicked as (l: OptionLetter) => void}
+              />
             );
           })}
         </div>
@@ -204,6 +176,7 @@ export default function WrongbookPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [repeatedCount, setRepeatedCount] = useState(0);
+  const [practiceMode, setPracticeMode] = useState(false);
 
   useEffect(() => {
     const sessionId = getSessionId();
@@ -230,9 +203,28 @@ export default function WrongbookPage() {
     return <div className="max-w-4xl mx-auto px-4 py-8 text-red-600">{error}</div>;
   }
 
+  // 做題模式
+  if (practiceMode) {
+    const redoItems: RedoItem[] = items.map((it) => ({
+      questionId: it.questionId,
+      paperCode: it.paperCode,
+      paperName: it.paperName,
+      question: it.question,
+    }));
+    const prevAnswerMap = new Map(items.map((it) => [it.questionId, it.userAnswer]));
+    return (
+      <RedoPractice
+        items={redoItems}
+        title="錯題本 · 重做練習"
+        prevUserAnswer={(id) => prevAnswerMap.get(id)}
+        onExit={() => setPracticeMode(false)}
+      />
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <h1 className="text-2xl font-bold">錯題本</h1>
         {items.length > 0 && (
           <div className="flex items-center gap-3 text-sm">
@@ -240,6 +232,10 @@ export default function WrongbookPage() {
               <Badge variant="destructive">反覆錯 {repeatedCount} 題</Badge>
             )}
             <span className="text-zinc-500">共 {items.length} 題</span>
+            <Button onClick={() => setPracticeMode(true)}>
+              <Play className="w-4 h-4 mr-1" />
+              做題模式
+            </Button>
           </div>
         )}
       </div>

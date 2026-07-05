@@ -4,9 +4,18 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star } from "lucide-react";
+import {
+  Star,
+  Eye,
+  EyeOff,
+  RotateCcw,
+  Play,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import { getSessionId } from "@/lib/session";
 import { QuestionActions } from "@/components/QuestionActions";
+import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
+import { RedoPractice, type RedoItem } from "@/components/RedoPractice";
 
 type FavItem = {
   questionId: string;
@@ -24,10 +33,144 @@ type FavItem = {
   };
 };
 
+function FavItemCard({
+  item,
+  onRemove,
+}: {
+  item: FavItem;
+  onRemove: (id: string) => void;
+}) {
+  const [revealed, setRevealed] = useState(false);
+  const [picked, setPicked] = useState<string | null>(null);
+
+  const q = item.question;
+  const correctLetter = (q.answer || "").toLowerCase();
+  const pickedCorrect = picked != null && picked === correctLetter;
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2 text-sm flex-wrap">
+            <Badge variant="secondary">{item.paperCode}</Badge>
+            <span className="font-medium">#{q.number}</span>
+            {q.ref && (
+              <Badge variant="outline" className="text-xs">
+                {q.ref}
+              </Badge>
+            )}
+            <span className="text-xs text-zinc-500">{q.sourceLabel}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <QuestionActions
+              number={q.number}
+              question={q.question}
+              options={q.options}
+              ref={q.ref || undefined}
+              size="xs"
+            />
+            {picked != null && (
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => setPicked(null)}
+              >
+                <RotateCcw className="w-3 h-3 mr-1" />
+                重做
+              </Button>
+            )}
+            <Button
+              variant={revealed ? "outline" : "ghost"}
+              size="xs"
+              onClick={() => setRevealed((v) => !v)}
+            >
+              {revealed ? (
+                <>
+                  <EyeOff className="w-3 h-3 mr-1" />
+                  隱藏答案
+                </>
+              ) : (
+                <>
+                  <Eye className="w-3 h-3 mr-1" />
+                  顯示答案
+                </>
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="xs"
+              onClick={() => onRemove(item.questionId)}
+              title="移除收藏"
+            >
+              <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
+              移除
+            </Button>
+          </div>
+        </div>
+        <CardTitle className="text-base leading-relaxed mt-2">
+          {q.question}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-xs text-zinc-400">點選選項復習作答</p>
+        <div className="space-y-2">
+          {(["a", "b", "c", "d"] as const).map((letter) => {
+            const optText = q.options[letter];
+            if (!optText) return null;
+            return (
+              <PracticeOption
+                key={letter}
+                letter={letter}
+                text={optText}
+                isPicked={picked === letter}
+                correctLetter={correctLetter}
+                showResult={picked != null}
+                onPick={setPicked as (l: OptionLetter) => void}
+              />
+            );
+          })}
+        </div>
+
+        {picked != null && (
+          <div
+            className={cn(
+              "p-3 rounded-lg border text-sm font-medium",
+              pickedCorrect
+                ? "bg-green-50 border-green-200 text-green-700"
+                : "bg-red-50 border-red-200 text-red-700"
+            )}
+          >
+            {pickedCorrect
+              ? "✓ 復習答對了"
+              : `✗ 答錯 · 正確答案:${correctLetter.toUpperCase()}`}
+          </div>
+        )}
+
+        {revealed && (
+          <div className="p-3 rounded-lg border border-zinc-200 bg-zinc-50 text-sm space-y-1">
+            <p>
+              <span className="text-zinc-500">正確答案:</span>{" "}
+              <span className="text-green-700 font-medium">
+                {correctLetter.toUpperCase()} — {q.options[correctLetter]}
+              </span>
+            </p>
+            {q.explanation && (
+              <p className="text-zinc-700 text-xs mt-2 leading-relaxed">
+                💡 {q.explanation}
+              </p>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function FavoritesPage() {
   const [items, setItems] = useState<FavItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [practiceMode, setPracticeMode] = useState(false);
 
   const load = () => {
     const sessionId = getSessionId();
@@ -66,9 +209,37 @@ export default function FavoritesPage() {
     return <div className="max-w-4xl mx-auto px-4 py-8 text-red-600">{error}</div>;
   }
 
+  // 做題模式
+  if (practiceMode) {
+    const redoItems: RedoItem[] = items.map((it) => ({
+      questionId: it.questionId,
+      paperCode: it.paperCode,
+      paperName: it.paperName,
+      question: it.question,
+    }));
+    return (
+      <RedoPractice
+        items={redoItems}
+        title="收藏題 · 重做練習"
+        onExit={() => setPracticeMode(false)}
+      />
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-4">收藏題</h1>
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <h1 className="text-2xl font-bold">收藏題</h1>
+        {items.length > 0 && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-zinc-500">共 {items.length} 題</span>
+            <Button onClick={() => setPracticeMode(true)}>
+              <Play className="w-4 h-4 mr-1" />
+              做題模式
+            </Button>
+          </div>
+        )}
+      </div>
       {items.length === 0 ? (
         <Card>
           <CardHeader>
@@ -83,67 +254,11 @@ export default function FavoritesPage() {
       ) : (
         <div className="space-y-3">
           {items.map((it) => (
-            <Card key={it.questionId}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Badge variant="secondary">{it.paperCode}</Badge>
-                    <span className="font-medium">#{it.question.number}</span>
-                    {it.question.ref && (
-                      <Badge variant="outline" className="text-xs">
-                        {it.question.ref}
-                      </Badge>
-                    )}
-                    <span className="text-xs text-zinc-500">
-                      {it.question.sourceLabel}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <QuestionActions
-                      number={it.question.number}
-                      question={it.question.question}
-                      options={it.question.options}
-                      ref={it.question.ref || undefined}
-                      size="sm"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => remove(it.questionId)}
-                    >
-                      <Star className="w-4 h-4 mr-1 fill-yellow-400 text-yellow-400" />
-                      移除
-                    </Button>
-                  </div>
-                </div>
-                <CardTitle className="text-base leading-relaxed mt-2">
-                  {it.question.question}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-sm space-y-1">
-                  {(["a", "b", "c", "d"] as const).map((l) => {
-                    const text = it.question.options[l];
-                    if (!text) return null;
-                    const isAnswer = it.question.answer === l;
-                    return (
-                      <p
-                        key={l}
-                        className={isAnswer ? "text-green-700 font-medium" : ""}
-                      >
-                        {l.toUpperCase()}) {text}
-                        {isAnswer && " ✓"}
-                      </p>
-                    );
-                  })}
-                  {it.question.explanation && (
-                    <p className="text-zinc-700 text-xs mt-2 leading-relaxed">
-                      💡 {it.question.explanation}
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            <FavItemCard
+              key={it.questionId}
+              item={it}
+              onRemove={remove}
+            />
           ))}
         </div>
       )}
