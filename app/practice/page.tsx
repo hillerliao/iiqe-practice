@@ -355,7 +355,6 @@ function PracticeInner() {
   }
 
   const progress = ((currentIdx + 1) / questions.length) * 100;
-  const answeredCount = Object.keys(answers).length;
   const mm = timeLeft != null ? Math.floor(timeLeft / 60) : 0;
   const ss = timeLeft != null ? timeLeft % 60 : 0;
 
@@ -366,9 +365,6 @@ function PracticeInner() {
           <div className="flex items-center gap-3">
             <span className="font-medium">
               第 {currentIdx + 1} / {questions.length} 題
-            </span>
-            <span className="text-zinc-500">
-              已答 {answeredCount} / {questions.length}
             </span>
             {currentQ.ref && (
               <Badge variant="outline" className="text-xs">

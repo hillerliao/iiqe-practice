@@ -17,6 +17,9 @@ import {
 import { cn } from "@/lib/utils";
 import { QuestionActions } from "@/components/QuestionActions";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
+import { buildSearchQuery } from "@/components/QuestionSearchButtons";
+import { formatQuestionText } from "@/components/CopyQuestionButton";
+import { useToast, ToastContainer } from "@/components/useToast";
 
 export type RedoQuestion = {
   id: string;
@@ -49,15 +52,21 @@ type RedoPracticeProps = {
 
 type AnswerMap = Record<string, string>;
 
+/** 答對後自動跳下一題的延遲(毫秒) */
+const AUTO_NEXT_DELAY = 1200;
+
 export function RedoPractice({
   items,
   prevUserAnswer,
   onExit,
   title = "重做練習",
 }: RedoPracticeProps) {
+  const { toast, toasts } = useToast();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [finished, setFinished] = useState(false);
+  const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
+  const autoNextTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const total = items.length;
   const current = items[currentIdx];
@@ -66,18 +75,38 @@ export function RedoPractice({
   const correctLetter = current ? current.question.answer.toLowerCase() : "";
   const isCorrect = current && isAnswered && userAnswer === correctLetter;
 
+  function clearAutoNext() {
+    if (autoNextTimerRef.current) {
+      clearTimeout(autoNextTimerRef.current);
+      autoNextTimerRef.current = null;
+    }
+    setAutoNextCountdown(null);
+  }
+
   // 切題時若該題已有作答,保留紀錄(可隨時回頭重看)
   function pickAnswer(letter: string) {
     if (!current || isAnswered) return;
     setAnswers((prev) => ({ ...prev, [current.questionId]: letter }));
+    // 答對且非最後一題 → 延遲自動跳下一題
+    if (letter === correctLetter && currentIdx < total - 1) {
+      clearAutoNext();
+      setAutoNextCountdown(Math.ceil(AUTO_NEXT_DELAY / 1000));
+      autoNextTimerRef.current = setTimeout(() => {
+        autoNextTimerRef.current = null;
+        setAutoNextCountdown(null);
+        setCurrentIdx((i) => Math.min(i + 1, total - 1));
+      }, AUTO_NEXT_DELAY);
+    }
   }
 
   function goPrev() {
+    clearAutoNext();
     if (currentIdx === 0) return;
     setCurrentIdx((i) => i - 1);
   }
 
   function goNext() {
+    clearAutoNext();
     if (currentIdx >= total - 1) {
       setFinished(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -87,6 +116,7 @@ export function RedoPractice({
   }
 
   function restart() {
+    clearAutoNext();
     setAnswers({});
     setCurrentIdx(0);
     setFinished(false);
@@ -94,6 +124,7 @@ export function RedoPractice({
   }
 
   function jumpToQuestion(id: string) {
+    clearAutoNext();
     const idx = items.findIndex((x) => x.questionId === id);
     if (idx >= 0) {
       setCurrentIdx(idx);
@@ -101,6 +132,22 @@ export function RedoPractice({
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
+
+  // 倒計時顯示 — 每秒減 1
+  useEffect(() => {
+    if (autoNextCountdown == null || autoNextCountdown <= 0) return;
+    const id = setTimeout(() => {
+      setAutoNextCountdown((c) => (c != null ? c - 1 : null));
+    }, 1000);
+    return () => clearTimeout(id);
+  }, [autoNextCountdown]);
+
+  // 卸載時清理 timer
+  useEffect(() => {
+    return () => {
+      if (autoNextTimerRef.current) clearTimeout(autoNextTimerRef.current);
+    };
+  }, []);
 
   // 用 ref 持有最新狀態,讓 keydown listener 只註冊一次
   const stateRef = useRef({
@@ -110,13 +157,11 @@ export function RedoPractice({
     isAnswered,
     finished,
   });
-  stateRef.current = {
-    currentIdx,
-    total,
-    current,
-    isAnswered,
-    finished,
-  };
+  stateRef.current = { currentIdx, total, current, isAnswered, finished };
+
+  // pickAnswer 透過 ref 暴露,鍵盤 handler 復用同一份邏輯(包含自動跳題)
+  const pickAnswerRef = useRef<(letter: string) => void>(() => {});
+  pickAnswerRef.current = pickAnswer;
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -129,13 +174,16 @@ export function RedoPractice({
       if (key === "ArrowLeft") {
         e.preventDefault();
         if (s.currentIdx === 0) return;
+        clearAutoNext();
         setCurrentIdx((i) => i - 1);
       } else if (key === "ArrowRight" || key === "Enter") {
         e.preventDefault();
         if (s.currentIdx >= s.total - 1) {
+          clearAutoNext();
           setFinished(true);
           window.scrollTo({ top: 0, behavior: "smooth" });
         } else {
+          clearAutoNext();
           setCurrentIdx((i) => i + 1);
         }
       } else if (
@@ -151,8 +199,44 @@ export function RedoPractice({
           : (key.toLowerCase() as "a" | "b" | "c" | "d");
         if (s.current.question.options[letter]) {
           e.preventDefault();
-          setAnswers((prev) => ({ ...prev, [s.current!.questionId]: letter }));
+          pickAnswerRef.current(letter);
         }
+      } else if (
+        (key === "s" || key === "S") &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey &&
+        s.current
+      ) {
+        e.preventDefault();
+        const q = buildSearchQuery({
+          question: s.current.question.question,
+          options: s.current.question.options,
+          ref: s.current.question.ref || undefined,
+        });
+        window.open(
+          `https://www.google.com/search?q=${encodeURIComponent(q)}`,
+          "_blank",
+          "noopener,noreferrer"
+        );
+      } else if (
+        (key === "x" || key === "X") &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey &&
+        s.current
+      ) {
+        e.preventDefault();
+        const text = formatQuestionText({
+          number: s.current.question.number,
+          question: s.current.question.question,
+          options: s.current.question.options,
+          ref: s.current.question.ref || undefined,
+        });
+        navigator.clipboard
+          ?.writeText(text)
+          .then(() => toast("已複製題目"))
+          .catch(() => {});
       }
     }
     window.addEventListener("keydown", onKey);
@@ -281,14 +365,9 @@ export function RedoPractice({
     <div className="max-w-3xl mx-auto px-4 py-6">
       <div className="mb-4 space-y-3">
         <div className="flex items-center justify-between text-sm flex-wrap gap-2">
-          <div className="flex items-center gap-3">
-            <span className="font-medium">
-              第 {currentIdx + 1} / {total} 題
-            </span>
-            <span className="text-zinc-500">
-              已答 {answeredCount} / {total}
-            </span>
-          </div>
+          <span className="font-medium">
+            第 {currentIdx + 1} / {total} 題
+          </span>
           <Button variant="ghost" size="sm" onClick={onExit}>
             <X className="w-4 h-4 mr-1" />
             退出練習
@@ -362,6 +441,11 @@ export function RedoPractice({
                   <>
                     <Check className="inline w-4 h-4 mr-1" />
                     答對了
+                    {autoNextCountdown != null && (
+                      <span className="text-green-600 ml-2 font-normal">
+                        （{autoNextCountdown}s 後跳下一題…）
+                      </span>
+                    )}
                   </>
                 ) : (
                   <>
@@ -436,7 +520,21 @@ export function RedoPractice({
           </kbd>{" "}
           下一題
         </span>
+        <span>
+          <kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">
+            S
+          </kbd>{" "}
+          Google 搜尋
+        </span>
+        <span>
+          <kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">
+            X
+          </kbd>{" "}
+          複製題目
+        </span>
       </div>
+
+      <ToastContainer toasts={toasts} />
     </div>
   );
 }
