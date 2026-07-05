@@ -13,7 +13,7 @@ type QuestionSearchButtonsProps = {
 
 /**
  * 將題幹與選項組合成搜尋關鍵字。
- * 開頭加上固定前綴「（香港保險中介人資格考試相關題目）」,
+ * 開頭加上固定前綴「（香港保險中介人資格考試相關題目,請答題並作通俗解釋)」,
  * 若有章節號(ref)則緊接前綴以 [x.x.x] 形式帶上,
  * 題幹為主,選項帶序號(如 "A. xxx")以空白串接,
  * 讓搜尋引擎能比對到完整題目與選項結構。
@@ -24,7 +24,7 @@ export function buildSearchQuery(opts: {
   ref?: string;
 }): string {
   const { question, options, ref } = opts;
-  const parts: string[] = ["（香港保險中介人資格考試相關題目）"];
+  const parts: string[] = ["（香港保險中介人資格考試相關題目,請答題並作通俗解釋）"];
   if (ref) parts.push(`[${ref}]`);
   parts.push(question.trim());
   for (const letter of ["a", "b", "c", "d"] as const) {
