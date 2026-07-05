@@ -5,11 +5,44 @@ import { prisma } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { sessionId, paperId, mode, source, durationSec, questionIds } = body;
+  const { sessionId, paperId, mode, source, durationSec, questionIds, fromAttemptId } = body;
 
-  if (!sessionId || !paperId || !Array.isArray(questionIds) || questionIds.length === 0) {
+  // 「重做」模式:不傳 questionIds,改從既有 attempt 的 Answer 記錄撈
+  let finalQuestionIds: string[] = questionIds;
+  let finalPaperId = paperId;
+  let finalMode = mode;
+  let finalSource = source;
+  let finalDurationSec = durationSec;
+
+  if (fromAttemptId) {
+    if (!sessionId) {
+      return NextResponse.json(
+        { error: "sessionId 必填" },
+        { status: 400 }
+      );
+    }
+    const src = await prisma.attempt.findUnique({
+      where: { id: fromAttemptId },
+      include: {
+        answers: { select: { questionId: true } },
+      },
+    });
+    if (!src) {
+      return NextResponse.json(
+        { error: "來源 attempt 找不到" },
+        { status: 404 }
+      );
+    }
+    finalQuestionIds = src.answers.map((a) => a.questionId);
+    finalPaperId = src.paperId;
+    finalMode = src.mode;
+    finalSource = src.source;
+    finalDurationSec = src.durationSec;
+  }
+
+  if (!sessionId || !finalPaperId || !Array.isArray(finalQuestionIds) || finalQuestionIds.length === 0) {
     return NextResponse.json(
-      { error: "sessionId, paperId, questionIds[] 必填" },
+      { error: "sessionId, paperId, questionIds[] 必填(fromAttemptId 模式需有作答記錄)" },
       { status: 400 }
     );
   }
@@ -17,15 +50,48 @@ export async function POST(req: NextRequest) {
   const attempt = await prisma.attempt.create({
     data: {
       sessionId,
-      paperId,
-      mode: mode ?? "exam",
-      source: source ?? "exam",
-      durationSec: durationSec ?? null,
-      totalQ: questionIds.length,
+      paperId: finalPaperId,
+      mode: finalMode ?? "exam",
+      source: finalSource ?? "exam",
+      durationSec: finalDurationSec ?? null,
+      totalQ: finalQuestionIds.length,
     },
   });
 
-  return NextResponse.json({ attempt });
+  // 「重做」模式下,同步回傳題目完整資料,讓前端可以預先存到 sessionStorage
+  // (避免 practice 頁 fallback 抓到整卷題目而非本次子集)
+  let questions: Array<{
+    id: string;
+    number: number;
+    ref: string;
+    question: string;
+    options: Record<string, string>;
+    answer: string;
+    explanation: string | null;
+    page: number | null;
+  }> | undefined;
+  if (fromAttemptId) {
+    const qs = await prisma.question.findMany({
+      where: { id: { in: finalQuestionIds } },
+    });
+    // 保持與原 attempt 一致的題目順序
+    const byId = new Map(qs.map((q) => [q.id, q]));
+    questions = finalQuestionIds
+      .map((qid) => byId.get(qid))
+      .filter((q): q is NonNullable<typeof q> => q != null)
+      .map((q) => ({
+        id: q.id,
+        number: q.number,
+        ref: q.ref,
+        question: q.question,
+        options: JSON.parse(q.options),
+        answer: q.answer?.toLowerCase() ?? "",
+        explanation: q.explanation,
+        page: q.page,
+      }));
+  }
+
+  return NextResponse.json({ attempt, questions });
 }
 
 export async function GET(req: NextRequest) {

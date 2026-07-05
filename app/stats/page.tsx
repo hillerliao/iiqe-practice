@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Play, FileText } from "lucide-react";
+import { Play, FileText, RotateCcw } from "lucide-react";
 import { getSessionId } from "@/lib/session";
 
 // 把題目序號陣列壓縮成區段字串,例如 [110,111,118,119,120,126] → "110~111, 118~120, 126"
@@ -52,6 +53,9 @@ export default function StatsPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [redoingId, setRedoingId] = useState<string | null>(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     const sessionId = getSessionId();
@@ -79,6 +83,42 @@ export default function StatsPage() {
     return (
       <div className="max-w-5xl mx-auto px-4 py-8 text-red-600">{error}</div>
     );
+  }
+
+  async function handleRedo(attemptId: string) {
+    if (redoingId) return;
+    setRedoingId(attemptId);
+    setError(null);
+    try {
+      const sessionId = getSessionId();
+      const res = await fetch("/api/attempts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, fromAttemptId: attemptId }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "未知錯誤" }));
+        throw new Error(err.error ?? `HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      const newAttemptId = data.attempt.id as string;
+      // 把題目預先存到 sessionStorage / localStorage,讓 practice 頁能直接用
+      // (避免 fallback 抓到整卷題目而非本次子集)
+      if (Array.isArray(data.questions)) {
+        sessionStorage.setItem(
+          `attempt:${newAttemptId}:questions`,
+          JSON.stringify(data.questions)
+        );
+        localStorage.setItem(
+          `attempt:${newAttemptId}:questions`,
+          JSON.stringify(data.questions)
+        );
+      }
+      router.push(`/practice?id=${newAttemptId}`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "重做失敗");
+      setRedoingId(null);
+    }
   }
   if (!stats || stats.total === 0) {
     return (
@@ -281,12 +321,23 @@ export default function StatsPage() {
                           </Link>
                         </Button>
                       ) : (
-                        <Button asChild size="sm" variant="outline">
-                          <Link href={`/result?id=${a.id}`}>
-                            <FileText className="w-3.5 h-3.5 mr-1" />
-                            查看結果
-                          </Link>
-                        </Button>
+                        <div className="flex flex-col gap-1.5">
+                          <Button asChild size="sm" variant="outline">
+                            <Link href={`/result?id=${a.id}`}>
+                              <FileText className="w-3.5 h-3.5 mr-1" />
+                              查看結果
+                            </Link>
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            disabled={redoingId === a.id}
+                            onClick={() => handleRedo(a.id)}
+                          >
+                            <RotateCcw className="w-3.5 h-3.5 mr-1" />
+                            {redoingId === a.id ? "準備中..." : "重做"}
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </div>
