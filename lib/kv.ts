@@ -212,15 +212,16 @@ export type NoteRecord = {
   updatedAt: string;
 };
 
-const FAV_META_PREFIX = "fav:meta:";
 const AT = "attempt:";
 const SESS_AT = "session:attempts:";
 const SESS_FAV = "session:favs:";
+const SESS_FAV_META = "session:favs-meta:";
 const SESS_NOTES = "session:notes:";
 
 export function attemptKey(id: string) { return `${AT}${id}`; }
 function sessAttemptsKey(sid: string) { return `${SESS_AT}${sid}`; }
 function sessFavsKey(sid: string) { return `${SESS_FAV}${sid}`; }
+function sessFavMetaKey(sid: string) { return `${SESS_FAV_META}${sid}`; }
 function sessNotesKey(sid: string) { return `${SESS_NOTES}${sid}`; }
 
 export async function createAttempt(record: AttemptRecord): Promise<void> {
@@ -263,12 +264,12 @@ export async function listAttempts(sessionId: string): Promise<AttemptRecord[]> 
 
 export async function addFavorite(sessionId: string, questionId: string): Promise<void> {
   await kv.sadd(sessFavsKey(sessionId), questionId);
-  await kv.hset(sessFavsKey(sessionId), `${FAV_META_PREFIX}${questionId}`, { createdAt: new Date().toISOString() });
+  await kv.hset(sessFavMetaKey(sessionId), questionId, { createdAt: new Date().toISOString() });
 }
 
 export async function removeFavorite(sessionId: string, questionId: string): Promise<void> {
   await kv.srem(sessFavsKey(sessionId), questionId);
-  await kv.hdel(sessFavsKey(sessionId), `${FAV_META_PREFIX}${questionId}`);
+  await kv.hdel(sessFavMetaKey(sessionId), questionId);
 }
 
 export async function listFavorites(sessionId: string): Promise<string[]> {
@@ -276,7 +277,7 @@ export async function listFavorites(sessionId: string): Promise<string[]> {
 }
 
 export async function getFavoriteMeta(sessionId: string, questionId: string): Promise<{ createdAt: string } | null> {
-  return kv.hget<{ createdAt: string }>(sessFavsKey(sessionId), `${FAV_META_PREFIX}${questionId}`);
+  return kv.hget<{ createdAt: string }>(sessFavMetaKey(sessionId), questionId);
 }
 
 export async function saveNote(sessionId: string, questionId: string, content: string): Promise<void> {
@@ -327,6 +328,7 @@ export async function migrateSession(fromSessionId: string, toSessionId: string)
     result.favorites++;
   }
   await kv.del(sessFavsKey(fromSessionId));
+  await kv.del(sessFavMetaKey(fromSessionId));
 
   const notes = await listNotes(fromSessionId);
   const toNotes = await listNotes(toSessionId);
