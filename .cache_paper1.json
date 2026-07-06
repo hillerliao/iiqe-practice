@@ -1,6 +1,5 @@
 [
   {
-    "id": "P1-exam-1",
     "number": 1,
     "ref": "1.1.2(a)",
     "question": "因心臟病產生的醫療開支最有可以被歸類為_____________。",
@@ -10,14 +9,10 @@
       "c": "特定風險",
       "d": "基本風險"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 1,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 1
   },
   {
-    "id": "P1-exam-2",
     "number": 2,
     "ref": "1.1.2(b)",
     "question": "汽車意外、個人損傷等情況，最有可能屬於_______________",
@@ -27,14 +22,10 @@
       "c": "純粹風險",
       "d": "投機風險"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 1,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 1
   },
   {
-    "id": "P1-exam-3",
     "number": 3,
     "ref": "1.2.3(ii)",
     "question": "如果索償涉及______________，該項索償很有可能被拒",
@@ -44,14 +35,10 @@
       "c": "自然災害造成的損失",
       "d": "人為錯誤"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 1,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 1
   },
   {
-    "id": "P1-exam-4",
     "number": 4,
     "ref": "1.1.2(b)",
     "question": "盜竊最有可能屬於_______________:",
@@ -61,14 +48,10 @@
       "c": "純粹風險",
       "d": "投機風險"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 1,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 1
   },
   {
-    "id": "P1-exam-5",
     "number": 5,
     "ref": "1.1.3",
     "question": "就以下風險管理措施，提供安全訓練屬於:",
@@ -78,14 +61,10 @@
       "c": "損失降低",
       "d": "風險轉移"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 1,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 1
   },
   {
-    "id": "P1-exam-6",
     "number": 6,
     "ref": "1.1.3",
     "question": "進行能促進工業安全的活動是以下那項處理風險的方法？",
@@ -95,14 +74,10 @@
       "c": "損失降低",
       "d": "風險融資"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 1,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 1
   },
   {
-    "id": "P1-exam-7",
     "number": 7,
     "ref": "1.1.3",
     "question": "不提供食物及飲料以避免食物中毒的風險，屬哪種風險管理的措施?",
@@ -112,14 +87,10 @@
       "c": "損失降低",
       "d": "風險轉移"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 2,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 2
   },
   {
-    "id": "P1-exam-8",
     "number": 8,
     "ref": "1.1.3",
     "question": "不提供專業意見以後避免負上法律責任的風險管理措施是:",
@@ -129,14 +100,10 @@
       "c": "風險轉移",
       "d": "損失降低"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 2,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 2
   },
   {
-    "id": "P1-exam-9",
     "number": 9,
     "ref": "1.2",
     "question": "以下哪幾項可視為保險為香港帶來的輔助功能/好處?\ni.保險對受保損失的被保險人提供財務補償\nii.保險為本港提供就業機會\niii.一般保險的慣例下倡導防範損失的措施\niv.一般保險的慣例下倡導控制損失的措施",
@@ -146,14 +113,10 @@
       "c": "i,iii,iv",
       "d": "ii,iii,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 2,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 2
   },
   {
-    "id": "P1-exam-10",
     "number": 10,
     "ref": "1.2",
     "question": "以下哪幾項可視為保險為香港帶來的輔助功能/好處?\ni.保險為本港提供就業機會\nii.保險對受保損失的被保險人提供財務補償\niii.一般保險的慣例下倡導防範損失的措施\niv.某些業務可以涉及很高的純粹風險，或會令投資者卻步，除非他們可以投保潛在的財\n務損失",
@@ -163,14 +126,10 @@
       "c": "i,iii,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 2,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 2
   },
   {
-    "id": "P1-exam-11",
     "number": 11,
     "ref": "1.1.1",
     "question": "有一類風險會使我們情緒上感到難過及悲傷，但並不涉及財務損失。這類風險：",
@@ -180,14 +139,10 @@
       "c": "只有損失是由意外造成才受保的",
       "d": "相當可能不受保"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 2,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 2
   },
   {
-    "id": "P1-exam-12",
     "number": 12,
     "ref": "1.1.1",
     "question": "從保險人的角度，風險一詞是指：\ni)所保的危險\nii)承保的財產\niii)保險人承保的人身\niv)一項與潛在損失有關的不確定性",
@@ -197,14 +152,10 @@
       "c": "i,ii,iii",
       "d": "i,ii,iii,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 3,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 3
   },
   {
-    "id": "P1-exam-13",
     "number": 13,
     "ref": "1.1.1",
     "question": "在不同的情況下，我們可以用同一個詞語來描述損失的可能性，受保財產或一項受保危險\n，這一個詞語是:",
@@ -214,14 +165,10 @@
       "c": "保險",
       "d": "近因"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 3,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 3
   },
   {
-    "id": "P1-exam-14",
     "number": 14,
     "ref": "1.1.1",
     "question": "有些風險可能引起難過，但並不牽涉財務損失，它們：",
@@ -231,14 +178,10 @@
       "c": "只有當損失的成因是意外時才是可保的",
       "d": "相當可能不會是可保的"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 3,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 3
   },
   {
-    "id": "P1-exam-15",
     "number": 15,
     "ref": "1.1.1",
     "question": "如果一名由保險人聘請的檢驗人，提出他必須就某項「風險」進行檢驗，那麼「風險」一\n詞在這方面有下列哪項或哪些含義？",
@@ -248,14 +191,10 @@
       "c": "將要成為被保險人的人的信貸資料",
       "d": "以上任何一項"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 3,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 3
   },
   {
-    "id": "P1-exam-16",
     "number": 16,
     "ref": "1.1.1",
     "question": "以下哪項有關風險的陳述是正確的?\ni)所有類型的風險在商業上都是可保的\nii)保險人在使用保險一詞時，通常是指它們的營業成績的不確定性\niii)有些風險是商業保險人視為不可保的\niv)在任何情況下帶來財務後果的風險是可保的",
@@ -265,14 +204,10 @@
       "c": "iii",
       "d": "iii,iv"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 3,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 3
   },
   {
-    "id": "P1-exam-17",
     "number": 17,
     "ref": "1.1.1",
     "question": "當風險真正出現時，以下哪項風險後果相當可能屬於不可保?",
@@ -282,14 +217,10 @@
       "c": "因意外引致喪失肢體的風險",
       "d": "悲傷及傷心的風險"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 3,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 3
   },
   {
-    "id": "P1-exam-18",
     "number": 18,
     "ref": "1.1.1",
     "question": "描述保險及風險的關係，以下哪項是正確的：",
@@ -299,14 +230,10 @@
       "c": "所有風險在商業上都是可保的",
       "d": "以上各項皆是"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 4,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 4
   },
   {
-    "id": "P1-exam-19",
     "number": 19,
     "ref": "1.1.1",
     "question": "風險所帶來的潛在損失可能是身體上，財務上及情緒上。以下哪項或哪些潛在損失可能是\n可保的？",
@@ -316,14 +243,10 @@
       "c": "財務上及情緒上可保而已",
       "d": "身體上、財務上及情緒上"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 4,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 4
   },
   {
-    "id": "P1-exam-20",
     "number": 20,
     "ref": "1.1.1",
     "question": "下列哪項有關「風險和保險」的陳述是正確的？",
@@ -333,14 +256,10 @@
       "c": "應付風險的唯一方法是購買保險",
       "d": "保險與風險有關，然而不是所有類型的風險都是可保的"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 4,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 4
   },
   {
-    "id": "P1-exam-21",
     "number": 21,
     "ref": "1.1.1註",
     "question": "當保險單提供「全險」的保障時，所提及的風險是指:",
@@ -350,14 +269,10 @@
       "c": "正在考慮承保的人身",
       "d": "正在考慮承保的財物或人身"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 4,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 4
   },
   {
-    "id": "P1-exam-22",
     "number": 22,
     "ref": "1.1.1註",
     "question": "一個獲保險人聘用的檢驗人，若他要求對所承保的風險進行檢驗，「風險」一詞含義為：",
@@ -367,14 +282,10 @@
       "c": "作為保單持有人的人的信貸能力",
       "d": "以上所有各項"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 4,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 4
   },
   {
-    "id": "P1-exam-23",
     "number": 23,
     "ref": "1.1.2",
     "question": "商業保險人所保的風險主要是:",
@@ -384,14 +295,10 @@
       "c": "純粹風險及特定風險",
       "d": "純粹風險及投機風險"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 4,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 4
   },
   {
-    "id": "P1-exam-24",
     "number": 24,
     "ref": "1.1.2a",
     "question": "只有損失的機會而無收益的可能性之風險稱為：",
@@ -401,14 +308,10 @@
       "c": "投機風險",
       "d": "基本風險"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 4,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 4
   },
   {
-    "id": "P1-exam-25",
     "number": 25,
     "ref": "1.1.2a",
     "question": "從可保程度的角度來看，純粹風險屬於：",
@@ -418,14 +321,10 @@
       "c": "可保程度可能低於投機風險",
       "d": "可保程度可能高於投機風險"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 5,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 5
   },
   {
-    "id": "P1-exam-26",
     "number": 26,
     "ref": "1.1.2a",
     "question": "以下哪項屬於「投機風險」類型？",
@@ -435,14 +334,10 @@
       "c": "與友人合資博彩於賽馬活動中",
       "d": "包括以上各項"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 5,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 5
   },
   {
-    "id": "P1-exam-27",
     "number": 27,
     "ref": "1.1.2b",
     "question": "如果根據風險所帶來的影響區別，風險可以分為：",
@@ -452,14 +347,10 @@
       "c": "投機風險及特定風險",
       "d": "特定風險及基本風險"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 5,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 5
   },
   {
-    "id": "P1-exam-28",
     "number": 28,
     "ref": "1.1.2b",
     "question": "某種風險可能會造成嚴重，廣泛及災難性的影響，這風險稱為:",
@@ -469,14 +360,10 @@
       "c": "投機風險",
       "d": "基本風險"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 5,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 5
   },
   {
-    "id": "P1-exam-29",
     "number": 29,
     "ref": "1.1.2b",
     "question": "從可保程度的角度來看，哪項是用來形容特定風險的?",
@@ -486,14 +373,10 @@
       "c": "可保程度較可能低於基本風險",
       "d": "可保程度較可能高於基本風險"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 5,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 5
   },
   {
-    "id": "P1-exam-30",
     "number": 30,
     "ref": "1.1",
     "question": "「保險」與「風險」之間的關係如何?",
@@ -503,14 +386,10 @@
       "c": "應付風險的唯一方法就是保險",
       "d": "所有風險都是可保的"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 5,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 5
   },
   {
-    "id": "P1-exam-31",
     "number": 31,
     "ref": "1.1.3",
     "question": "以下哪項不是「風險管理」的正確陳述？",
@@ -520,14 +399,10 @@
       "c": "保險人可把範圍縮窄至只對可保風險的管理",
       "d": "保險人只會在談論承保損失價值時才用這個詞"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 5,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 5
   },
   {
-    "id": "P1-exam-32",
     "number": 32,
     "ref": "1.1.3",
     "question": "若把風險視為一門擁有本身知識及研究方法的獨門科學，「風險管理」便屬於經常採用的\n用語，當保險人採用這個名詞時：",
@@ -537,14 +412,10 @@
       "c": "他們指的是投機性而非純粹風險",
       "d": "它的含義只涉及保費"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 6,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 6
   },
   {
-    "id": "P1-exam-33",
     "number": 33,
     "ref": "1.1.3",
     "question": "以下哪項陳述是正確的?",
@@ -554,14 +425,10 @@
       "c": "風險管理是與保險完全相同的學科",
       "d": "保險是風險管理的工具"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 6,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 6
   },
   {
-    "id": "P1-exam-34",
     "number": 34,
     "ref": "1.1.3",
     "question": "以下哪項有關風險管理是正確的？",
@@ -571,14 +438,10 @@
       "c": "涉及識別風險",
       "d": "只涉及識別及量化風險"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 6,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 6
   },
   {
-    "id": "P1-exam-35",
     "number": 35,
     "ref": "1.1.3",
     "question": "以下哪項有關「風險管理」一詞的描述是正確的:",
@@ -588,14 +451,10 @@
       "c": "它指三步驟:風險識別˴風險免除及風險融資",
       "d": "它包含二個步驟:風險識別及風險量化"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 6,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 6
   },
   {
-    "id": "P1-exam-36",
     "number": 36,
     "ref": "1.1.3",
     "question": "以下哪項有關風險管理的描述是正確的？",
@@ -605,14 +464,10 @@
       "c": "保險與風險管理是完全相同之學科",
       "d": "風險管理是工程技術的一門學科"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 6,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 6
   },
   {
-    "id": "P1-exam-37",
     "number": 37,
     "ref": "1.1.3",
     "question": "「安裝自動灑水系統」是以下那項處理風險的方法？",
@@ -622,14 +477,10 @@
       "c": "損失降低",
       "d": "風險融資"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 6,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 6
   },
   {
-    "id": "P1-exam-38",
     "number": 38,
     "ref": "1.1.3",
     "question": "考慮改善受保風險之潛在損失的可能性時，保險人所採用的字眼為：",
@@ -639,14 +490,10 @@
       "c": "風險管理",
       "d": "保險風險分析"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 6,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 6
   },
   {
-    "id": "P1-exam-39",
     "number": 39,
     "ref": "1.1.3",
     "question": "作爲一個獨立的知識與研究的領域，風險管理可以解釋爲管理學的一個分支，它要進行的\n步驟包括：",
@@ -656,14 +503,10 @@
       "c": "應付",
       "d": "以上各項皆是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 7,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 7
   },
   {
-    "id": "P1-exam-40",
     "number": 40,
     "ref": "1.1.3",
     "question": "作為風險管理在獨立的知識及研究範疇上，一般的理解為：",
@@ -673,14 +516,10 @@
       "c": "以識別、量化及處理作為進行的步驟",
       "d": "環繞著對保險合約的訂立及處理"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 7,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 7
   },
   {
-    "id": "P1-exam-41",
     "number": 41,
     "ref": "1.2",
     "question": "一名被保險人死亡後，保險人向其受養人支付死亡保險金，這做法顯示：",
@@ -690,14 +529,10 @@
       "c": "壽險的唯一好處及功能",
       "d": "並非壽險的好處及功能"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 7,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 7
   },
   {
-    "id": "P1-exam-42",
     "number": 42,
     "ref": "1.2",
     "question": "以下哪項或哪幾項是保險的基本的好處？",
@@ -707,14 +542,10 @@
       "c": "以人壽保險及年金作為儲蓄",
       "d": "金融服務的發展"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 7,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 7
   },
   {
-    "id": "P1-exam-43",
     "number": 43,
     "ref": "1.2",
     "question": "提供就業機會，損失防範，協助儲蓄及投資，可被形容為：",
@@ -724,14 +555,10 @@
       "c": "是保險的輔助功能而非基本功能",
       "d": "是保險基本目的而非副產品"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 7,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 7
   },
   {
-    "id": "P1-exam-44",
     "number": 44,
     "ref": "1.2",
     "question": "保險對社會有益處嗎？",
@@ -741,14 +568,10 @@
       "c": "沒有，僅僅是私人的安排",
       "d": "沒有，除非是強制的"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 7,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 7
   },
   {
-    "id": "P1-exam-45",
     "number": 45,
     "ref": "2.1.3(d)",
     "question": "以下哪項不是簡單合約具備的元素？",
@@ -758,14 +581,10 @@
       "c": "訂約的行為能力",
       "d": "合理便宜的價格"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 7,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 7
   },
   {
-    "id": "P1-exam-46",
     "number": 46,
     "ref": "2.2.5",
     "question": "代理人代表委託人行事時招致的費用，委託人應:",
@@ -775,14 +594,10 @@
       "c": "向代理人報銷行事時適當及合理地招致的費用及開支",
       "d": "只支付在符合代理協定條件下的費用"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 8,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 8
   },
   {
-    "id": "P1-exam-47",
     "number": 47,
     "ref": "2.2.3(b)",
     "question": "表面權限意味著:",
@@ -792,14 +607,10 @@
       "c": "權限是透過委託人表明同意而產生的，並可能會對委託人產生約束力",
       "d": "在緊急的情況下持有必要權限為委託人採取行動，並成為必要代理人"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 8,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 8
   },
   {
-    "id": "P1-exam-48",
     "number": 48,
     "ref": "2.1.3",
     "question": "以下項是「可使無效」的合約最佳描述?",
@@ -809,14 +620,10 @@
       "c": "一個於投保階段提供錯誤投保資料的保險合約",
       "d": "一個法律不存在的合約"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 8,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 8
   },
   {
-    "id": "P1-exam-49",
     "number": 49,
     "ref": "2.1.2",
     "question": "以下哪項陳述是正確的?",
@@ -826,14 +633,10 @@
       "c": "保險合約有效性必須以書面合約為證",
       "d": "保險合約屬於簡單合約，因內容淺白令一般人易於明白"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 8,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 8
   },
   {
-    "id": "P1-exam-50",
     "number": 50,
     "ref": "2.2.2",
     "question": "代理關係可以透過以下哪些途徑產生?\ni.明示協議\nii.隱含協議\niii.追認\niv.代理人出錯",
@@ -843,14 +646,10 @@
       "c": "iii,iv",
       "d": "以上皆是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 8,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 8
   },
   {
-    "id": "P1-exam-51",
     "number": 51,
     "ref": "2.1.3(a)",
     "question": "以下哪項有關保單的要約描述是正確的？",
@@ -860,14 +659,10 @@
       "c": "沒有要約就沒有合約",
       "d": "非人壽保險的要約法已匯入保險業條例之中"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 8,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 8
   },
   {
-    "id": "P1-exam-52",
     "number": 52,
     "ref": "2.1.3(f)",
     "question": "以下哪幾項是構成有效合約的「合約元素」?\ni.要約及承約\nii.公平性\niii.代價\niv.訂立法律關係的意向",
@@ -877,14 +672,10 @@
       "c": "i,iii,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 9,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 9
   },
   {
-    "id": "P1-exam-53",
     "number": 53,
     "ref": "2.2",
     "question": "以下哪項對代理法的描述是正確的?\ni.委託人受其代理人的行為所約束\nii.代理人受其委託人的行為所約束\niii.委託人受其代理人的行為而須負起轉承責任\niv.代理法只適用於保險代理人及經紀",
@@ -894,14 +685,10 @@
       "c": "ii,iii",
       "d": "i,ii,iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 9,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 9
   },
   {
-    "id": "P1-exam-54",
     "number": 54,
     "ref": "2.2",
     "question": "以下哪項對代理法的描述是正確的?\ni.保險人透過保險代理人行事與親自執行沒有分別\nii.委託人需對代理人行為負起轉承責任\niii.保險代理人及保險經紀有能力就保險人的行為負起轉承責任\niv.代理關係必須透過書面方式訂立而產生",
@@ -911,14 +698,10 @@
       "c": "ii,iii",
       "d": "i,ii,iii,iv"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 9,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 9
   },
   {
-    "id": "P1-exam-55",
     "number": 55,
     "ref": "2.1.2(a)",
     "question": "某人從一個小販那裏拿起一份雜誌，清楚地表明他要購買，技術上，這是:",
@@ -928,14 +711,10 @@
       "c": "簡單合約",
       "d": "嚴格來說，這並不構成合約"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 9,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 9
   },
   {
-    "id": "P1-exam-56",
     "number": 56,
     "ref": "2.1",
     "question": "以下哪項最恰當描述何謂「保險單」：",
@@ -945,14 +724,10 @@
       "c": "保險合約中的一種可見的表達",
       "d": "沒有這份文件，有關的合約便告取消"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 9,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 9
   },
   {
-    "id": "P1-exam-57",
     "number": 57,
     "ref": "2.1.1",
     "question": "合約可以界定為：",
@@ -962,14 +737,10 @@
       "c": "以書面形式表達的協議",
       "d": "任何兩方或多方的協議"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 10,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 10
   },
   {
-    "id": "P1-exam-58",
     "number": 58,
     "ref": "2.1.1",
     "question": "社交中，朋友的晚飯約會：",
@@ -979,14 +750,10 @@
       "c": "若果有書面上的來往便可稱為合約",
       "d": "在法律上被承認為有效的合約"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 10,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 10
   },
   {
-    "id": "P1-exam-59",
     "number": 59,
     "ref": "2.1.1",
     "question": "以下哪項或哪些是保險單的正確描述：",
@@ -996,14 +763,10 @@
       "c": "是一份證明保險合約的憑證",
       "d": "如果保險單被損毀，保險合便告無效"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 10,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 10
   },
   {
-    "id": "P1-exam-60",
     "number": 60,
     "ref": "2.1.2",
     "question": "以下哪項有關「簡單合約」的說明是正確?",
@@ -1013,14 +776,10 @@
       "c": "它必須蓋章後發出才屬有效",
       "d": "以上各項皆是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 10,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 10
   },
   {
-    "id": "P1-exam-61",
     "number": 61,
     "ref": "2.1.2(a)",
     "question": "儘管缺乏口頭或書面證據，但可從涉及之人的行為斷定某項合約的存在，在法律上可描述\n為：",
@@ -1030,14 +789,10 @@
       "c": "推斷合約",
       "d": "以上任何一項"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 10,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 10
   },
   {
-    "id": "P1-exam-62",
     "number": 62,
     "ref": "2.1.2(b)",
     "question": "以下哪種合約是保險人會以契據方式成立的？",
@@ -1047,14 +802,10 @@
       "c": "擔保",
       "d": "以上所有各項"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 10,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 10
   },
   {
-    "id": "P1-exam-63",
     "number": 63,
     "ref": "2.1.2(b)",
     "question": "一種與非常正式並需要簽署，蓋章及送遞形式有別，易於構成的合約稱為：",
@@ -1064,14 +815,10 @@
       "c": "紀錄合約",
       "d": "不複雜合約"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 10,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 10
   },
   {
-    "id": "P1-exam-64",
     "number": 64,
     "ref": "2.1.3",
     "question": "如果一份合約稱為可使無效，意味著其中一方可在某種情況下讓合約變為無效，如果該一\n方並未採取有關行動：",
@@ -1081,14 +828,10 @@
       "c": "經過一段「合理」時間後，該合約便不會就該種情況變為無效",
       "d": "為該合約支付的任何金錢均須退還"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 11,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 11
   },
   {
-    "id": "P1-exam-65",
     "number": 65,
     "ref": "2.1.3",
     "question": "以下哪項可使無效的保險合約之陳述是正確的?",
@@ -1098,14 +841,10 @@
       "c": "受屈的一方可於合理時間內把合約視為無效的決定",
       "d": "只有被保險人才能把保單視作可使無效(即可予以取消)"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 11,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 11
   },
   {
-    "id": "P1-exam-66",
     "number": 66,
     "ref": "2.1.3",
     "question": "一份合約由於一些要求還未完成而令致有關合約無法執行，此稱為:",
@@ -1115,14 +854,10 @@
       "c": "無效的合約",
       "d": "不合法的合約"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 11,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 11
   },
   {
-    "id": "P1-exam-67",
     "number": 67,
     "ref": "2.1.3",
     "question": "一般協議有別於合約的原因，以下有哪些或哪項的描述是正確的",
@@ -1132,14 +867,10 @@
       "c": "合約包含多項法律準則",
       "d": "以上所有各項"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 11,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 11
   },
   {
-    "id": "P1-exam-68",
     "number": 68,
     "ref": "2.1.3(a)",
     "question": "保險合約中的要約人是：",
@@ -1149,14 +880,10 @@
       "c": "可以是保險人或被保險人",
       "d": "通常是中介人代表的一方"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 11,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 11
   },
   {
-    "id": "P1-exam-69",
     "number": 69,
     "ref": "2.1.3(b)",
     "question": "如果保險人表示須就某項投保取額外保費及附加保單免賠額，才會接納該風險，這種由保\n險人提出的建議在法律上可以稱為：",
@@ -1166,14 +893,10 @@
       "c": "有保留承約",
       "d": "有條件承約"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 11,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 11
   },
   {
-    "id": "P1-exam-70",
     "number": 70,
     "ref": "2.1.3(b)",
     "question": "要成立任何合約，其要約：",
@@ -1183,14 +906,10 @@
       "c": "必須被承約，並須以書面通知收到",
       "d": "總是須大體上被承約"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 11,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 11
   },
   {
-    "id": "P1-exam-71",
     "number": 71,
     "ref": "2.1.3(b)",
     "question": "下列哪項有關〝反要約〞之陳述是正確的？\ni)反要約出現時，原要約人會變成受要約人\nii)反要約出現時，原受要約人變成要約人\niii)反要約出現代表原要約的婉拒及終止\niv)若反要約不被接納，則可以從新執行原要約",
@@ -1200,14 +919,10 @@
       "c": "i,iii,iv",
       "d": "ii,iii,iv"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 12,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 12
   },
   {
-    "id": "P1-exam-72",
     "number": 72,
     "ref": "2.1.3(b)",
     "question": "在訂立合約的過程中，「甲方」是提出要約的一方；即「要約人」，而「乙方」則是「受\n要約人」，如「乙方」不接受「甲方」的提議，並作出反要約",
@@ -1217,14 +932,10 @@
       "c": "原本的要約仍然有效",
       "d": "在保險合約中，永不會出現「反要約」"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 12,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 12
   },
   {
-    "id": "P1-exam-73",
     "number": 73,
     "ref": "2.1.3(c)",
     "question": "以下哪項是簡單合約訂立時必須具備的條件？",
@@ -1234,14 +945,10 @@
       "c": "合約雙方付出代價",
       "d": "以上各項皆是"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 12,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 12
   },
   {
-    "id": "P1-exam-74",
     "number": 74,
     "ref": "2.1.3(c)",
     "question": "甚麼是代價?",
@@ -1251,14 +958,10 @@
       "c": "這是合約的一方對另一方的義務",
       "d": "以上各項皆正確"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 12,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 12
   },
   {
-    "id": "P1-exam-75",
     "number": 75,
     "ref": "2.1.3(c)",
     "question": "安琪在登機前購買一份旅遊保險，保險人容許她在旅程後繳付保險費。安琪不幸在旅程中\n斷了一條腿，保險人拒絕賠付安琪有關的醫療費用，請問保險人有權這樣做嗎？",
@@ -1268,14 +971,10 @@
       "c": "有。保險人若賠付只出於同情",
       "d": "有。安琪沒有交保費"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 12,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 12
   },
   {
-    "id": "P1-exam-76",
     "number": 76,
     "ref": "2.1.3(c)",
     "question": "蘇先生在電話要求一份機器全險保障，保險人承諾在一星期後發出保單。電話對話一小時\n後，該組機器在火災中被毀。請問有否一份有效的機器全險合約保障？",
@@ -1285,14 +984,10 @@
       "c": "有，因保障在承諾一刻生效",
       "d": "有，追溯性保單保障機器損失"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 12,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 12
   },
   {
-    "id": "P1-exam-77",
     "number": 77,
     "ref": "2.1.3(d)",
     "question": "在簡單合約中，「訂約的行為能力」是指訂立合約的能力。在保險合約中，這項要求適用\n於：",
@@ -1302,14 +997,10 @@
       "c": "投保人，但不一定適用於保險人",
       "d": "保險人，但不一定適用於投保人"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 13,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 13
   },
   {
-    "id": "P1-exam-78",
     "number": 78,
     "ref": "2.1.3(d)",
     "question": "有關「立約行為能力」，下列哪項陳述是正確的？\ni)未成年者的立約能力受到限制\nii)是指訂立合約的法律能力\niii)精神病者的立約能力受到限制\niv)是指有關業務開展的合法授權",
@@ -1319,14 +1010,10 @@
       "c": "i,iii,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 13,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 13
   },
   {
-    "id": "P1-exam-79",
     "number": 79,
     "ref": "2.1.3(f)",
     "question": "簡單合約要素有多種，其中訂立協議雙方明確自己的目的，並知道有關條款具有法律效力\n，此要素稱為:",
@@ -1336,14 +1023,10 @@
       "c": "要約及承約",
       "d": "代價"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 13,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 13
   },
   {
-    "id": "P1-exam-80",
     "number": 80,
     "ref": "2.2",
     "question": "保險代理人的委託人一般是?",
@@ -1353,14 +1036,10 @@
       "c": "既非保險人亦非被保險人",
       "d": "兩者皆是保險人及非保險人"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 13,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 13
   },
   {
-    "id": "P1-exam-81",
     "number": 81,
     "ref": "2.2",
     "question": "根據代理法：",
@@ -1370,14 +1049,10 @@
       "c": "保險代理人屬於「代理人」，但保險經紀則不是",
       "d": "保險經紀屬於「代理人」，但保險代理人則不是"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 13,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 13
   },
   {
-    "id": "P1-exam-82",
     "number": 82,
     "ref": "2.2",
     "question": "「透過他人行事與自己親自執行並無分別」法律原則是來自：",
@@ -1387,14 +1062,10 @@
       "c": "侵權法",
       "d": "保險業條例"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 13,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 13
   },
   {
-    "id": "P1-exam-83",
     "number": 83,
     "ref": "2.2.1",
     "question": "保險代理人在安排一份保險時，為保險人行事，當中涉及兩份合約。其中一份存在於保險\n代理人與保險人之間，另一份則存在於：",
@@ -1404,14 +1075,10 @@
       "c": "保險代理人與保單持有人之間",
       "d": "保險人與保險經紀之間"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 14,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 14
   },
   {
-    "id": "P1-exam-84",
     "number": 84,
     "ref": "2.2.2",
     "question": "以下哪項是追認的正確描述？",
@@ -1421,14 +1088,10 @@
       "c": "出於緊急情況的授權行為",
       "d": "根據經蓋章的合約給予的權限"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 14,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 14
   },
   {
-    "id": "P1-exam-85",
     "number": 85,
     "ref": "2.2.2",
     "question": "由委託人追認而確認的代理關係是指：",
@@ -1438,14 +1101,10 @@
       "c": "代理人曾在緊急情況下替委託人辦事",
       "d": "代理人進行類似過去曾被批准的未授權行動"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 14,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 14
   },
   {
-    "id": "P1-exam-86",
     "number": 86,
     "ref": "2.2.3",
     "question": "代理人的權限包括：\ni)實際權限\nii)表面權限\niii)非表面權限\niv)必要權限",
@@ -1455,14 +1114,10 @@
       "c": "ii,iii,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 14,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 14
   },
   {
-    "id": "P1-exam-87",
     "number": 87,
     "ref": "2.2.3(a)",
     "question": "委託人明示或隱含地向代理人表明同意代理人代表委託人或替其行事，是屬於下列哪項代\n理人的權限:",
@@ -1472,14 +1127,10 @@
       "c": "必要權限",
       "d": "不容反悔的代理權"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 14,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 14
   },
   {
-    "id": "P1-exam-88",
     "number": 88,
     "ref": "2.2.3(a)",
     "question": "明示實際權限是代表：",
@@ -1489,14 +1140,10 @@
       "c": "可以是書面或口頭的授權",
       "d": "口頭以外的方式授權"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 14,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 14
   },
   {
-    "id": "P1-exam-89",
     "number": 89,
     "ref": "2.2.3(b)",
     "question": "就表面權限而言，權限問題與代理關係是有所相關及分別，以下哪些或哪項是正確的?",
@@ -1506,14 +1153,10 @@
       "c": "在無授權情況之下，而幫助委託人訂立合約時，會令委託人受代理人行為約束",
       "d": "以上各項皆是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 15,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 15
   },
   {
-    "id": "P1-exam-90",
     "number": 90,
     "ref": "2.2.3(b)",
     "question": "以下哪個是表面權限的正確描述：",
@@ -1523,14 +1166,10 @@
       "c": "是局限於委託人與第三者之間的關係",
       "d": "實際權限"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 15,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 15
   },
   {
-    "id": "P1-exam-91",
     "number": 91,
     "ref": "2.2.3(c)",
     "question": "必要權限可能在以下哪種情況產生？",
@@ -1540,14 +1179,10 @@
       "c": "由一位假定委託人的行為而產生",
       "d": "如果代理人在緊急情況下必須代表委託人行事"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 15,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 15
   },
   {
-    "id": "P1-exam-92",
     "number": 92,
     "ref": "2.2.3(c)",
     "question": "某人在某時為他人的最佳利益而行事，雖然他事前並沒有獲得授權，但在法律上卻持有這\n種權限‧並被視為",
@@ -1557,14 +1192,10 @@
       "c": "具有追溯性授權的代理人",
       "d": "自動獲授權的代理人"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 15,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 15
   },
   {
-    "id": "P1-exam-93",
     "number": 93,
     "ref": "2.2.3(c)",
     "question": "在沒有獲授權的情況下，為另一方作了某些事情，而該行為是基於合理及必要，在此情況\n下，這人便成為了：",
@@ -1574,14 +1205,10 @@
       "c": "必要代理人",
       "d": "實際權限代理人"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 15,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 15
   },
   {
-    "id": "P1-exam-94",
     "number": 94,
     "ref": "2.2.3(c)",
     "question": "第三者根據一名〈假定）委託人的行為，覺得一名〈假定）代理人為委託人的代理〈其實\n並沒有授權），這類代理關係稱為：",
@@ -1591,14 +1218,10 @@
       "c": "必要代理",
       "d": "追索代理"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 15,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 15
   },
   {
-    "id": "P1-exam-95",
     "number": 95,
     "ref": "2.2.3(c)",
     "question": "如果需要或出於人道或其他合理的原因，某人代理另一人行事的開支，即使沒有獲授權，\n此人也可以被認為是他的代理人，這種代理關係的成立是基於以下那項？",
@@ -1608,14 +1231,10 @@
       "c": "必要權限",
       "d": "不容反悔"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 16,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 16
   },
   {
-    "id": "P1-exam-96",
     "number": 96,
     "ref": "2.2.3(d)",
     "question": "不容反悔的代理權是來自:",
@@ -1625,14 +1244,10 @@
       "c": "事後對代理人的行為所作的明確指示",
       "d": "據稱的委託人的行為"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 16,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 16
   },
   {
-    "id": "P1-exam-97",
     "number": 97,
     "ref": "2.2.3(d)",
     "question": "若保險人根據被保險人的行為，合理地判斷一位（其實沒有被授權的）事務律師具備授權\n來替被保險人行事，那麼根據以下哪項原則，被保險人受該事務律師的行為所約束？",
@@ -1642,14 +1257,10 @@
       "c": "追認代理",
       "d": "必要權限"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 16,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 16
   },
   {
-    "id": "P1-exam-98",
     "number": 98,
     "ref": "2.2.4",
     "question": "有關代理人必須對委託人所收取金錢進行「報帳」，意思是:\n代理業務的狀況",
@@ -1659,14 +1270,10 @@
       "c": "代理人必須書面紀錄與委託人的認真溝通",
       "d": "代理人以委託人的名義收取的所有的物品必須在3天之內交回委託人"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 16,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 16
   },
   {
-    "id": "P1-exam-99",
     "number": 99,
     "ref": "2.2.4",
     "question": "以下那項代理人對委託人的責任的描述是不正確的：",
@@ -1676,14 +1283,10 @@
       "c": "不能下放權力，除非獲得明示授權",
       "d": "要有適當的謹慎及技巧"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 16,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 16
   },
   {
-    "id": "P1-exam-100",
     "number": 100,
     "ref": "2.2.6",
     "question": "下列哪項或哪些屬於保險代理協議终止的途徑",
@@ -1693,14 +1296,10 @@
       "c": "不忠誠",
       "d": "以上所有各項"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 16,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 16
   },
   {
-    "id": "P1-exam-101",
     "number": 101,
     "ref": "2.2.6",
     "question": "雙方終止代理關係：",
@@ -1710,14 +1309,10 @@
       "c": "需對保險代理作出金錢上的賠償",
       "d": "足以令與第三者所定立的現存合約無效"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 17,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 17
   },
   {
-    "id": "P1-exam-102",
     "number": 102,
     "ref": "2.2.6",
     "question": "需要甚麼規定才能延續一份為期一年的協議?",
@@ -1727,14 +1322,10 @@
       "c": "需在委託人及代理人雙方同意下才可延續",
       "d": "自動延續"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 17,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 17
   },
   {
-    "id": "P1-exam-103",
     "number": 103,
     "ref": "2.2.6",
     "question": "於合約條款中，哪方可在協議有效期間內撤銷協議?",
@@ -1744,14 +1335,10 @@
       "c": "委託人或代理人",
       "d": "不是委託人；也不是代理人"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 17,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 17
   },
   {
-    "id": "P1-exam-104",
     "number": 104,
     "ref": "2.2.6",
     "question": "下列哪種情況下，代理人可以撤銷協議？",
@@ -1761,14 +1348,10 @@
       "c": "委託人沒有在合理時間內支付報酬",
       "d": "委託人已經精神錯亂"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 17,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 17
   },
   {
-    "id": "P1-exam-105",
     "number": 105,
     "ref": "2.2.6",
     "question": "以下哪一項是代理人精神錯亂的處理方法？",
@@ -1778,14 +1361,10 @@
       "c": "維持代理合約直至代理人康復",
       "d": "確保繼續支付佣金給代理人"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 17,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 17
   },
   {
-    "id": "P1-exam-106",
     "number": 106,
     "ref": "3.2.4",
     "question": "根據普通法，投保人需要遵守最高誠信責任的期限：",
@@ -1795,14 +1374,10 @@
       "c": "涉及整段合約生效時",
       "d": "僅至簽署投保書時為止"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 17,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 17
   },
   {
-    "id": "P1-exam-107",
     "number": 107,
     "ref": "3.1",
     "question": "於一般保險中，理賠時不需考慮下列哪項?",
@@ -1812,14 +1387,10 @@
       "c": "代位",
       "d": "比例分攤"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 17,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 17
   },
   {
-    "id": "P1-exam-108",
     "number": 108,
     "ref": "3.1.4",
     "question": "以下哪項可保權益的陳述正確?\ni.每人對自己的肢體都有保險利益\nii.承按人不可以對按揭財產投保\niii.又可稱為保險標的\niv.保險人與被保險人之間法律認可的關係",
@@ -1829,14 +1400,10 @@
       "c": "ii,iv",
       "d": "i,ii,iv"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 18,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 18
   },
   {
-    "id": "P1-exam-109",
     "number": 109,
     "ref": "3.3.2(c)",
     "question": "不保危險_____________:",
@@ -1846,14 +1413,10 @@
       "c": "政策上被列為除外危險",
       "d": "包括自然災害，例如地震"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 18,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 18
   },
   {
-    "id": "P1-exam-110",
     "number": 110,
     "ref": "3.3.2",
     "question": "除外危險_____________:",
@@ -1863,14 +1426,10 @@
       "c": "除超額保障以外，將承保的危險",
       "d": "例如各種天災，地震等"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 18,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 18
   },
   {
-    "id": "P1-exam-111",
     "number": 111,
     "ref": "3.4.2",
     "question": "人壽與保險不受彌償的原則約束，原因是:",
@@ -1880,14 +1439,10 @@
       "c": "無論支付多少錢不能精確地作出彌償",
       "d": "以上各項皆成立"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 18,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 18
   },
   {
-    "id": "P1-exam-112",
     "number": 112,
     "ref": "3.3.1",
     "question": "以下哪項屬於近因中被視為\"危險\"",
@@ -1897,14 +1452,10 @@
       "c": "珠寶被盜竊",
       "d": "木造建築"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 18,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 18
   },
   {
-    "id": "P1-exam-113",
     "number": 113,
     "ref": "3.1.6",
     "question": "以下哪項不屬保險合約轉讓的後果?",
@@ -1914,14 +1465,10 @@
       "c": "在壽險中，轉讓是決不會換入一個新的受保生命",
       "d": "保險人於保險合約轉讓後停止承保轉讓人的損失"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 18,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 18
   },
   {
-    "id": "P1-exam-114",
     "number": 114,
     "ref": "3.4.3",
     "question": "以下哪項與彌償保險原則沒有關係？",
@@ -1931,14 +1478,10 @@
       "c": "代位",
       "d": "退還財產"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 19,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 19
   },
   {
-    "id": "P1-exam-115",
     "number": 115,
     "ref": "3.2.3(b)",
     "question": "以下哪項不會影響保險合約存在與否或保險條款?",
@@ -1948,14 +1491,10 @@
       "c": "可保權益",
       "d": "以上各項皆不是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 19,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 19
   },
   {
-    "id": "P1-exam-116",
     "number": 116,
     "ref": "3.2.1",
     "question": "正面回答所有被問及的問題並保證作出的回答是真實的，這屬於:",
@@ -1965,26 +1504,18 @@
       "c": "內在誠信",
       "d": "合約誠信"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 19,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 19
   },
   {
-    "id": "P1-exam-117",
     "number": 117,
     "ref": "3.4.7(b)",
     "question": "以下哪項阻止了保單為被保險人作出彌償?\ni.比例分攤\nii.多於二人有可保權益\niii.免賠額\niv.起賠額",
     "options": {},
-    "answer": "c",
-    "explanation": null,
-    "page": 19,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 19
   },
   {
-    "id": "P1-exam-118",
     "number": 118,
     "ref": "3.4.7(b)",
     "question": "以下哪項阻止了保單作出彌償?\ni.起賠額\nii.免賠額\niii.起賠期限\niv.重複保險",
@@ -1994,14 +1525,10 @@
       "c": "iii,iv",
       "d": "以上皆是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 19,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 19
   },
   {
-    "id": "P1-exam-119",
     "number": 119,
     "ref": "3.1.4",
     "question": "以下哪項或哪幾項是符合可保權益所需要之條件？",
@@ -2011,14 +1538,10 @@
       "c": "一男子希望幫助他伯父的生命購買保險",
       "d": "以上各項皆是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 19,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 19
   },
   {
-    "id": "P1-exam-120",
     "number": 120,
     "ref": "3.1.6",
     "question": "以下哪一項有關保單轉讓的描述是正確的?",
@@ -2028,14 +1551,10 @@
       "c": "保單轉讓人只會把在合約中的的責任轉移到承讓人的身上",
       "d": "保單轉讓人在合約中的權益和責任均完全轉移到承讓人的身上"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 20,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 20
   },
   {
-    "id": "P1-exam-121",
     "number": 121,
     "ref": "3.1.6(b)",
     "question": "以下哪項有關一般誠信的描述是不正確?\ni.合約各方所提供的資訊必須是實質上真實，而且沒有主動披露的責任\nii.合約各方所提供的資訊可以真實或虛假，不可以信賴\niii.合約各方所提供的資訊必須是百分百真實\niv.合約各方必須主動披露可能影響是否訂立合約的一切重要資訊",
@@ -2045,14 +1564,10 @@
       "c": "i,ii",
       "d": "iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 20,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 20
   },
   {
-    "id": "P1-exam-122",
     "number": 122,
     "ref": "3.1.6",
     "question": "以下哪一項有關保單轉讓的描述是正確的?",
@@ -2062,14 +1577,10 @@
       "c": "承讓人承讓人承諾支付未來的保費",
       "d": "承讓人承諾支付未來的保費，包括保單轉讓時未有支付的保費"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 20,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 20
   },
   {
-    "id": "P1-exam-123",
     "number": 123,
     "ref": "3.1.6(b)",
     "question": "以下哪項就轉讓收取保險金的權利的權利描述是正確的?",
@@ -2079,14 +1590,10 @@
       "c": "轉讓水險合約的收取保險金的權利，必須取得保險人的同意",
       "d": "只有A及C是正確"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 20,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 20
   },
   {
-    "id": "P1-exam-124",
     "number": 124,
     "ref": "3.2.1",
     "question": "以下哪項有關「一般誠信」一詞是正確的描述：\n問的事情保持緘默",
@@ -2096,14 +1603,10 @@
       "c": "各方向他方披露的資料可以是真實或虛假，所以不可信",
       "d": "訂立合約時，本著誠實態度行事，所提供的資訊是實質上真實的，而對於另一方沒有詢"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 20,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 20
   },
   {
-    "id": "P1-exam-125",
     "number": 125,
     "ref": "3.2.4",
     "question": "根據香港法律，投保人需要遵守最高誠信責任：",
@@ -2113,14 +1616,10 @@
       "c": "一直至保險人交付保單為止",
       "d": "一直至簽署簽署及呈交投保書止"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 20,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 20
   },
   {
-    "id": "P1-exam-126",
     "number": 126,
     "ref": "3.2.4",
     "question": "投保人於投保時遵守最高誠信以披露重要事實的期限:",
@@ -2130,14 +1629,10 @@
       "c": "一直至合約具約束力結束為止，並無例外",
       "d": "有時通過相互協議予以延伸"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 21,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 21
   },
   {
-    "id": "P1-exam-127",
     "number": 127,
     "ref": "3.2.6",
     "question": "違反最高誠信的形式分別有欺詐性失實陳述，非欺詐性失實陳述，欺詐性不披露，非欺詐\n性不披露的四個類別，當中非欺詐性不披露是:",
@@ -2147,14 +1642,10 @@
       "c": "無意地或疏忽地漏了向另一方披露重要事實",
       "d": "蓄意地或疏忽地漏了向另一方披露重要事實"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 21,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 21
   },
   {
-    "id": "P1-exam-128",
     "number": 128,
     "ref": "3.3.2",
     "question": "被保單條款明顯地剔除的保障範圍的損失原因稱為:",
@@ -2164,14 +1655,10 @@
       "c": "不受保危險",
       "d": "不被接受的危險"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 21,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 21
   },
   {
-    "id": "P1-exam-129",
     "number": 129,
     "ref": "3.4.2",
     "question": "彌償原則合適用以上甚麼保險項目類型?",
@@ -2181,14 +1668,10 @@
       "c": "人身意外保險",
       "d": "以上各項皆是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 21,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 21
   },
   {
-    "id": "P1-exam-130",
     "number": 130,
     "ref": "3.4.3",
     "question": "以下哪項與彌償關係最少的保險原則？",
@@ -2198,14 +1681,10 @@
       "c": "最高誠信",
       "d": "可保權益"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 21,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 21
   },
   {
-    "id": "P1-exam-131",
     "number": 131,
     "ref": "3.4.3",
     "question": "「彌償」這項保險原則對以下哪項關係最為密切？",
@@ -2215,14 +1694,10 @@
       "c": "代位",
       "d": "以上全部皆是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 21,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 21
   },
   {
-    "id": "P1-exam-132",
     "number": 132,
     "ref": "3.4.7",
     "question": "於香港處理財產保險的保險中介人，需盡力地確保客戶釐定投保額時最低限度代表財產價\n值。以下哪一項是出現投保額不足導致的後果?",
@@ -2232,14 +1707,10 @@
       "c": "賠償金額將可能受到比例分攤原則所約束",
       "d": "保險人將拒絕續保"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 22,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 22
   },
   {
-    "id": "P1-exam-133",
     "number": 133,
     "ref": "3.4.8",
     "question": "海上貨物保單是以定值方式提供保險保障，當出現全損索償時:",
@@ -2249,14 +1720,10 @@
       "c": "受保財產必須以十足的價值投保",
       "d": "約定價值一律被視為損失時的實質價值"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 22,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 22
   },
   {
-    "id": "P1-exam-134",
     "number": 134,
     "ref": "3.5.1",
     "question": "以下哪項是標準火險保單理賠時遇上重複保險運用到的條款？",
@@ -2266,14 +1733,10 @@
       "c": "比例分攤",
       "d": "以上各項皆不是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 22,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 22
   },
   {
-    "id": "P1-exam-135",
     "number": 135,
     "ref": "3.1",
     "question": "以下哪項不是可保權益的先決條件?",
@@ -2283,14 +1746,10 @@
       "c": "保險標的是屬於法律責任，財產或法律權利",
       "d": "物件必須是保險的標的"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 22,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 22
   },
   {
-    "id": "P1-exam-136",
     "number": 136,
     "ref": "3.1.2",
     "question": "以下哪項有關沒有可保權益的說明正確?",
@@ -2300,14 +1759,10 @@
       "c": "只有涉及沒有可保權益導致的損失時才無效",
       "d": "一般情況下，在不知道保險無效的情況下繼續支付的保費是可退回的"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 22,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 22
   },
   {
-    "id": "P1-exam-137",
     "number": 137,
     "ref": "3.1.2",
     "question": "沒有可保權益的情況下，以下哪項處理是不正確的?",
@@ -2317,14 +1772,10 @@
       "c": "有關損失不獲賠償",
       "d": "在不知悉無效情況下支付的保費可獲退回"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 22,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 22
   },
   {
-    "id": "P1-exam-138",
     "number": 138,
     "ref": "3.1.3",
     "question": "在香港，下列哪項可構成可保權益(為自己的利益而購買保險)",
@@ -2334,14 +1785,10 @@
       "c": "自己精神錯亂的配偶",
       "d": "以上各項皆是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 22,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 22
   },
   {
-    "id": "P1-exam-139",
     "number": 139,
     "ref": "3.1.3",
     "question": "在香港，每一名對下列哪項人士的生命不具有可保權益？﹝為個人本身的利益購買人壽保\n險﹞",
@@ -2351,14 +1798,10 @@
       "c": "個人的本身",
       "d": "上述各項均存在可保權益"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 23,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 23
   },
   {
-    "id": "P1-exam-140",
     "number": 140,
     "ref": "3.1.3",
     "question": "以下哪項不太可能屬於可保權益的先決條件?",
@@ -2368,14 +1811,10 @@
       "c": "標的是可受保的",
       "d": "被保險人與保險標的之間的一種法律擁有權"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 23,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 23
   },
   {
-    "id": "P1-exam-141",
     "number": 141,
     "ref": "3.1.4",
     "question": "構成財產保險可保權益的是：",
@@ -2385,14 +1824,10 @@
       "c": "絕對擁有該項財產",
       "d": "以上各項皆是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 23,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 23
   },
   {
-    "id": "P1-exam-142",
     "number": 142,
     "ref": "3.1.4",
     "question": "在香港，就以下哪項的生命投保的人壽保險不具備可保權益？",
@@ -2402,14 +1837,10 @@
       "c": "個人15歲的子女",
       "d": "個人的貸款欠款人"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 23,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 23
   },
   {
-    "id": "P1-exam-143",
     "number": 143,
     "ref": "3.1.4(a)",
     "question": "在香港，每一名人士對以下哪項人士的生命不具有可保權益？",
@@ -2419,14 +1850,10 @@
       "c": "個人的兄弟及父母",
       "d": "個人十八歲以下的子女或受監護人"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 23,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 23
   },
   {
-    "id": "P1-exam-144",
     "number": 144,
     "ref": "3.1.4(a)",
     "question": "在香港，每一名人士對以下哪項或哪些人士的生命不具有可保權益(為個人本身的利益購\n買人壽保險)？",
@@ -2436,14 +1863,10 @@
       "c": "個人17歲的妻子",
       "d": "以上所有各項均存在可保權益"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 23,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 23
   },
   {
-    "id": "P1-exam-145",
     "number": 145,
     "ref": "3.1.4(b)",
     "question": "一份恰當地安排的財產保險，於被保險的全損出現時，應可獲完全補償。這項補償代表該\n名被保險人在有關保險上的權益，顯示彌補與以下哪些或哪項的原則相連：",
@@ -2453,14 +1876,10 @@
       "c": "最高誠信",
       "d": "以上各項"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 24,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 24
   },
   {
-    "id": "P1-exam-146",
     "number": 146,
     "ref": "3.1.4(b)",
     "question": "阿倫給予他的朋友玫瑰一個他所擁有的單位免費住兩個月，請問玫瑰有權為該單位購買保\n險?理由何在?\n於所有保險合約中，被保險人必需在投保時對標的物有可保權益，以下哪項保險項目在索",
@@ -2470,14 +1889,10 @@
       "c": "有，她是以單位託管人的身份人對該單位具有權益的",
       "d": "沒有，因為她並非擁有該單位"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 24,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 24
   },
   {
-    "id": "P1-exam-147",
     "number": 147,
     "ref": "3.1.4(b)",
     "question": "償時需要有可保權益？\ni任何型式的責任保險\nii)車險\niii)人壽保險\niv)船上的貨物保險",
@@ -2487,14 +1902,10 @@
       "c": "i,ii,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 24,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 24
   },
   {
-    "id": "P1-exam-148",
     "number": 148,
     "ref": "3.1.4(b)",
     "question": "以下哪項或哪些對財產可保權益的描述是正確的?",
@@ -2504,14 +1915,10 @@
       "c": "投保人不一定需要是財產擁有人",
       "d": "以上所列各項皆是"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 24,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 24
   },
   {
-    "id": "P1-exam-149",
     "number": 149,
     "ref": "3.1.4(c)",
     "question": "以下哪項或哪幾項是符合可保權益所需要之條件：",
@@ -2521,14 +1928,10 @@
       "c": "一男子因為自己的利益,希望幫助他粗心大意的朋友的手錶投買保險",
       "d": "以上各項皆是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 24,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 24
   },
   {
-    "id": "P1-exam-150",
     "number": 150,
     "ref": "3.1.4(c)",
     "question": "以下哪項對首要責任及轉承責任的描述是正確的？\ni)首要責任是個人對他人的作為或不作為負上責任\nii)首要責任是個人本身的作為或不作為所引致的法律責任\niii)轉承責任經常在代理關係上產生\niv)轉承責任可能在僱傭關係上產生",
@@ -2538,14 +1941,10 @@
       "c": "ii,iii,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 25,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 25
   },
   {
-    "id": "P1-exam-151",
     "number": 151,
     "ref": "3.1.4(d)",
     "question": "符合法律認可關係的可保權益，以下哪項為非人身、財物或法律責任的可保權益?",
@@ -2555,14 +1954,10 @@
       "c": "債主為自己的債務購買保險",
       "d": "僱主為受僱職員的損傷購買保險"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 25,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 25
   },
   {
-    "id": "P1-exam-152",
     "number": 152,
     "ref": "3.1.5",
     "question": "人壽保險與其他保險一樣要求可保權益的存在，但對人壽保險而言可保權益必須存在於",
@@ -2572,14 +1967,10 @@
       "c": "只是保單可能轉讓的時候",
       "d": "保單開始及索償出現的時候"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 25,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 25
   },
   {
-    "id": "P1-exam-153",
     "number": 153,
     "ref": "3.1.6",
     "question": "以下哪項對轉讓的陳述是正確的?\ni)人壽保險可以不經保險人同意自由轉讓\nii)海上貨物保險可以不經保險人同意自由轉讓\niii)商業「全險」保單不可以沒有保險人同意便轉讓\niv)人壽保險不可以沒有保險人同意便轉讓",
@@ -2589,14 +1980,10 @@
       "c": "i，iii，iv",
       "d": "ii，iii，iv"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 25,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 25
   },
   {
-    "id": "P1-exam-154",
     "number": 154,
     "ref": "3.1.6",
     "question": "實際上，哪項或哪些必須在保險人的同意下轉讓？",
@@ -2606,14 +1993,10 @@
       "c": "海上貨物保險",
       "d": "以上所有各項"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 25,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 25
   },
   {
-    "id": "P1-exam-155",
     "number": 155,
     "ref": "3.1.6",
     "question": "收取保險金的轉讓，意思是指：",
@@ -2623,14 +2006,10 @@
       "c": "把保單的擁有權轉讓予他人",
       "d": "讓另一個人替代原本的被保險人"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 26,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 26
   },
   {
-    "id": "P1-exam-156",
     "number": 156,
     "ref": "3.2",
     "question": "最高誠信的責任適用於:",
@@ -2640,14 +2019,10 @@
       "c": "任何情況下的被保險人及保險人",
       "d": "被保險人及保險人，但只限於保單有這要求"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 26,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 26
   },
   {
-    "id": "P1-exam-157",
     "number": 157,
     "ref": "3.2.1",
     "question": "有別於最高誠信，一般誠信是指由各方提供的資料必須:",
@@ -2657,14 +2032,10 @@
       "c": "可以是真實或虛假，所以不應信賴",
       "d": "必須實質上真實，但沒有主動的責任披露每項事實"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 26,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 26
   },
   {
-    "id": "P1-exam-158",
     "number": 158,
     "ref": "3.2.1",
     "question": "有別於最高誠信，一般誠信的意思是:",
@@ -2674,14 +2045,10 @@
       "c": "所提及的需承諾及保證完全真實",
       "d": "本著誠信的態度的行事，而資訊必須是實質上真實"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 26,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 26
   },
   {
-    "id": "P1-exam-159",
     "number": 159,
     "ref": "3.2.4",
     "question": "如果保險人要求保證所有披露資料，不論重要與否，均需完全真實，這表示:",
@@ -2691,14 +2058,10 @@
       "c": "這合約受制於而非最高誠信",
       "d": "這合約受制於最高誠信"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 26,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 26
   },
   {
-    "id": "P1-exam-160",
     "number": 160,
     "ref": "3.2.2",
     "question": "最高誠信的要求有時會改變，以下哪項是正確描述？",
@@ -2708,14 +2071,10 @@
       "c": "所有保險都是要求只在保單開始時需要",
       "d": "可以因為雙方的協議而修改"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 26,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 26
   },
   {
-    "id": "P1-exam-161",
     "number": 161,
     "ref": "3.2.3",
     "question": "以下哪項屬於必須披露的重要事實？",
@@ -2725,14 +2084,10 @@
       "c": "投保貨物的高度可燃性﹝火險﹞",
       "d": "上述所有各項"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 26,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 26
   },
   {
-    "id": "P1-exam-162",
     "number": 162,
     "ref": "3.2.3(b)",
     "question": "根據最高誠信的原則，下列哪項屬於無須揭露的事實?\ni)近期健康狀況\nii)與常識有關的事件\niii)保險人已知的事實\niv)增加風險的事實",
@@ -2742,14 +2097,10 @@
       "c": "ii，iii",
       "d": "iii，iv"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 27,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 27
   },
   {
-    "id": "P1-exam-163",
     "number": 163,
     "ref": "3.2.3(b)",
     "question": "於行使最高誠信時,下列哪項不需予以披露：",
@@ -2759,14 +2110,10 @@
       "c": "改善風險狀況的事實",
       "d": "上述各項皆無須披露"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 27,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 27
   },
   {
-    "id": "P1-exam-164",
     "number": 164,
     "ref": "3.2.3(b)",
     "question": "以下哪項是投保人須披露：",
@@ -2776,14 +2123,10 @@
       "c": "投保人過往的索償紀錄",
       "d": "以上所有各項"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 27,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 27
   },
   {
-    "id": "P1-exam-165",
     "number": 165,
     "ref": "3.2.4",
     "question": "如果保險人要求保證所有披露資料，不論重要與否，均需完全真實，這表示:",
@@ -2793,14 +2136,10 @@
       "c": "這合約受制於而非最高誠信",
       "d": "這合約受制於最高誠信"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 27,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 27
   },
   {
-    "id": "P1-exam-166",
     "number": 166,
     "ref": "3.2.4",
     "question": "如在保險保障期間，風險上有重大的轉變：",
@@ -2810,14 +2149,10 @@
       "c": "普通法要求在續約時方須要提出",
       "d": "以上各項皆正確"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 27,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 27
   },
   {
-    "id": "P1-exam-167",
     "number": 167,
     "ref": "3.2.4",
     "question": "在非人壽保險單續保時，最高誠信的責任：",
@@ -2827,14 +2162,10 @@
       "c": "不再適用",
       "d": "只對保險人適用"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 27,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 27
   },
   {
-    "id": "P1-exam-168",
     "number": 168,
     "ref": "3.2.5",
     "question": "以下哪項屬於違反最高誠信的種類？",
@@ -2844,14 +2175,10 @@
       "c": "非欺詐性失實陳述",
       "d": "以上所有各項"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 28,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 28
   },
   {
-    "id": "P1-exam-169",
     "number": 169,
     "ref": "3.2.6",
     "question": "假如被保險人違反最高誠信，保險人可作出以下哪項的補救行動:",
@@ -2861,14 +2188,10 @@
       "c": "可提出侵權法訴訟要求損害賠償",
       "d": "以上各項皆是"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 28,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 28
   },
   {
-    "id": "P1-exam-170",
     "number": 170,
     "ref": "3.2.6",
     "question": "如果被保險人違反最高誠信，保險人可使用以下哪些補救方法？\ni)就該項索償拒賠\nii)在剩餘的保險期限內把保單視為有效\niii)保留部分已繳保費\niv)保留全部已繳保費",
@@ -2878,14 +2201,10 @@
       "c": "ii,iii,iv",
       "d": "以上各項皆不是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 28,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 28
   },
   {
-    "id": "P1-exam-171",
     "number": 171,
     "ref": "3.2.6",
     "question": "某投保人在投保火險保單時忘記披露某些重要事實，該保單的保費為港幣一萬二千元，而\n保險人在保單起保一個月後發現這件事，以下哪項為受屈的保險人可享用的補救：",
@@ -2895,14 +2214,10 @@
       "c": "保險人可選擇推翻保單，並保留一個月的保費(即港幣一千元)",
       "d": "保險人可選擇取消合約，並保留一個月的保費(即港幣一千二百元)"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 28,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 28
   },
   {
-    "id": "P1-exam-172",
     "number": 172,
     "ref": "3.2.6",
     "question": "在保險合約中，下列哪項不屬於最高誠信的補救？",
@@ -2912,14 +2227,10 @@
       "c": "受屈的一方可向另一方展開刑事檢控",
       "d": "如果涉及詐騙，受屈一方便可提出侵權法追求賠償"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 28,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 28
   },
   {
-    "id": "P1-exam-173",
     "number": 173,
     "ref": "3.2.6",
     "question": "如果投保人違反最高誠信:",
@@ -2929,14 +2240,10 @@
       "c": "除非牽涉詐騙或疏忽成份的情況下，保險人才可得到補救",
       "d": "保險保單會自動取消"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 28,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 28
   },
   {
-    "id": "P1-exam-174",
     "number": 174,
     "ref": "3.3.1",
     "question": "在保險中，近因是重要的，因為:",
@@ -2946,14 +2253,10 @@
       "c": "並不是每一個引起損失的原因都是受保單保障的",
       "d": "根據情況保險人可能必須通知警方"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 29,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 29
   },
   {
-    "id": "P1-exam-175",
     "number": 175,
     "ref": "3.3.1",
     "question": "因為幾乎所有保單都有除外責任，所以確定什麼是有效導致損失的原因是非常重要的，這\n類調查與下列哪項最有關係？",
@@ -2963,14 +2266,10 @@
       "c": "可保權益",
       "d": "最高誠信"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 29,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 29
   },
   {
-    "id": "P1-exam-176",
     "number": 176,
     "ref": "3.3.1",
     "question": "近因原則在保險中非常重要，理由是:",
@@ -2980,14 +2279,10 @@
       "c": "如屬個人疏忽導致的損失，保險人無須負責",
       "d": "如屬天意造成的損失及損毀，保險人永遠不需賠償"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 29,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 29
   },
   {
-    "id": "P1-exam-177",
     "number": 177,
     "ref": "3.3.2",
     "question": "下列哪三種屬於決定一項損失的近因時，須予考慮的危險種類？\ni)受保危險\nii)不保危險\niii)額外危險\niv)除外危險",
@@ -2997,14 +2292,10 @@
       "c": "i,iii,iv",
       "d": "ii,iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 29,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 29
   },
   {
-    "id": "P1-exam-178",
     "number": 178,
     "ref": "3.3.2",
     "question": "在考慮「近因」時，如果一項特定損失涉及一項單一成因，那麼：",
@@ -3014,14 +2305,10 @@
       "c": "如果該成因是一項除外危險，被保險人便不能就所引致的損失得到保障",
       "d": "上述所有各項陳述均屬正確"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 29,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 29
   },
   {
-    "id": "P1-exam-179",
     "number": 179,
     "ref": "3.3.2",
     "question": "假設火險保單只保障火災或雷電帶來的損失或損壞。如果雨水透過開敞窗戶而進入室內而\n造成的損失是得不到保障的，因為其近因是:",
@@ -3031,14 +2318,10 @@
       "c": "外來危險",
       "d": "不可保危險"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 29,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 29
   },
   {
-    "id": "P1-exam-180",
     "number": 180,
     "ref": "3.3.3",
     "question": "下列哪項或哪些有關近因的陳述是正確的？",
@@ -3048,14 +2331,10 @@
       "c": "如果有一項除外危險引發了一連串事故，索償將會無效",
       "d": "以上所有各項"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 30,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 30
   },
   {
-    "id": "P1-exam-181",
     "number": 181,
     "ref": "3.3.3",
     "question": "有一項索償個案，是關於由一宗﹝受火險保單所保障的﹞意外火災所導致的損失。火災發\n生的過程中，消防員為了獲取進入建築物的通道，以及用水撲救大火，引致進一步的損害\n。按照近因規則，因消防員所作努力而導致的損害：",
@@ -3065,14 +2344,10 @@
       "c": "是一項由受保危險導致的不保危險，因此得到保障",
       "d": "只能於火險保單已經伸延至保障這項風險時，才會得到保障"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 30,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 30
   },
   {
-    "id": "P1-exam-182",
     "number": 182,
     "ref": "3.3.3",
     "question": "以下哪些或哪項屬於應用近因原則的普遍規定?",
@@ -3082,14 +2357,10 @@
       "c": "損害由一項除外危險所引致，然而受保危險緊隨其後發生的話，仍可受到保障",
       "d": "以上各項皆是"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 30,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 30
   },
   {
-    "id": "P1-exam-183",
     "number": 183,
     "ref": "3.3.3",
     "question": "就近因法則而言，以下哪項或哪些是正確的?",
@@ -3099,14 +2370,10 @@
       "c": "損失是由不保危險引起的除外危險可得到保障",
       "d": "以上各項皆是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 30,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 30
   },
   {
-    "id": "P1-exam-184",
     "number": 184,
     "ref": "3.3.3",
     "question": "就近因而言，以下哪項或哪些陳述是正確的?",
@@ -3116,14 +2383,10 @@
       "c": "由自然地來自除外危險導致的損害是不受到保障的",
       "d": "以上各項皆正確"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 30,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 30
   },
   {
-    "id": "P1-exam-185",
     "number": 185,
     "ref": "3.3.3",
     "question": "以下哪項是描述「既不是受保也不是除外責任的危險，而是在保單保障的範圍以外」？",
@@ -3133,14 +2396,10 @@
       "c": "不保危險",
       "d": "非受保特定危險"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 30,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 30
   },
   {
-    "id": "P1-exam-186",
     "number": 186,
     "ref": "3.3.3",
     "question": "一個單位購買火險後，鄰居發生火警，在必要情況下，消防員需要破壞此單位某些設施進\n入鄰居救火，有關這些設施的損失：",
@@ -3150,14 +2409,10 @@
       "c": "屬於不保危險，故此得不到賠償",
       "d": "屬於受保危險，故此得到賠償"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 30,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 30
   },
   {
-    "id": "P1-exam-187",
     "number": 187,
     "ref": "3.3.4",
     "question": "保險單：",
@@ -3167,14 +2422,10 @@
       "c": "可能包含更改應用近因原則的短句",
       "d": "符合以上各項陳述"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 31,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 31
   },
   {
-    "id": "P1-exam-188",
     "number": 188,
     "ref": "3.3.4",
     "question": "在保險索償中，近因法則是:",
@@ -3184,14 +2435,10 @@
       "c": "有時可以透過保單條款來修改",
       "d": "是絕對性的，不可經私人協議而修改"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 31,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 31
   },
   {
-    "id": "P1-exam-189",
     "number": 189,
     "ref": "3.4",
     "question": "以下哪兩項保險原理有相當密切的關係?\ni)彌償\nii)分擔\niii)近因\niv)最高誠信",
@@ -3201,14 +2448,10 @@
       "c": "iii，iv",
       "d": "i，iii"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 31,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 31
   },
   {
-    "id": "P1-exam-190",
     "number": 190,
     "ref": "3.4.2",
     "question": "人壽與人生意外保險都不受彌償的原則約束，因為:",
@@ -3218,14 +2461,10 @@
       "c": "保險人不願意作出十足的財務補償",
       "d": "以上所以各項"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 31,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 31
   },
   {
-    "id": "P1-exam-191",
     "number": 191,
     "ref": "3.4.2",
     "question": "一名男子在撞車意外中死亡。他有意外死亡保單的保障，同時他的汽車保單提供死亡權益\n。在這情況下：",
@@ -3235,14 +2474,10 @@
       "c": "只由保額較大的保單才需支付",
       "d": "由於是汽車意外，因此由汽車保單提供權益"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 31,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 31
   },
   {
-    "id": "P1-exam-192",
     "number": 192,
     "ref": "3.4.2",
     "question": "以下哪項不是一般業務的處理範圍:",
@@ -3252,14 +2487,10 @@
       "c": "計算及處理保單抵押貸款",
       "d": "應用代位"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 31,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 31
   },
   {
-    "id": "P1-exam-193",
     "number": 193,
     "ref": "3.4.2",
     "question": "人壽及人身意外保單有時稱為「利益保單」，這是由於它們:",
@@ -3269,14 +2500,10 @@
       "c": "所提供的多於財務補償",
       "d": "按本身支付的金錢，無須繳稅"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 32,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 32
   },
   {
-    "id": "P1-exam-194",
     "number": 194,
     "ref": "3.4.2",
     "question": "彌償只能出現於：",
@@ -3286,14 +2513,10 @@
       "c": "非提供彌償的保單之間",
       "d": "提供彌償的保單之間"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 32,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 32
   },
   {
-    "id": "P1-exam-195",
     "number": 195,
     "ref": "3.4.3",
     "question": "一份恰當地安排的財產保險，於被保險的全損出現時，應可提供完全的補償。這項補償代\n表該名被保險人在有關財產上的權益，顯示彌償與以下哪一項的原則相連?",
@@ -3303,14 +2526,10 @@
       "c": "最高誠信",
       "d": "以上所以各項"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 32,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 32
   },
   {
-    "id": "P1-exam-196",
     "number": 196,
     "ref": "3.4.3",
     "question": "彌償與可保權益這兩項保險原則：",
@@ -3320,14 +2539,10 @@
       "c": "與近因原則的關係非常密切",
       "d": "皆有共同的基礎，因爲他們均涉及被保險人的財務權益"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 32,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 32
   },
   {
-    "id": "P1-exam-197",
     "number": 197,
     "ref": "3.4.5",
     "question": "損餘在保險公司運作上，通常:",
@@ -3337,14 +2552,10 @@
       "c": "只限汽車殘駭上的應用",
       "d": "無論任何情況下保險人只付一半賠償"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 32,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 32
   },
   {
-    "id": "P1-exam-198",
     "number": 198,
     "ref": "3.4.6",
     "question": "當被保險人提出索償時，將損餘部份交予保險人以換取索取全數賠償。可能在機緣巧合下\n，在出售損餘後的款項高於實質賠償的金額，那麼:",
@@ -3354,14 +2565,10 @@
       "c": "這項事宜須呈予法庭解決",
       "d": "盈餘須歸予被保險人"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 32,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 32
   },
   {
-    "id": "P1-exam-199",
     "number": 199,
     "ref": "3.4.6",
     "question": "把受保財產的所有權交給保險人，以取得全損賠款的慣例稱為：",
@@ -3371,14 +2578,10 @@
       "c": "代位",
       "d": "委付"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 32,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 32
   },
   {
-    "id": "P1-exam-200",
     "number": 200,
     "ref": "3.4.6",
     "question": "將某一損餘委付保險人，以取得全部的款項，這通常見於：",
@@ -3388,14 +2591,10 @@
       "c": "火險",
       "d": "汽車保險"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 33,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 33
   },
   {
-    "id": "P1-exam-201",
     "number": 201,
     "ref": "3.4.7",
     "question": "有些保單條款允許多於嚴格彌償的賠償，以下哪項不屬於這個範圍之內?",
@@ -3405,14 +2604,10 @@
       "c": "重置保險",
       "d": "\"以新代舊\"保單"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 33,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 33
   },
   {
-    "id": "P1-exam-202",
     "number": 202,
     "ref": "3.4.7(a)",
     "question": "在水險中，「海損(Average)」的含義是：",
@@ -3422,14 +2617,10 @@
       "c": "超額賠償",
       "d": "上述各項皆不是"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 33,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 33
   },
   {
-    "id": "P1-exam-203",
     "number": 203,
     "ref": "3.4.7(a)",
     "question": "損失$6,000，有關保單保額$1,000,000，該保單包含比例分攤及保單限額為$8,000，如受\n保物件實質價值為$3,000,000。保險人賠償多少？保險人在賠償後出售損餘價值為$300，\n請問就損餘部分之價值分配多少被保險人？",
@@ -3439,14 +2630,10 @@
       "c": "$6,000；$0",
       "d": "$2,000；$600"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 33,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 33
   },
   {
-    "id": "P1-exam-204",
     "number": 204,
     "ref": "3.4.7(b)",
     "question": "如果保單受x金額免賠額條約所約束，這就意味著:",
@@ -3456,14 +2643,10 @@
       "c": "超過x元的損失保險人全額賠償",
       "d": "保單保額受x元限制"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 33,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 33
   },
   {
-    "id": "P1-exam-205",
     "number": 205,
     "ref": "3.4.8",
     "question": "一部電視機受火災損害時已經使用五年之久，損失維修費用$5,000，有關家居保險人全數\n支付，由此可推斷該保險由以下哪項訂立？",
@@ -3473,14 +2656,10 @@
       "c": "恢復原狀方式",
       "d": "約定價值方式"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 33,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 33
   },
   {
-    "id": "P1-exam-206",
     "number": 206,
     "ref": "3.4.8",
     "question": "重置保險，「以新代舊」保障，約定價值保單及水險保單之共通點是：",
@@ -3490,14 +2669,10 @@
       "c": "同樣適用於所有業務",
       "d": "跟彌償沒有關係"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 34,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 34
   },
   {
-    "id": "P1-exam-207",
     "number": 207,
     "ref": "3.4.8",
     "question": "一份海上船體保單的承保表是這樣寫的：「保額$1,000,000；約定價值$1,000,000」，意\n味着：",
@@ -3507,14 +2682,10 @@
       "c": "約定價值一律被視爲損失時的實際價值",
       "d": "這是一份重置保險"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 34,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 34
   },
   {
-    "id": "P1-exam-208",
     "number": 208,
     "ref": "3.5.1",
     "question": "保單持有人購買了一份意外死亡保險及汽車意外保險。若保單持有人在一次汽車意外中死\n亡，以下哪項索償是正確的？",
@@ -3524,14 +2695,10 @@
       "c": "兩份保單也會作出賠償",
       "d": "由於是在汽車意外死亡，故只有汽車意外保險作出賠償"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 34,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 34
   },
   {
-    "id": "P1-exam-209",
     "number": 209,
     "ref": "3.5.1",
     "question": "如果發現保單持有人持有兩份保單來保障自已的財產(例如:盜竊)，合法的情況應該是:",
@@ -3541,14 +2708,10 @@
       "c": "僅僅是他投保的第一個保險人必須賠償損失",
       "d": "兩個保險人將得到最終分擔提供彌償的責任"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 34,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 34
   },
   {
-    "id": "P1-exam-210",
     "number": 210,
     "ref": "3.5.1",
     "question": "在重複保險上，以下哪項不應出現分擔原理？",
@@ -3558,14 +2721,10 @@
       "c": "人身意外保險中的人壽利益部份",
       "d": "以上各項皆是"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 34,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 34
   },
   {
-    "id": "P1-exam-211",
     "number": 211,
     "ref": "3.5.1",
     "question": "假設銀行借錢給\"A\"購買物業，不尋常地，該銀行對該物業的權益購買保險保障，而\"A\"亦\n按照其意志投買保險，如果投保損失發生:",
@@ -3575,14 +2734,10 @@
       "c": "A的保單將作出賠償，因他是物業的真正擁有者",
       "d": "銀行的保單將作出賠償，因為借貸協定給它優先權"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 34,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 34
   },
   {
-    "id": "P1-exam-212",
     "number": 212,
     "ref": "3.5.3",
     "question": "分擔必須符合以下那些條件：\ni.每張保單必須對有關損失提供彌償\nii.每張保單必須保障相同的保險標的\niii.每張保單必須保障相同危險所導致的損失\niv.每張保單必須保障相同的財務利益",
@@ -3592,14 +2747,10 @@
       "c": "ii,iii,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 35,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 35
   },
   {
-    "id": "P1-exam-213",
     "number": 213,
     "ref": "3.5.3",
     "question": "分擔的產生，必需符合以下哪項條件？",
@@ -3609,14 +2760,10 @@
       "c": "每份保單都保障了受影響的保險標的",
       "d": "以上各項皆是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 35,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 35
   },
   {
-    "id": "P1-exam-214",
     "number": 214,
     "ref": "3.5.3",
     "question": "A向X保險人購有汽車第三者保險，B向Y保險人購有汽車第三者保險，當A車撞B\n車，分擔原則並不適用，是因為：",
@@ -3626,14 +2773,10 @@
       "c": "這是違法的",
       "d": "B不希望損失「無索償折扣」"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 35,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 35
   },
   {
-    "id": "P1-exam-215",
     "number": 215,
     "ref": "3.5.4",
     "question": "如果發現保單持有人有兩份保險提供財產上的保障(例如:盜竊)，以下哪情況是正確的？",
@@ -3643,14 +2786,10 @@
       "c": "第一份購買的保單會承擔所有的賠付",
       "d": "兩份保單會以共同分擔賠付"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 35,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 35
   },
   {
-    "id": "P1-exam-216",
     "number": 216,
     "ref": "3.5.5",
     "question": "一份有分擔成份的保單，保險人可以怎樣更改此分擔條款？",
@@ -3660,14 +2799,10 @@
       "c": "讓保險人向其他保險人尋找分擔機會",
       "d": "以上各項皆正確"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 35,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 35
   },
   {
-    "id": "P1-exam-217",
     "number": 217,
     "ref": "3.5.5",
     "question": "以下那項條款是指「把保險人的責任限於它對損失的比率份額」？",
@@ -3677,14 +2812,10 @@
       "c": "代位權",
       "d": "更具體受保條款"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 35,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 35
   },
   {
-    "id": "P1-exam-218",
     "number": 218,
     "ref": "3.5.5",
     "question": "當發生一項$1,000,000的財產損失，當中出現重複保險。此保單的全損為$30,000,000，\n另設有單一物件限制$5,000。這次總賠償金額為$995,000，這顯示以下哪項所述是正確的\n?",
@@ -3694,14 +2825,10 @@
       "c": "這份保單有比例分攤條款",
       "d": "所有有關保單均有比率之數條款"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 36,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 36
   },
   {
-    "id": "P1-exam-219",
     "number": 219,
     "ref": "3.5.5",
     "question": "一個家居保險可能有「更具體受保」的物件，是以下那個例子：",
@@ -3711,14 +2838,10 @@
       "c": "分擔條件",
       "d": "隱含保單條件"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 36,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 36
   },
   {
-    "id": "P1-exam-220",
     "number": 220,
     "ref": "3.5.5",
     "question": "購買火險中，可能包含一項海上條款，其含意是：",
@@ -3728,14 +2851,10 @@
       "c": "水險保單均可與火險保單共同作出賠償",
       "d": "上述所有各項皆不是"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 36,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 36
   },
   {
-    "id": "P1-exam-221",
     "number": 221,
     "ref": "3.6",
     "question": "容許已提供彌償的保險人，為本身的利益承繼並使用其被保險人對第三者的權利的保險原\n則為：",
@@ -3745,14 +2864,10 @@
       "c": "重複保險",
       "d": "最高誠信"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 36,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 36
   },
   {
-    "id": "P1-exam-222",
     "number": 222,
     "ref": "3.6.1",
     "question": "一宗撞車意外因為第三者疏忽而引起，在此情況下，請問「代位」在下列哪一項保險適用\n?",
@@ -3762,14 +2877,10 @@
       "c": "汽車保險",
       "d": "以上所以各項"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 36,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 36
   },
   {
-    "id": "P1-exam-223",
     "number": 223,
     "ref": "3.6.2",
     "question": "代位權的出現，是由第三者疏忽地對受保財產造成損毀，並且該財產的保險人承繼對疏忽\n人士行使法律權利。技術上，此代位權是來自:",
@@ -3779,14 +2890,10 @@
       "c": "分攤",
       "d": "因他人的行為疏忽而負上責任"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 36,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 36
   },
   {
-    "id": "P1-exam-224",
     "number": 224,
     "ref": "3.6.2",
     "question": "一名僱員補償保險人巳向受害僱員作出賠償，在一項條款下可向疏忽的第三者索償，這是\n基於：",
@@ -3796,14 +2903,10 @@
       "c": "在法規下產生的代位權",
       "d": "在損餘中產生的代位權"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 37,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 37
   },
   {
-    "id": "P1-exam-225",
     "number": 225,
     "ref": "3.6.2",
     "question": "代位如何出現?\ni)在侵權法上\nii)在合約上\niii)在法規下\niv)在損餘中",
@@ -3813,14 +2916,10 @@
       "c": "ii，iii，iv",
       "d": "i，ii，iii，iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 37,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 37
   },
   {
-    "id": "P1-exam-226",
     "number": 226,
     "ref": "3.6.4",
     "question": "在普通法中，只有在給予彌償之後才可取得代位權，而保單的條件通常:",
@@ -3830,14 +2929,10 @@
       "c": "說明任何時候不可取得代位權",
       "d": "說明只有被保險人可擁有代位權"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 37,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 37
   },
   {
-    "id": "P1-exam-227",
     "number": 227,
     "ref": "3.6.4",
     "question": "對於一隻購買了全險的指環，在遺失後按照保額的5萬元如數結清。該指環稍後時間尋回\n並以6萬元售出。在代位的原則下，該1萬元的利潤：",
@@ -3847,14 +2942,10 @@
       "c": "由保險人及被保險人平均分享",
       "d": "給付由保險人指明的慈善機構"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 37,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 37
   },
   {
-    "id": "P1-exam-228",
     "number": 228,
     "ref": "3.6.4",
     "question": "建築商就一意外向一架私家車擁有人支付$13,000,000。因為一項每宗責任事故限額的應\n用，該名私家車司機只有向其責任保險人取得保險金$12,000,000。如果保險人後來向第\n三者追回$7,000,000，請問誰有權取得這筆錢?又怎樣分這筆金額?",
@@ -3864,14 +2955,10 @@
       "c": "保險人佔$6,000,000，被保險人$1,000,000",
       "d": "保險人佔十三分之十二，被保險人佔十三分之一"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 37,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 37
   },
   {
-    "id": "P1-exam-229",
     "number": 229,
     "ref": "3.6.4",
     "question": "一項損失發生，沒有重複保險的存在，但受保單免賠額的限制，保險人只負責$6,000的損\n失賠付$5,000，後來因代位權成功向疏忽的第三者追討$1,000，問誰有權取得賠償？金額\n是多少？",
@@ -3881,14 +2968,10 @@
       "c": "保險人可獲得追討金額的1/6,被保險人可獲得追討金額的5/6",
       "d": "被保險人和保險人各可獲得追討金額的一半"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 38,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 38
   },
   {
-    "id": "P1-exam-230",
     "number": 230,
     "ref": "4.1",
     "question": "哪句說話最可以形容產品開發部的功能?",
@@ -3898,14 +2981,10 @@
       "c": "為應付法規要求而設",
       "d": "純粹為行銷目的而設"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 38,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 38
   },
   {
-    "id": "P1-exam-231",
     "number": 231,
     "ref": "4.3&4.4",
     "question": "哪句說話最可以形容市場行銷及保險的銷售部門的關係?",
@@ -3915,14 +2994,10 @@
       "c": "他們向不同的管理層匯報",
       "d": "他們面對著不同的客戶群"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 38,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 38
   },
   {
-    "id": "P1-exam-232",
     "number": 232,
     "ref": "4.6",
     "question": "就保單處理方面，一般保險及人壽保險的區別是:",
@@ -3932,14 +3007,10 @@
       "c": "人壽保險單提出索償時必須出示人壽保單，一般保險就不需要",
       "d": "一般保險更複雜"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 38,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 38
   },
   {
-    "id": "P1-exam-233",
     "number": 233,
     "ref": "4.6(d)",
     "question": "以下哪項人壽保險支付保費的獨特之處?",
@@ -3949,14 +3020,10 @@
       "c": "合約生效取決於是否實際繳付首次保費",
       "d": "保費只可以整付方式支付"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 38,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 38
   },
   {
-    "id": "P1-exam-234",
     "number": 234,
     "ref": "4.11",
     "question": "對於培訓及發展部門，以下哪項的描述是正確的？\ni.培訓對於內勤及外勤的員工同樣重要\nii.它必須與公司的需要配合\niii.它必須由非職員提供\niv.資源及紀錄對提高該部門的運作效率是非常重要的",
@@ -3966,14 +3033,10 @@
       "c": "i,iii,iv",
       "d": "ii,iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 38,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 38
   },
   {
-    "id": "P1-exam-235",
     "number": 235,
     "ref": "4.9",
     "question": "以下哪項就精算支援的描述是正確的?\ni.《保險業條例》要求所有獲授權保險人必須委任一名合資格並被保監局接納的精算師\nii.精算師的主要職責是對所有資產及負債進行評估\niii.只有人壽保險需要精算支援\niv.精算支援負責估算所需的未決申索儲備金",
@@ -3983,14 +3046,10 @@
       "c": "ii,iii,iv",
       "d": "i,iv"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 39,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 39
   },
   {
-    "id": "P1-exam-236",
     "number": 236,
     "ref": "4.1",
     "question": "一般新產品\"具有競爭力壽命\":意思是指?",
@@ -4000,14 +3059,10 @@
       "c": "產品被其他保險公司複製後完結",
       "d": "無限的"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 39,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 39
   },
   {
-    "id": "P1-exam-237",
     "number": 237,
     "ref": "4.2",
     "question": "客戶服務是保險公司的主要功能，建立公司形象屬於哪種職責範圍?",
@@ -4017,14 +3072,10 @@
       "c": "文件的提供",
       "d": "投訴"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 39,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 39
   },
   {
-    "id": "P1-exam-238",
     "number": 238,
     "ref": "4.1",
     "question": "產品開發是保險公司的重要功能，原因是:",
@@ -4034,14 +3085,10 @@
       "c": "可以看出，由於在過去幾年中保險監管框架的迅速變化，保險產品很快就過時了",
       "d": "必須根據不斷變化的法規要求對強制性保險單進行頻繁的修訂"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 39,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 39
   },
   {
-    "id": "P1-exam-239",
     "number": 239,
     "ref": "4.1",
     "question": "產品開發是保險公司的重要功能，原因是:",
@@ -4051,14 +3098,10 @@
       "c": "客戶對保險的需求不斷改變",
       "d": "新產品往往被競爭對手完全複製，因保險產品並沒擁有知識產權"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 39,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 39
   },
   {
-    "id": "P1-exam-240",
     "number": 240,
     "ref": "4.11",
     "question": "下列哪項或哪些涉及培訓及發展部的描述是正確的?\ni)培訓公司內部人員和外勤職員\nii)顯然與公司公持續發展相配合\niii)須由非職員主理培訓\niv)培訓設施及進度記錄對提高部門效率",
@@ -4068,14 +3111,10 @@
       "c": "i,iii,iv",
       "d": "ii,iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 39,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 39
   },
   {
-    "id": "P1-exam-241",
     "number": 241,
     "ref": "4.12",
     "question": "保險人必須先取得保險業監管局的認可，方可委任＿＿＿＿？",
@@ -4085,14 +3124,10 @@
       "c": "精算部門的職員",
       "d": "理賠部門的職員"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 40,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 40
   },
   {
-    "id": "P1-exam-242",
     "number": 242,
     "ref": "4.1",
     "question": "以下哪些項目有機會屬於產品開發部的功能？\ni)個別產品開發\nii)產品組合開發\niii)產品研究\niv)巿場趨勢",
@@ -4102,14 +3137,10 @@
       "c": "ii,iii,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 40,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 40
   },
   {
-    "id": "P1-exam-243",
     "number": 243,
     "ref": "4.1",
     "question": "對於保險人，產品的開發：",
@@ -4119,14 +3150,10 @@
       "c": "對強制性的業務來說是沒有必要的",
       "d": "在敲定了保單的用字後便不再需要"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 40,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 40
   },
   {
-    "id": "P1-exam-244",
     "number": 244,
     "ref": "4.1",
     "question": "下列哪項業務較可能與產品開發部有關?\ni)公共關係\nii)產品研究\niii)產品組合開發\niv)個別產品開發",
@@ -4136,14 +3163,10 @@
       "c": "i,ii,iii",
       "d": "ii,iii,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 40,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 40
   },
   {
-    "id": "P1-exam-245",
     "number": 245,
     "ref": "4.1",
     "question": "產品研究應將焦點放在：",
@@ -4153,14 +3176,10 @@
       "c": "本身及競爭對手的產品",
       "d": "本身及競爭對手的產品，以及市場的趨勢"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 40,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 40
   },
   {
-    "id": "P1-exam-246",
     "number": 246,
     "ref": "4.1",
     "question": "以下哪項有關全新產品「具有競爭力的壽命」的描述是正確的？",
@@ -4170,14 +3189,10 @@
       "c": "在競爭對手把焦點集中在新的保險產品之前，至少兩年時間",
       "d": "非常之長"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 40,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 40
   },
   {
-    "id": "P1-exam-247",
     "number": 247,
     "ref": "4.2",
     "question": "以下哪三方面有可能屬於客戶服務部門的職能範圍？\ni)文件的提供\nii)公共關係\niii)索償的談判\niv)一般的聯絡",
@@ -4187,14 +3202,10 @@
       "c": "i,iii,iv",
       "d": "ii,iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 41,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 41
   },
   {
-    "id": "P1-exam-248",
     "number": 248,
     "ref": "4.2",
     "question": "處理投訴屬於客戶服務部的重要職責之一，這是因為下列哪項或哪些原因?",
@@ -4204,14 +3215,10 @@
       "c": "處理投訴的方法，對客戶造成的影響",
       "d": "以上所有各項"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 41,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 41
   },
   {
-    "id": "P1-exam-249",
     "number": 249,
     "ref": "4.3",
     "question": "對於應告的工作，挑選公司以外的機構，採用其他媒介的深入程度，廣告活動的協調工作\n，很大可能是以下哪個部門的工作？",
@@ -4221,14 +3228,10 @@
       "c": "市場行銷及促銷部",
       "d": "保險銷售部"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 41,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 41
   },
   {
-    "id": "P1-exam-250",
     "number": 250,
     "ref": "4.5",
     "question": "以下哪項屬於核保的範疇?\ni)評估風險的可保性\nii)釐定可保風險的條款\niii)製備核保手冊和保費率指南\niv)製備「拒絕名單」",
@@ -4238,14 +3241,10 @@
       "c": "只有i,ii及iii",
       "d": "i,ii,iii,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 41,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 41
   },
   {
-    "id": "P1-exam-251",
     "number": 251,
     "ref": "4.5",
     "question": "壽險保單核保工作很重要，以下哪項原因是正確的:",
@@ -4255,14 +3254,10 @@
       "c": "壽險保單的保額通常巨大",
       "d": "壽險保單牽涉的佣金較大"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 41,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 41
   },
   {
-    "id": "P1-exam-252",
     "number": 252,
     "ref": "4.5",
     "question": "一項保險，保險人於其後時間不能取消，而且只可能對每項風險進行一次核保，此保險為\n:",
@@ -4272,14 +3267,10 @@
       "c": "海上船體保險",
       "d": "公眾責任保險"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 42,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 42
   },
   {
-    "id": "P1-exam-253",
     "number": 253,
     "ref": "4.5",
     "question": "下列哪一項有關一般保險業務的陳述是錯誤？",
@@ -4289,14 +3280,10 @@
       "c": "涉及之業務風險甚高",
       "d": "其賠償涉及複雜的紅利計算"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 42,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 42
   },
   {
-    "id": "P1-exam-254",
     "number": 254,
     "ref": "4.5",
     "question": "人壽保險核保部門眼中的「目標風險」，較可能屬於以下哪類風險？",
@@ -4306,14 +3293,10 @@
       "c": "保險人尤不願意承保的風險",
       "d": "有關保險代理人可得到較高佣金率的風險"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 42,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 42
   },
   {
-    "id": "P1-exam-255",
     "number": 255,
     "ref": "4.5",
     "question": "一個形容保險人極之希望爭取的壽險業務及極不想爭取的非壽險業務字眼為:",
@@ -4323,14 +3306,10 @@
       "c": "目標風險",
       "d": "投機風險"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 42,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 42
   },
   {
-    "id": "P1-exam-256",
     "number": 256,
     "ref": "4.5",
     "question": "保險人有時向保險中介人提供一些不可承保的職業，財產的名稱或類型方面的名單，這種\n名單通常稱之為",
@@ -4340,14 +3319,10 @@
       "c": "不可取的風險名單",
       "d": "不可接受的風險名單"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 42,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 42
   },
   {
-    "id": "P1-exam-257",
     "number": 257,
     "ref": "4.6",
     "question": "實際保單文件對於以下哪種保險業務是最重要的:",
@@ -4357,14 +3332,10 @@
       "c": "火險",
       "d": "汽車保險"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 42,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 42
   },
   {
-    "id": "P1-exam-258",
     "number": 258,
     "ref": "4.7",
     "question": "一般保險的理賠部門，不大考慮以下哪項?",
@@ -4374,14 +3345,10 @@
       "c": "代位權的可能性",
       "d": "比例分攤的應用"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 42,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 42
   },
   {
-    "id": "P1-exam-259",
     "number": 259,
     "ref": "4.7",
     "question": "處理人壽及非人壽索償時有的共同特性是數額的問題及：",
@@ -4391,14 +3358,10 @@
       "c": "責任的問題",
       "d": "代位權的問題"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 43,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 43
   },
   {
-    "id": "P1-exam-260",
     "number": 260,
     "ref": "4.7",
     "question": "對大多數非人壽保險索償，保險人支付數額均經過認真核實，用以描述索償支付數額的名\n詞為:",
@@ -4408,14 +3371,10 @@
       "c": "可追回金額",
       "d": "保險人的分擔"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 43,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 43
   },
   {
-    "id": "P1-exam-261",
     "number": 261,
     "ref": "4.7",
     "question": "處理人壽保險及一般保險理賠時出現的兩項主要共同的特點是責任及:",
@@ -4425,14 +3384,10 @@
       "c": "分擔",
       "d": "代位權"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 43,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 43
   },
   {
-    "id": "P1-exam-262",
     "number": 262,
     "ref": "4.9",
     "question": "最可能涉及訂定保費率，計算儲備及債務估值的專業人士為:",
@@ -4442,14 +3397,10 @@
       "c": "會計師",
       "d": "核保人"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 43,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 43
   },
   {
-    "id": "P1-exam-263",
     "number": 263,
     "ref": "4.9",
     "question": "一種要經過一段時間後，索償才會出現或形成的保險，精算師可說是居功不少，以下哪個\n是正確的。",
@@ -4459,14 +3410,10 @@
       "c": "長期保單",
       "d": "長期業務"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 43,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 43
   },
   {
-    "id": "P1-exam-264",
     "number": 264,
     "ref": "4.9",
     "question": "最可能協助保費率，儲蓄及債務估值方面計算的部門是:",
@@ -4476,14 +3423,10 @@
       "c": "培訓及發展",
       "d": "會計及投資"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 43,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 43
   },
   {
-    "id": "P1-exam-265",
     "number": 265,
     "ref": "4.10",
     "question": "下列哪項屬於會計及投資部門的工作?\ni)紀錄保存\nii)款項收集\niii)付款\niv)投資",
@@ -4493,14 +3436,10 @@
       "c": "ii，iii，iv",
       "d": "以上各項皆是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 44,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 44
   },
   {
-    "id": "P1-exam-266",
     "number": 266,
     "ref": "5.2",
     "question": "以下哪項就獲授權的保險人的描述是不正確的?",
@@ -4510,14 +3449,10 @@
       "c": "獲授權保險人不可以是專業再保險人",
       "d": "獲授權保險人可以是綜合業務保險人"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 44,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 44
   },
   {
-    "id": "P1-exam-267",
     "number": 267,
     "ref": "5.1.1",
     "question": "按照《保險業條例》的分類方法，以下哪項或哪些屬於長期保險的業務範圍?",
@@ -4527,14 +3462,10 @@
       "c": "婚姻及出生",
       "d": "財產損壞"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 44,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 44
   },
   {
-    "id": "P1-exam-268",
     "number": 268,
     "ref": "5.11",
     "question": "根據《保險業條例》，以下哪項屬於一般業務類別涵蓋營業中斷?",
@@ -4544,14 +3475,10 @@
       "c": "財產損壞",
       "d": "信貸"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 44,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 44
   },
   {
-    "id": "P1-exam-269",
     "number": 269,
     "ref": "5.5.1",
     "question": "以下哪項關於香港保險業聯會的陳述是正確的?",
@@ -4561,14 +3488,10 @@
       "c": "提供素質認證",
       "d": "除了香港保險人，它亦提升及推廣香港再保險人的共同利益"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 44,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 44
   },
   {
-    "id": "P1-exam-270",
     "number": 270,
     "ref": "5.5",
     "question": "香港保險業聯會的成立，其使命宣言是鼓勵會員達到最高道德標準及:",
@@ -4578,14 +3501,10 @@
       "c": "能力",
       "d": "索償標準"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 44,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 44
   },
   {
-    "id": "P1-exam-271",
     "number": 271,
     "ref": "5.5",
     "question": "過去曾經謍辦保險代理登記委員會的自我規管團體是:",
@@ -4595,14 +3514,10 @@
       "c": "香港保險顧問聯會",
       "d": "香港專業保險經紀協會"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 45,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 45
   },
   {
-    "id": "P1-exam-272",
     "number": 272,
     "ref": "5.1.4",
     "question": "再保險的目是：",
@@ -4612,14 +3527,10 @@
       "c": "提高承保能力",
       "d": "公共關係"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 45,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 45
   },
   {
-    "id": "P1-exam-273",
     "number": 273,
     "ref": "5.1.1",
     "question": "以下哪兩項屬於長期業務的類別?\ni)飛機方面的法律責任\nii)人壽及年金\niii)永久健康\niv)財產損壞",
@@ -4629,14 +3540,10 @@
       "c": "ii，iv",
       "d": "iii，iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 45,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 45
   },
   {
-    "id": "P1-exam-274",
     "number": 274,
     "ref": "5.1.1",
     "question": "根據《保險業條例》的分類，以下哪項或哪些保險屬於長期保險的業務範圍?",
@@ -4646,14 +3553,10 @@
       "c": "財產損壞",
       "d": "以上所有各項"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 45,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 45
   },
   {
-    "id": "P1-exam-275",
     "number": 275,
     "ref": "5.1.1",
     "question": "以下哪項是保險法定類別中長期保險業務所包括的保障：",
@@ -4663,14 +3566,10 @@
       "c": "資本贖回",
       "d": "財產損壞"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 45,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 45
   },
   {
-    "id": "P1-exam-276",
     "number": 276,
     "ref": "5.1.1",
     "question": "因意外喪失能力或健康欠佳提供利益的長期保單是？",
@@ -4680,14 +3579,10 @@
       "c": "意外及疾病",
       "d": "永久喪失能力"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 45,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 45
   },
   {
-    "id": "P1-exam-277",
     "number": 277,
     "ref": "5.1.1",
     "question": "根據《保險業條例》以下哪項為一般而非長期業務？",
@@ -4697,14 +3592,10 @@
       "c": "資本贖回",
       "d": "財產損壞"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 46,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 46
   },
   {
-    "id": "P1-exam-278",
     "number": 278,
     "ref": "5.1.1",
     "question": "根據《保險業條例》的保險類別分類，以下哪項保險屬於一般保險而非包括在長期業務的\n業務範圍內:",
@@ -4714,14 +3605,10 @@
       "c": "永久健康",
       "d": "資本贖回"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 46,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 46
   },
   {
-    "id": "P1-exam-279",
     "number": 279,
     "ref": "5.1.2",
     "question": "根據保險的實務類別，保險分類有四個類別，包括人壽，水險，火災及意外，這屬於以下\n哪項的分類？",
@@ -4731,14 +3618,10 @@
       "c": "部門式",
       "d": "業務式"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 46,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 46
   },
   {
-    "id": "P1-exam-280",
     "number": 280,
     "ref": "5.1.2",
     "question": "根據英國部門式分類的制度，主要分為四大類(意外險、火險、壽險及海上保險)。美國制\n度下，則分為兩大類，包括人壽和非人壽。後者亦經常進一步劃分為:",
@@ -4748,14 +3631,10 @@
       "c": "海上保險，火險，保證及意外險",
       "d": "汽車及責任"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 46,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 46
   },
   {
-    "id": "P1-exam-281",
     "number": 281,
     "ref": "5.1.2",
     "question": "保險業務的其中一種分類是按客戶分類的，以下哪項是正確的:",
@@ -4765,14 +3644,10 @@
       "c": "個人和商業",
       "d": "業務和非業務"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 46,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 46
   },
   {
-    "id": "P1-exam-282",
     "number": 282,
     "ref": "5.1.3",
     "question": "以下哪項或哪些是保險業中的學術分類",
@@ -4782,14 +3657,10 @@
       "c": "一籃子保險",
       "d": "以上各項都是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 46,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 46
   },
   {
-    "id": "P1-exam-283",
     "number": 283,
     "ref": "5.1.4",
     "question": "對於特定的保險公司，「分出再保險」與「分入再保險」的分别是：",
@@ -4799,14 +3670,10 @@
       "c": "分入再保險以該公司作為再保險人",
       "d": "分出再保險以該公司作為再保險人"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 47,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 47
   },
   {
-    "id": "P1-exam-284",
     "number": 284,
     "ref": "5.1.4",
     "question": "以下哪一項是有關再保險的正確描述?",
@@ -4816,14 +3683,10 @@
       "c": "再保險只適用於核事故或天災的大型風險",
       "d": "再保險是保險人增加資本的方法"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 47,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 47
   },
   {
-    "id": "P1-exam-285",
     "number": 285,
     "ref": "5.2.1",
     "question": "在香港獲授權的保險人，劃分為純一般業務保險人、純長期業務保險人及：",
@@ -4833,14 +3696,10 @@
       "c": "兩險種保險人",
       "d": "多險種保險人"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 47,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 47
   },
   {
-    "id": "P1-exam-286",
     "number": 286,
     "ref": "5.5.1",
     "question": "以下哪項有關保險業聯會的正確描述？",
@@ -4850,14 +3709,10 @@
       "c": "香港保險業聯會是由保險代理登記委員會成立的",
       "d": "香港保險業聯會的成立目的是向香港及世界各地宣傳保險訊息"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 47,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 47
   },
   {
-    "id": "P1-exam-287",
     "number": 287,
     "ref": "5.5.1",
     "question": "以下哪項是香港保險業聯會的正確陳述？",
@@ -4867,14 +3722,10 @@
       "c": "它的目的之一是推廣在香港經營業務的保險人的共同利益",
       "d": "它的目的之一是向香港及世界各地推廣保險的利益"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 47,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 47
   },
   {
-    "id": "P1-exam-288",
     "number": 288,
     "ref": "5.5.3",
     "question": "香港汽車保險局的存在目的是：",
@@ -4884,14 +3735,10 @@
       "c": "用以向沒有購買汽車保險的人提出檢控",
       "d": "上述各項皆是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 47,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 47
   },
   {
-    "id": "P1-exam-289",
     "number": 289,
     "ref": "6.2.1",
     "question": "以下哪項為保監局施行的發牌制度的描述是正確的?",
@@ -4901,14 +3748,10 @@
       "c": "獲授權保險人的職員，從事受規管活動則無須首先獲得保監局發出的牌照",
       "d": "邀請某人作出“關鍵決定”必須首先取得個人保險代理牌照"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 48,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 48
   },
   {
-    "id": "P1-exam-290",
     "number": 290,
     "ref": "6.1.1c",
     "question": "以下哪幾項有關保險公司的償付準備金規定的描述是正確的?\ni.償付準備金至少相當於「有關數額」\nii.一般業務及長期業務保險人有相同的最低償付準備金額要求\niii.一般業務及長期業務保險人有不同的計算準則\nvi.專屬自保保險人有另一套適用的計算準則",
@@ -4918,14 +3761,10 @@
       "c": "ii,iii,iv",
       "d": "i,iii"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 48,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 48
   },
   {
-    "id": "P1-exam-291",
     "number": 291,
     "ref": "6.2.4(iv)",
     "question": "以下哪項是持牌保險經紀公司的發牌條件?",
@@ -4935,14 +3774,10 @@
       "c": "申請人並非持有保險代理機構牌照",
       "d": "申請人持有保險代理機構牌照"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 48,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 48
   },
   {
-    "id": "P1-exam-292",
     "number": 292,
     "ref": "6.1.1b",
     "question": "根據《保險業條例》，實繳股本的最低要求為200萬港元適用於？\n於香港的一般業務保險人必須就其從香港保險業務所產生的負債在香港維持正資產，以下",
@@ -4952,14 +3787,10 @@
       "c": "只經營一般業務",
       "d": "只經營長期業務"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 48,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 48
   },
   {
-    "id": "P1-exam-293",
     "number": 293,
     "ref": "6.11f",
     "question": "哪項就所需數額計算的描述是正確的?\ni.淨負債額（即已經扣除再保險所保的那部分）的百分之80%\nii.計算保險人的淨負債額（即已經扣除不保損失的部分）的80%及有關數額加起來\niii.所需數額以訂明的兩種匯算方法之一計算\niv.計算保險人的淨負債額（即已經扣除具爭議的債務）的80%及有關數額加起來",
@@ -4969,14 +3800,10 @@
       "c": "i,ii,iv",
       "d": "i,iii,iv"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 48,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 48
   },
   {
-    "id": "P1-exam-294",
     "number": 294,
     "ref": "6.1.1b",
     "question": "根據《保險業條例》，以下哪項就實繳股本要求是不正確的？",
@@ -4986,14 +3813,10 @@
       "c": "同時經營一般及長期業務為2000萬港元",
       "d": "只經營長期業務為1000萬港元"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 48,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 48
   },
   {
-    "id": "P1-exam-295",
     "number": 295,
     "ref": "6.2.4(i)",
     "question": "以下哪項是持牌保險代理機構的發牌條件?",
@@ -5003,14 +3826,10 @@
       "c": "並非持有持牌業務代表（代理人）牌照",
       "d": "只可以合夥公司才可申請牌照"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 49,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 49
   },
   {
-    "id": "P1-exam-296",
     "number": 296,
     "ref": "6.2.2",
     "question": "《保險業條例》第68條對_______________就其委任的保險代理人的作為須負上\n轉承責任。",
@@ -5020,14 +3839,10 @@
       "c": "獲授權保險人",
       "d": "獲授權被保險人"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 49,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 49
   },
   {
-    "id": "P1-exam-297",
     "number": 297,
     "ref": "6.2.4(c)",
     "question": "沒有按照法院的頒令償還任何判定債務，這未能滿足哪項發牌條件?",
@@ -5037,14 +3852,10 @@
       "c": "足夠的再保險安排",
       "d": "以上各頂皆是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 49,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 49
   },
   {
-    "id": "P1-exam-298",
     "number": 298,
     "ref": "6.1.1b",
     "question": "有關保險人的獲授權要求，以下哪一項描述是正確的?",
@@ -5054,14 +3865,10 @@
       "c": "足夠再保險是保險人獲的授權的最低要求",
       "d": "《承保商專業守則》規定了“適當人選”的相關要求"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 49,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 49
   },
   {
-    "id": "P1-exam-299",
     "number": 299,
     "ref": "6.1.1",
     "question": "根據《2015年保險公司（修訂）條例》，下列哪項不屬保險業監管局成立的政策目標？\ni.為保單持有人提供更佳的保障\nii.建立一個直接規管保險中介人的制度，以補充舊有的自律規管制度\niii.確保保險業的規管架構與時並進，促使保險業的高速發展\niv.就保險業採取適當措施，鞏固香港的國際保險中心地位",
@@ -5071,14 +3878,10 @@
       "c": "ii,iii,iv",
       "d": "iii,iv"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 49,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 49
   },
   {
-    "id": "P1-exam-300",
     "number": 300,
     "ref": "6.1.3",
     "question": "以下哪項是保險投訴局服務的必要條件?\ni.相關中介人必須是保險投訴局會員\nii.投訴個案不可以與索償無關\niii.投訴人必須為被保險人或保單持有人\niv.保單為商業保險保單",
@@ -5088,14 +3891,10 @@
       "c": "ii,iv",
       "d": "以上各項皆是"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 49,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 49
   },
   {
-    "id": "P1-exam-301",
     "number": 301,
     "ref": "6.1",
     "question": "根據《2015年保險公司（修訂）條例》，下列哪項不是保險業監管局成立的政策目標？\ni.為保單持有人提供經濟援助\nii.確保保險業的規管架構與時並進，促使保險業的高速發展\niii.確保保險業的償付準備金與國際慣例看齊\niv.與國際慣常做法看齊，監管機構在財政上和運作上獨立於政府",
@@ -5105,14 +3904,10 @@
       "c": "i,ii",
       "d": "ii,iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 50,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 50
   },
   {
-    "id": "P1-exam-302",
     "number": 302,
     "ref": "6.1.1a",
     "question": "根據《保險業條例》就獲得授權的最低要求，當中包括：\ni.董事及控權人\nii.實繳股本\niii.利潤率\niv.足夠的投資保險安排",
@@ -5122,14 +3917,10 @@
       "c": "i,iii,iv",
       "d": "ii,iii,iv"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 50,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 50
   },
   {
-    "id": "P1-exam-303",
     "number": 303,
     "ref": "6.1",
     "question": "以下哪一項就《保險業條例》的描述是正確的?",
@@ -5139,14 +3930,10 @@
       "c": "《保險業條例》於2015年經修訂後由保險業監理處執行",
       "d": "《保險業條例》2017年6生效後，已重新命名為《保險公司條例》"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 50,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 50
   },
   {
-    "id": "P1-exam-304",
     "number": 304,
     "ref": "6..1.1e",
     "question": "《與有關公司安排再保險的指引》之所以重要，原因是:",
@@ -5156,14 +3943,10 @@
       "c": "當再保險人與某保險有關連的時候，保險人對其再保險安排時須向保監局提出報告",
       "d": "當再保險人與某保險有關連的時候，保險人對其再保險安排時須得到保監局批准"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 50,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 50
   },
   {
-    "id": "P1-exam-305",
     "number": 305,
     "ref": "6.2.5(f)(ii)",
     "question": "以下哪項有關《持牌保險經紀操守守則》一般原則2–\n以符合客戶的最佳利益行事並公平對待客戶的描述是正確的？",
@@ -5173,14 +3956,10 @@
       "c": "應就其進行的受規管活動保存妥善的紀錄，以遵守所有適用的法律",
       "d": "應有足夠的管控及保障，以防止未經授權存取客戶資產"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 50,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 50
   },
   {
-    "id": "P1-exam-306",
     "number": 306,
     "ref": "6.2.4",
     "question": "個人持牌人承擔並非與進行受規管活動有關的責任，該等責任是否將會引致利益衝突，涉\n及甚麼領域?",
@@ -5190,14 +3969,10 @@
       "c": "財政狀況",
       "d": "其他事宜"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 51,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 51
   },
   {
-    "id": "P1-exam-307",
     "number": 307,
     "ref": "6.1.3b",
     "question": "保險索償投訴委員會能處理以下的個案：",
@@ -5207,14 +3982,10 @@
       "c": "十萬港元的個人財產保險索償（全險）",
       "d": "正在進行中的仲裁索償"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 51,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 51
   },
   {
-    "id": "P1-exam-308",
     "number": 308,
     "ref": "6.1.3c",
     "question": "以下哪項與索償無關的個案屬保險投訴局的職權範圍?\ni.一項涉及100,000港元的保單爭議金額\nii.已就該糾紛個案進入法律程序\niii.保險人收取過高保費，猶如比客人實際年齡大了10歲，客人投訴於銷售的過程中沒有\n驗證其真實年齡\niv.對保險人派發紅利金額的投訴，客人聲稱銷售過程中承諾該保單是屬於「抗通脹保單\n」",
@@ -5224,14 +3995,10 @@
       "c": "ii,iii",
       "d": "i,iii,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 51,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 51
   },
   {
-    "id": "P1-exam-309",
     "number": 309,
     "ref": "6.1.3b",
     "question": "以下哪項與索償有關的個案屬保險投訴局的職權範圍?\ni.100,000港元個人保單索償\nii.因違反保單條款，300,000港元家居保險索償爭議\niii.涉及汽車保險的無償折扣糾紛\niv.汽車全險中涉及10,000港元的玻璃保險索償",
@@ -5241,14 +4008,10 @@
       "c": "i.ii",
       "d": "i,iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 51,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 51
   },
   {
-    "id": "P1-exam-310",
     "number": 310,
     "ref": "6.1.1g",
     "question": "以下哪些《2015年保險公司（修訂）條例》就保險業監管局新增的年修訂條例》下新增的\n規管權力？",
@@ -5258,14 +4021,10 @@
       "c": "限制保費收入",
       "d": "以上各項皆是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 51,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 51
   },
   {
-    "id": "P1-exam-311",
     "number": 311,
     "ref": "6.1",
     "question": "根據《2015年保險公司（修訂）條例》，下列哪項是保險業監管局成立的政策目標？\ni.就影響保險業的事宜，進行研究\nii.提升保險業界在環球保險業市場的競爭力\niii.協助特區行政長官維持香港金融穩定\niv.提高保單持有人對保險產品和保險業的了解",
@@ -5275,14 +4034,10 @@
       "c": "i,iii,iv",
       "d": "ii,iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 52,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 52
   },
   {
-    "id": "P1-exam-312",
     "number": 312,
     "ref": "6.2.4",
     "question": "保監局評估某人是否屬於適當人選時，就保險公司的控權人、合夥人、董事或負責人以及\n獲委任精算師有甚麼考慮因素?\ni.該人的學歷、或其他資歷或經驗\nii.是否有能力稱職地、誠實地並公正地進行受規管活動\niii.該人的信譽、品格、可靠程度和誠信\niv.該人的財政狀況或償付能力",
@@ -5292,14 +4047,10 @@
       "c": "iii,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 52,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 52
   },
   {
-    "id": "P1-exam-313",
     "number": 313,
     "ref": "6.1.2(d)",
     "question": "以下哪項不是承保商專業守則第四部分關於保險代理人管理需加強注意的?",
@@ -5309,14 +4060,10 @@
       "c": "確保保險代理人在職務上得到足夠的支援",
       "d": "以上各項皆是"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 52,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 52
   },
   {
-    "id": "P1-exam-314",
     "number": 314,
     "ref": "6.1.2",
     "question": "以下哪項是承保商專業守則的描述是正確的?",
@@ -5326,14 +4073,10 @@
       "c": "列明保險代理管理的優良保險做法",
       "d": "以上各項皆是"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 52,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 52
   },
   {
-    "id": "P1-exam-315",
     "number": 315,
     "ref": "6.1.2",
     "question": "以下哪項是承保商專業守則的描述是正確的?",
@@ -5343,14 +4086,10 @@
       "c": "保險人的資本規定",
       "d": "以上皆是"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 52,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 52
   },
   {
-    "id": "P1-exam-316",
     "number": 316,
     "ref": "6.1.1(d)",
     "question": "《獲授權保險人的公司管治指引》的目的是:",
@@ -5360,14 +4099,10 @@
       "c": "保障投保大眾的利益",
       "d": "有效的公司治理"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 52,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 52
   },
   {
-    "id": "P1-exam-317",
     "number": 317,
     "ref": "6.2.4",
     "question": "以下哪項是持牌保險代理機構的主要發牌條件?",
@@ -5377,14 +4112,10 @@
       "c": "申請人獲最少4名獲授權保險人委任為代理人",
       "d": "申請人不可以是合夥經營"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 53,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 53
   },
   {
-    "id": "P1-exam-318",
     "number": 318,
     "ref": "6.1.1f",
     "question": "為更有效規管保險人名保單持有人的利益，以下哪項是《2015年修訂條例》下獲賦保監局\n新增的規管權力?",
@@ -5394,14 +4125,10 @@
       "c": "命令保險人以審計署作為審計師的權力",
       "d": "進行查察及對未應健全承保政策的保險人展開調查及向獲授權保險人施罰款的權力"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 53,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 53
   },
   {
-    "id": "P1-exam-319",
     "number": 319,
     "ref": "6.1.3",
     "question": "以下哪項是保險投訴局的描述是正確的?",
@@ -5411,14 +4138,10 @@
       "c": "只能處理保單屬非索償相關的投訴個案",
       "d": "所有在香港從事個人保險業務的獲授權保險人可自願申請成為保險投訴局的會員"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 53,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 53
   },
   {
-    "id": "P1-exam-320",
     "number": 320,
     "ref": "6.1",
     "question": "根據《2015年保險公司（修訂）條例》，保險業監管局成立的政策目標是甚麽？",
@@ -5428,14 +4151,10 @@
       "c": "建立一個保險中介人的法定發牌制度，補充自律規管制度",
       "d": "以上皆不是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 53,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 53
   },
   {
-    "id": "P1-exam-321",
     "number": 321,
     "ref": "6.1",
     "question": "下列那項屬於保險業監管局根據保險業條例承擔的職能或任務？",
@@ -5445,14 +4164,10 @@
       "c": "透過新的發牌制度，規管保險中介人的操守",
       "d": "擴大先前所制定的監管制度從而覆蓋所有每天聯繫客戶的保險從業員"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 53,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 53
   },
   {
-    "id": "P1-exam-322",
     "number": 322,
     "ref": "6.1.1b",
     "question": "專屬自保保險人的實繳股本最低要求為：",
@@ -5462,14 +4177,10 @@
       "c": "800萬港元",
       "d": "1000萬港元"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 53,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 53
   },
   {
-    "id": "P1-exam-323",
     "number": 323,
     "ref": "6.1.1d",
     "question": "保險業監管局發出了《獲授權保險人的公司管治指引》旨在:",
@@ -5479,14 +4190,10 @@
       "c": "防止獲授權保險人的高級管理人員作出欺詐行為，及行政出錯",
       "d": "確保獲授權保險人的董事局優先考慮保單持有人的利益"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 53,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 53
   },
   {
-    "id": "P1-exam-324",
     "number": 324,
     "ref": "6.1.1f",
     "question": "《保險業條例》列明經營一般業務的保險人必須就其從香港保險業務所產生的負債在香港\n維持資產，用來釐定這一數據的方法之一，是計算有關數額與以下之總和：\n以下哪些新增的監管權力是保險業監管局就《2015年保險公司（修訂）條例》所授予，對",
@@ -5496,14 +4203,10 @@
       "c": "净負債額（扣除再保險部分及可爭議負債）的80%",
       "d": "净負債額（扣除再保險部分）的80%"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 54,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 54
   },
   {
-    "id": "P1-exam-325",
     "number": 325,
     "ref": "6.1.1f",
     "question": "獲授權保險人施予的紀律處分？\ni.公開譴責\nii.對新業務的限制\niii.罰款\niv.限制保費收入",
@@ -5513,14 +4216,10 @@
       "c": "i，iii",
       "d": "ii，iii，iv"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 54,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 54
   },
   {
-    "id": "P1-exam-326",
     "number": 326,
     "ref": "6.1.2a",
     "question": "《承保商專業守則》的目的是對核保、索償產品分析等訂立:",
@@ -5530,14 +4229,10 @@
       "c": "投保的優良做法",
       "d": "索償做法"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 54,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 54
   },
   {
-    "id": "P1-exam-327",
     "number": 327,
     "ref": "6.1.2c",
     "question": "根據《承保商專業守則》，以下哪一項是關於理賠索償方面的要求描述是正確的?",
@@ -5547,14 +4242,10 @@
       "c": "不得委派理賠師以外第三者處理索償",
       "d": "代表保險人的理賠師應該具備的專業資格"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 54,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 54
   },
   {
-    "id": "P1-exam-328",
     "number": 328,
     "ref": "6.1.2c",
     "question": "根據《承保商專業守則》，以下哪一項是關於理賠索償方面的要求描述是正確的?",
@@ -5564,14 +4255,10 @@
       "c": "不得委派律師或理賠師以外第三者",
       "d": "代表保險人的第三者，在任何情況下都應當合理地行事，並且應該具備專業資格"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 54,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 54
   },
   {
-    "id": "P1-exam-329",
     "number": 329,
     "ref": "6.1.3",
     "question": "以下哪項是保險投訴局的描述是正確的?\ni)會員是在香港從事個人保險業務的獲授權保險人\nii)涉及的投訴個案保單須屬個人保單\niii)保險投訴委員會兩名委員必須來會計，法律或精算等業界\niv)保險投訴委員會兩名委員來自保險業界",
@@ -5581,14 +4268,10 @@
       "c": "iii,iv",
       "d": "i.ii,iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 55,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 55
   },
   {
-    "id": "P1-exam-330",
     "number": 330,
     "ref": "6.1.3b",
     "question": "以下哪幾項是保險投訴局有權處理的個案:\ni.發現沒有保證退保價值，客人投訴保險人於銷售過程中隱瞞沒有保證價值此事實\nii.投保人訴在核保結果為次標準風險\niii保險人收取過高保費，猶如比客人實際年齡大了10歲，客人投訴於銷售的過程中沒有\n驗證其真實年齡\niv.對保險人派發紅利金額的投訴，客人聲稱銷售過程中承諾該保單是屬於「抗通脹保單\n」",
@@ -5598,14 +4281,10 @@
       "c": "iii,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 55,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 55
   },
   {
-    "id": "P1-exam-331",
     "number": 331,
     "ref": "6.1.3c",
     "question": "保險人與保單持有人發生爭議，儘管保險合約中可能設有仲裁條款，保單持有人仍可向保\n險投訴局尋求調解服務，以下哪一項是該服務需要滿足的條件？\ni.爭議屬索償無關的投訴個案\nii.爭議賠償金額為80萬港元以下\niii.雙方必要放棄仲裁權利\niv涉案保險人已對索償或爭議作出了最終決定",
@@ -5615,14 +4294,10 @@
       "c": "iii,iv",
       "d": "i,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 55,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 55
   },
   {
-    "id": "P1-exam-332",
     "number": 332,
     "ref": "6.1.3c",
     "question": "保險人與保單持有人發生爭議，保險合約可能包含仲裁條款，保單持有人可向保險投訴局\n尋求調解服務，保險投訴局解釋以下哪項條件先需要滿足？\ni.爭議屬索償無關的投訴個案\nii.爭議賠償金額為80萬港元以下\niii.未能滿足保險投訴局的裁決條件\niv涉案保險人已對爭議作出了最終決定",
@@ -5632,14 +4307,10 @@
       "c": "iii,iv",
       "d": "i,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 55,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 55
   },
   {
-    "id": "P1-exam-333",
     "number": 333,
     "ref": "6.1.3c",
     "question": "以下哪一項與索償無關的個案肯定不屬保險投訴局的職權範圍?\n利息\n法\n證其真實年齡",
@@ -5649,14 +4320,10 @@
       "c": "保險人收取過高保費，猶如比客人實際年齡大了10歲，客人投訴於銷售的過程中沒有驗",
       "d": "對保險人派發紅利金額的投訴，客人聲稱銷售過程中承諾該保單是屬於「抗通脹保單」"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 56,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 56
   },
   {
-    "id": "P1-exam-334",
     "number": 334,
     "ref": "6.1.3c",
     "question": "以下哪一項是保險投訴局提供與索償無關的調解服務的先決條件?",
@@ -5666,14 +4333,10 @@
       "c": "受理金額上限為95萬港元",
       "d": "儘管鼓勵爭議雙方簽訂協議，但雙方無法簽訂"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 56,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 56
   },
   {
-    "id": "P1-exam-335",
     "number": 335,
     "ref": "6.2",
     "question": "有關《持牌保險代理人操守守則》，以下哪項描述是正確的?\ni.該守則由保監局頒布\nii.該守則列明八項持牌保險代理人應遵守的基本操守原則的一般原則\niii.為《保險業條例》提供指引，考慮持牌保險中介人是否屬繼續持牌的適當人選\niv.該守則保險業條例的附屬法例及有法律效力",
@@ -5683,14 +4346,10 @@
       "c": "ii,iv",
       "d": "ii,iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 56,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 56
   },
   {
-    "id": "P1-exam-336",
     "number": 336,
     "ref": "6.2.1",
     "question": "在新的牌照制度下，已獲保監局發出作為任何持牌保險代理機構進行一個或多於一個業務\n系列的受規管活動的牌照的個人，屬於以下哪一個牌照類別?",
@@ -5700,14 +4359,10 @@
       "c": "持牌保險代理機構",
       "d": "以上皆不是"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 56,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 56
   },
   {
-    "id": "P1-exam-337",
     "number": 337,
     "ref": "6.2.1",
     "question": "在新的牌照制度下，已獲保監局發出作為任何持牌保險經紀公司進行一個或多於一個業務\n系列的受規管活動的牌照的個人，屬於以下哪一個牌照類別?",
@@ -5717,14 +4372,10 @@
       "c": "持牌保險代理機構",
       "d": "以上皆不是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 56,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 56
   },
   {
-    "id": "P1-exam-338",
     "number": 338,
     "ref": "6.2.1",
     "question": "凡有意在經營業務或受僱過程中或為報酬而進行“受規管活動”必須首先獲得保監局發出\n的牌照，以下哪一項不屬於五類持牌人?",
@@ -5734,14 +4385,10 @@
       "c": "持牌業務代表（代理人）",
       "d": "持牌保險業務機構"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 56,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 56
   },
   {
-    "id": "P1-exam-339",
     "number": 339,
     "ref": "6.2.1",
     "question": "根據法定規定，以下哪些需要至少一名負責人\n(i)持牌保險機構\n(ii)持牌保險代理\n(iii)持牌保險代理機構\n(iv)持牌保險經紀公司",
@@ -5751,14 +4398,10 @@
       "c": "(ii)及(iv)而已",
       "d": "(iii)及(iv)而已"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 57,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 57
   },
   {
-    "id": "P1-exam-340",
     "number": 340,
     "ref": "6.2.2",
     "question": "《保險業條例》對獲授權保險人就其委任的保險代理人(受委人)，就其向該客戶就發出保\n險合約或關乎該合約的相關保險業務有所往來的作為須負上__________。",
@@ -5768,14 +4411,10 @@
       "c": "最高誠信",
       "d": "牌照"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 57,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 57
   },
   {
-    "id": "P1-exam-341",
     "number": 341,
     "ref": "6.2.4(c)",
     "question": "負責人須最少具有多少年保險業管理經驗？",
@@ -5785,14 +4424,10 @@
       "c": "10年",
       "d": "15年"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 57,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 57
   },
   {
-    "id": "P1-exam-342",
     "number": 342,
     "ref": "6.2.4(c)",
     "question": "評估商業實體有否識別出主要風險，及制訂策略以減低該等風險。涉及以下哪領域？",
@@ -5802,14 +4437,10 @@
       "c": "財政狀況",
       "d": "其他事宜"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 57,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 57
   },
   {
-    "id": "P1-exam-343",
     "number": 343,
     "ref": "6.2.4(c)",
     "question": "商業實體就遵守與其進行的業務系列的受規管活動相關的所有法律、規則、規例、守則、\n指引及其他規管規定設立足夠及有效的政策、程序及管控，涉及甚麼領域?",
@@ -5819,14 +4450,10 @@
       "c": "財政狀況",
       "d": "其他事宜"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 57,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 57
   },
   {
-    "id": "P1-exam-344",
     "number": 344,
     "ref": "6.2.4(c)",
     "question": "該人士須是香港永久性居民；或持有不限制該人在香港進行受規管活動的適當入境簽證或\n許可的人士。涉及以下哪領域？",
@@ -5836,14 +4463,10 @@
       "c": "財政狀況",
       "d": "其他事宜"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 57,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 57
   },
   {
-    "id": "P1-exam-345",
     "number": 345,
     "ref": "6.2.5(a)",
     "question": "根據規則3，任何人最多可獲4名獲授權保險人委任為“持牌人士”—持牌保險代理或持牌\n個人代理—進行受規管活動，其中獲授權經營__________________不得超過2名。",
@@ -5853,14 +4476,10 @@
       "c": "綜合業務保險人",
       "d": "以上各項皆不是"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 58,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 58
   },
   {
-    "id": "P1-exam-346",
     "number": 346,
     "ref": "6.1.1b",
     "question": "根據《保險業條例》，以下哪項有關最低實繳股本的要求是正確的?\ni)專屬自保保險公司為港幣200萬元\nii)只從事相連長期保險業務的保險人為港幣1,000萬元\niii)同時從事一般業務及長期業務為港幣2,000萬元\niv)從事一般業務的保險人﹝包括法定保險業務﹞為港幣2,000萬元",
@@ -5870,14 +4489,10 @@
       "c": "ii,iii,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 58,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 58
   },
   {
-    "id": "P1-exam-347",
     "number": 347,
     "ref": "6.1.1b",
     "question": "根據《保險業條例》，以下哪項有關最低實繳股本的要求是正確的？\ni)專屬自保保險公司為港幣200萬元\nii)只從事長期保險的業務保險為港幣1000萬元\niii)同時從事一般業務及長期業務的保險人為港幣2000萬元\niv)從事人身意外保險業務和汽車責任保險業務的保險人為港幣2000萬元",
@@ -5887,14 +4502,10 @@
       "c": "ii,iii,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 58,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 58
   },
   {
-    "id": "P1-exam-348",
     "number": 348,
     "ref": "6.1.1c",
     "question": "根據《保險業條例》，規定償付準備金的最低要求為200萬港元，這適用於長期業務或：",
@@ -5904,14 +4515,10 @@
       "c": "專屬自保保險公司",
       "d": "專業再保險公司"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 58,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 58
   },
   {
-    "id": "P1-exam-349",
     "number": 349,
     "ref": "6.1.1f",
     "question": "保險業條例要求所有保險人根據其要求呈交準備好的財務報表，呈交的頻率是:",
@@ -5921,14 +4528,10 @@
       "c": "每季度",
       "d": "每三年"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 58,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 58
   },
   {
-    "id": "P1-exam-350",
     "number": 350,
     "ref": "6.1.1f",
     "question": "《保險業條例》要求參與一般業務的保險人定期繳交甚麼報表?\ni)經審計的一般業務報表\nii)經審計的資產負債表\niii)經審計的精算報告表\niv)經審計的長期業務報表",
@@ -5938,14 +4541,10 @@
       "c": "ii，iii，iv",
       "d": "i，ii，iii"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 59,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 59
   },
   {
-    "id": "P1-exam-351",
     "number": 351,
     "ref": "6.1.1f",
     "question": "以下哪些新增的監管權力是保險業監管局就《2015年保險公司（修訂）條例》所授予，對\n獲授權保險人施予的紀律處分？\ni.將保險人清盤\nii.限制投資\niii.非公開譴責\niv.罰款",
@@ -5955,14 +4554,10 @@
       "c": "iii，iv",
       "d": "ii，iii，iv"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 59,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 59
   },
   {
-    "id": "P1-exam-352",
     "number": 352,
     "ref": "6.1.1g",
     "question": "根據《保險業條例》及相關法例，以下哪項屬於保險業監管局的干預範圍：\ni)限制保費收入\nii)將保險人清盤\niii)特定的精算調查\niv)行使對保險人的管理權",
@@ -5972,14 +4567,10 @@
       "c": "只有i,ii,iii",
       "d": "i,ii,iii,iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 59,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 59
   },
   {
-    "id": "P1-exam-353",
     "number": 353,
     "ref": "6.1.2a",
     "question": "以下哪項的目的是在訂立與核保、索償、產品分析相關的符合標準的優良保險做法?",
@@ -5989,14 +4580,10 @@
       "c": "保險業條例",
       "d": "保險業監管局發出指引"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 59,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 59
   },
   {
-    "id": "P1-exam-354",
     "number": 354,
     "ref": "6.1.2a",
     "question": "《承保商專業守則》的目的是對核保、索償產品分析等訂立:",
@@ -6006,14 +4593,10 @@
       "c": "投保的優良慣例",
       "d": "索償慣例"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 59,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 59
   },
   {
-    "id": "P1-exam-355",
     "number": 355,
     "ref": "6.1.2a",
     "question": "《承保商業守則》旨在訂立應有水平的優良保險慣例，包括：\ni)產品分析\nii)保險合約下的顧客權益及須負的責任\niii)廣泛的顧客權利及權益\niv)提高行業的公眾形象以作為優秀企業公民",
@@ -6023,14 +4606,10 @@
       "c": "ii,iii,iv",
       "d": "以上各項皆是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 60,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 60
   },
   {
-    "id": "P1-exam-356",
     "number": 356,
     "ref": "6.1.3",
     "question": "保險投訴局成員包括：",
@@ -6040,14 +4619,10 @@
       "c": "本港獲授權長期業務的保險人而已",
       "d": "本港所有承保個人壽險的獲授權保險人"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 60,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 60
   },
   {
-    "id": "P1-exam-357",
     "number": 357,
     "ref": "6.1.3",
     "question": "保險投訴局成立的基本目的是：",
@@ -6057,14 +4632,10 @@
       "c": "處理來自以個人作保單持有人的索償投訴",
       "d": "處理來自第三者的法定保險索償"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 60,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 60
   },
   {
-    "id": "P1-exam-358",
     "number": 358,
     "ref": "6.1.3a",
     "question": "投訴索償委員會由5人組成，當中有幾人來自保險業？",
@@ -6074,14 +4645,10 @@
       "c": "3人",
       "d": "4人"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 60,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 60
   },
   {
-    "id": "P1-exam-359",
     "number": 359,
     "ref": "6.1.3b",
     "question": "以下哪幾項是保險投訴局有權處理的個案:\ni.發現沒有保證退保價值，客人投訴保險人於銷售過程中隱瞞沒有保證價值此事實\nii.保險人收取過高保費，猶如比客人實際年齡大了10歲，客人投訴於銷售的過程中沒有\n驗證其真實年齡\niii.客人投訴保險人服務差，從而令客人有損失\niv.對保險人派發紅利金額的投訴，客人聲稱銷售過程中承諾該保單是屬於「抗通脹保單\n」",
@@ -6091,14 +4658,10 @@
       "c": "ii,iii,iv",
       "d": "iii,iv"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 60,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 60
   },
   {
-    "id": "P1-exam-360",
     "number": 360,
     "ref": "6.1.3c",
     "question": "保險投訴局提供與索償無關調解服務，以下哪些描述正確？",
@@ -6108,14 +4671,10 @@
       "c": "無論勝訴與否，保險人須負擔80%服務費用",
       "d": "爭議雙方使用保險投訴局的調解服務前，須已通過仲裁程序並未能從中成功解決紛爭"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 60,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 60
   },
   {
-    "id": "P1-exam-361",
     "number": 361,
     "ref": "6.2.5(a)",
     "question": "任何代理人最多可以代表:",
@@ -6125,14 +4684,10 @@
       "c": "兩間保險公司",
       "d": "任何數目的保險公司"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 61,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 61
   },
   {
-    "id": "P1-exam-362",
     "number": 362,
     "ref": "6.2.5",
     "question": "作為長期業務代理人，標準代理合約的最低限度的操守包括：",
@@ -6142,14 +4697,10 @@
       "c": "不得誤導被保險人以其他保險取代現有保險，引致該被保險人蒙受損失",
       "d": "以上各項皆是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 61,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 61
   },
   {
-    "id": "P1-exam-363",
     "number": 363,
     "ref": "6.2.5(g)",
     "question": "保險經紀備存的妥善簿冊及帳目，所需保留的最低限期為:",
@@ -6159,14 +4710,10 @@
       "c": "五年",
       "d": "七年"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 61,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 61
   },
   {
-    "id": "P1-exam-364",
     "number": 364,
     "ref": "6.2.5(g)",
     "question": "有關保險經紀必須備有的專業賠償保險，以下哪項或哪些項目正確?",
@@ -6176,14 +4723,10 @@
       "c": "過去12個月內佣金收入總額的兩倍",
       "d": "以上各項均是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 61,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 61
   },
   {
-    "id": "P1-exam-365",
     "number": 365,
     "ref": "6.2.5(g)",
     "question": "保險經紀必須備有「專業賠償保險」，最低的賠償限額為:",
@@ -6193,14 +4736,10 @@
       "c": "港幣300萬元",
       "d": "港幣400萬元"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 61,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 61
   },
   {
-    "id": "P1-exam-366",
     "number": 366,
     "ref": "7.5",
     "question": "根據《防止賄賂條例》，以下哪項屬於利益?\ni.客戶送贈的禮物\nii.團隊隊員給予的佣金\niii.百貨公司折扣禮劵\niv.保險公司職位",
@@ -6210,14 +4749,10 @@
       "c": "i,ii,iv",
       "d": "以上各項皆是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 61,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 61
   },
   {
-    "id": "P1-exam-367",
     "number": 367,
     "ref": "7.4.7b",
     "question": "基於風險為本的關鍵原則是:",
@@ -6227,14 +4762,10 @@
       "c": "根據風險級別分配資源",
       "d": "遵循標準慣例"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 62,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 62
   },
   {
-    "id": "P1-exam-368",
     "number": 368,
     "ref": "7.2.1",
     "question": "資料使用者透過制定服務合約，對資料處理者施加的責任是:\ni.資料使用者有權審核及視察資料處理者如何處理和儲存個人資料\nii.不再需要就受託目的處理有關個人資料時，必須適時交還、銷毀或刪除有關資料\niii.須採取的保安措施，以保障受託的個人資料，並要求資料處理者遵從保障資料原則\niv.資料處理者必須居於香港",
@@ -6244,14 +4775,10 @@
       "c": "iii,iv",
       "d": "i.ii.iii"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 62,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 62
   },
   {
-    "id": "P1-exam-369",
     "number": 369,
     "ref": "7.4.4",
     "question": "以下哪項屬於洗錢的階段?\ni.整合\nii.投資\niii.分層交易\niv.轉化交易",
@@ -6261,14 +4788,10 @@
       "c": "ii,iii,iv",
       "d": "i,iii"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 62,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 62
   },
   {
-    "id": "P1-exam-370",
     "number": 370,
     "ref": "7.4.6",
     "question": "以下哪項是《防止賄賂條例》的立法精神?\ni.協助商界維持一個有利於效率和公平競爭的營商環境\nii.吸引外商投資，並持續投資於香港\niii.保障不同持份者的利益，並保護主事人免受代理人以權謀私所損害\niv.消除社會就性別、殘疾、家庭崗位、種族的歧視",
@@ -6278,14 +4801,10 @@
       "c": "i,iv",
       "d": "以上全部皆是"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 62,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 62
   },
   {
-    "id": "P1-exam-371",
     "number": 371,
     "ref": "7.5.1b(iii)",
     "question": "根據《防止賄賂條例》，款待不是利益，以下哪項屬款待的定義?",
@@ -6295,14 +4814,10 @@
       "c": "即場享用之美食",
       "d": "海外公幹"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 62,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 62
   },
   {
-    "id": "P1-exam-372",
     "number": 372,
     "ref": "7.4.5",
     "question": "以下哪項屬於透過購買保險產品用於洗錢過程中所使用的手法?\n一張款項看似正當的支票",
@@ -6312,14 +4827,10 @@
       "c": "人壽保險單可作為抵押品，用以購買其他金融產品或取得資金",
       "d": "以上所有皆是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 62,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 62
   },
   {
-    "id": "P1-exam-373",
     "number": 373,
     "ref": "7.4.7",
     "question": "《打擊洗錢及恐怖分子資金籌集指引》（指引3）由下列哪個機構發出？",
@@ -6329,14 +4840,10 @@
       "c": "保險業監管局",
       "d": "以上各項皆正確"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 63,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 63
   },
   {
-    "id": "P1-exam-374",
     "number": 374,
     "ref": "7.4.7",
     "question": "《打擊洗錢及恐怖分子資金籌集指引》（指引3）不適用於:",
@@ -6346,14 +4853,10 @@
       "c": "持牌保險經紀公司",
       "d": "持牌個人保險代理"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 63,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 63
   },
   {
-    "id": "P1-exam-375",
     "number": 375,
     "ref": "7.4.6",
     "question": "在香港，與洗錢／恐怖分子資金籌集有關的法例為:\ni.《有組織及嚴重罪行條例》\nii.《販毒（追討得益）條例》\niii.《防止賄賂條例》\niv.《保險業條例》",
@@ -6363,14 +4866,10 @@
       "c": "i,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 63,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 63
   },
   {
-    "id": "P1-exam-376",
     "number": 376,
     "ref": "7.4.7c",
     "question": "《打擊洗錢及恐怖分子資金籌集指引》（指引3），保險機構的高級管理層有責任實施有\n效的打擊洗錢及恐怖分子資金籌集制度，所制訂的管控措施應涵蓋的範疇包括﹕",
@@ -6380,14 +4879,10 @@
       "c": "委任一名合規主任",
       "d": "成立一個情報單位"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 63,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 63
   },
   {
-    "id": "P1-exam-377",
     "number": 377,
     "ref": "7.2.1",
     "question": "根據《個人資料（私隱）條例》，以下哪項「個人資料」的定義是正確的?\ni.直接或間接地與活着的資料當事人有關\nii.任何資料包括意見的表達\niii.未被任何形式記錄的資料，口頭方式描述的資料不屬「個人資料」\niv.以上各項皆正確",
@@ -6397,14 +4892,10 @@
       "c": "i,ii",
       "d": "iv"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 63,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 63
   },
   {
-    "id": "P1-exam-378",
     "number": 378,
     "ref": "7.2.1",
     "question": "根據《個人資料(私隱)條例》，資料當事人有權查閱及更正其個人資料，屬於哪項資料使\n用原則?",
@@ -6414,14 +4905,10 @@
       "c": "第5原則:資訊須在一般情況下可提供",
       "d": "第6原則:查閱個人資料"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 63,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 63
   },
   {
-    "id": "P1-exam-379",
     "number": 379,
     "ref": "7.2.2",
     "question": "在《個人資料（私隱）條例》涉及範圍中，就保險人所擁有保單持有者的資料使用上，以\n下哪項是合法的？",
@@ -6431,14 +4918,10 @@
       "c": "向著名的報紙出賣被保險人資料",
       "d": "以上所有各項"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 64,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 64
   },
   {
-    "id": "P1-exam-380",
     "number": 380,
     "ref": "7.6",
     "question": "有關保險事宜的詐騙：",
@@ -6448,14 +4931,10 @@
       "c": "不會出現於人壽保險",
       "d": "只出現於財產保險索償過程中"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 64,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 64
   },
   {
-    "id": "P1-exam-381",
     "number": 381,
     "ref": "7.2.1",
     "question": "《個人資料（私隱條例》由哪個機構執行?\n以下哪項不能作為貪污的辯解理由?",
@@ -6465,14 +4944,10 @@
       "c": "資訊科技監控辦公室",
       "d": "以上各項皆不是"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 64,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 64
   },
   {
-    "id": "P1-exam-382",
     "number": 382,
     "ref": ")&(iv)",
     "question": "i收賄是行業或事業的習慣\nii受賄者和行賄者已達成口頭協議，但受賄者無意圖辦理行賄者要求的事\niii透過第三者收賄\niv貪污目的未達",
@@ -6482,14 +4957,10 @@
       "c": "ii,iii&iv",
       "d": "i,ii,iii&iv"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 64,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 64
   },
   {
-    "id": "P1-exam-383",
     "number": 383,
     "ref": "7.1.2",
     "question": "以下哪一項就保險代理人的描述是不正確?",
@@ -6499,14 +4970,10 @@
       "c": "因疏忽而對保單持有人提供錯誤的保險意見，須承擔侵權法律責任的機會並非較高",
       "d": "保險代理人完全不用承擔任何侵權法律責任風險之中"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 64,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 64
   },
   {
-    "id": "P1-exam-384",
     "number": 384,
     "ref": "7.2.1",
     "question": "以下哪項對《個人資料(私隱)條例》範圍的陳述是正確的?：\ni.自動化操作資料\nii.只適用於人手操作資料\niii.只適用香港永久居民\niv.它既涉及公營機構及私營機構",
@@ -6516,14 +4983,10 @@
       "c": "i,iv",
       "d": "i,ii,iii,iv"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 64,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 64
   },
   {
-    "id": "P1-exam-385",
     "number": 385,
     "ref": "7.2.1",
     "question": "個人資料（私隱）條例》列明的六項保障資料原則，以下哪一項就第1原\n則的描述正確?",
@@ -6533,14 +4996,10 @@
       "c": "採取適當的保安措施，以確保個人資料受保障而不受未獲准或意外的查閱",
       "d": "描繪如何合法和公平地收集個人資料"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 65,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 65
   },
   {
-    "id": "P1-exam-386",
     "number": 386,
     "ref": "7.5.1",
     "question": "當遇上賄賂行為，代理人應該:",
@@ -6550,14 +5009,10 @@
       "c": "接受行賄，但不協助其貪污行為",
       "d": "與行賄者協商賄款金額"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 65,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 65
   },
   {
-    "id": "P1-exam-387",
     "number": 387,
     "ref": "7.5.1",
     "question": "以下哪項不會觸犯《防止賄賂條例》第9條?\n病投保\n提供利益以換取簽訂員工團體保險合約",
@@ -6567,14 +5022,10 @@
       "c": "持牌個人保險代理為取得公司客戶的員工團體保險合約，私下向公司客戶的人事部經理",
       "d": "持牌業務代表(代理人)利用偽造的保險申請書來騙取持牌保險代理機構的佣金"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 65,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 65
   },
   {
-    "id": "P1-exam-388",
     "number": 388,
     "ref": "7.6.1",
     "question": "犯罪者不是以主犯的身份犯罪就是以那麼的身份犯罪?",
@@ -6584,14 +5035,10 @@
       "c": "助犯",
       "d": "刑事代替犯"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 65,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 65
   },
   {
-    "id": "P1-exam-389",
     "number": 389,
     "ref": "7.1.1",
     "question": "以下哪三項有關保險經紀的陳述是正確的?\ni)他們被視為保險業務上的專家\nii)在通常的情況下，有關經紀是保險人的代理人\niii)他們必須具備專業賠償保險\niv)保險經紀必須至少符合有關的「最低限度規定」",
@@ -6601,14 +5048,10 @@
       "c": "i，iii，iv",
       "d": "ii，iii，iv"
     },
-    "answer": "c",
-    "explanation": null,
-    "page": 65,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "C",
+    "page": 65
   },
   {
-    "id": "P1-exam-390",
     "number": 390,
     "ref": "7.2.1",
     "question": "根據《個人資料（私隱）條例》保障資料第1原則，若資料使用者收集個人資料時:\n保存時間超過處理該資料所需的時間\n保存時間超過30天",
@@ -6618,14 +5061,10 @@
       "c": "資料使用者須採取合約規範方法或其他方法，以防止轉移予該資料處理者的個人資料的",
       "d": "資料使用者須採取合約規範方法或其他方法，以防止轉移予該資料處理者的個人資料的"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 65,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 65
   },
   {
-    "id": "P1-exam-391",
     "number": 391,
     "ref": "7.2.1",
     "question": "保護個人資料這方面的安全，由以下哪個全盤監察法例的執行：",
@@ -6635,14 +5074,10 @@
       "c": "個人(資料)私人專員",
       "d": "個人(資料)私隱專員"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 66,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 66
   },
   {
-    "id": "P1-exam-392",
     "number": 392,
     "ref": "7.2.1",
     "question": "《個人資料(私隱)條例》，有關「個人資料」的定義包括？",
@@ -6652,14 +5087,10 @@
       "c": "有方法利用某種方式接觸或處理該等資料",
       "d": "以上各項皆是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 66,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 66
   },
   {
-    "id": "P1-exam-393",
     "number": 393,
     "ref": "7.2.1",
     "question": "《個人資料(私隱)條例》中的「資料」的定義包括以下哪項或哪些因素?",
@@ -6669,14 +5100,10 @@
       "c": "表示訊息的方式可能包括意見的表達",
       "d": "以上所有各項"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 66,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 66
   },
   {
-    "id": "P1-exam-394",
     "number": 394,
     "ref": "7.2.1",
     "question": "《個人資料(私隱)條例》中有關「個人資料」的定義不包括以下哪項？",
@@ -6686,14 +5113,10 @@
       "c": "有方法利用某種方式接觸或處理該等資料",
       "d": "藉此可以直接或間接地核實某人的身分"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 66,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 66
   },
   {
-    "id": "P1-exam-395",
     "number": 395,
     "ref": "7.2.1",
     "question": "個人資料(私隱)條例中的第1原則",
@@ -6703,14 +5126,10 @@
       "c": "個人資料應是準確的、最新的",
       "d": "個人資料應是準確的、最新的，其保留期限不應超過所需時間"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 66,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 66
   },
   {
-    "id": "P1-exam-396",
     "number": 396,
     "ref": "7.3.1",
     "question": "以下哪項或哪些情況，受保人有關性別歧視受到的待遇是法律容許的？",
@@ -6720,14 +5139,10 @@
       "c": "一切待遇與有關因素是合理的",
       "d": "有關待遇獲平等機會委員會所豁免"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 66,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 66
   },
   {
-    "id": "P1-exam-397",
     "number": 397,
     "ref": "7.3.2",
     "question": "對保險業而言，以下哪項屬於公平歧視(即合法)的情況:",
@@ -6737,14 +5152,10 @@
       "c": "向殘疾人士的保單加設特定條款",
       "d": "以上各項皆是"
     },
-    "answer": "d",
-    "explanation": null,
-    "page": 66,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "D",
+    "page": 66
   },
   {
-    "id": "P1-exam-398",
     "number": 398,
     "ref": "7.3.2",
     "question": "以下哪項有關保險人對投保人給予性別差別對待是法律容許的，並不觸犯歧視條例？",
@@ -6754,14 +5165,10 @@
       "c": "就有關因素而言屬於合理",
       "d": "一切參照可合理依據的來源所得的精算數據"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 67,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 67
   },
   {
-    "id": "P1-exam-399",
     "number": 399,
     "ref": "7.5",
     "question": "以下哪項是貪污，必須避免觸犯？",
@@ -6771,14 +5178,10 @@
       "c": "個人未經準許謀取私利，從而引至他人利益受損",
       "d": "個人挪用屬於他人的財產"
     },
-    "answer": "b",
-    "explanation": null,
-    "page": 67,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "B",
+    "page": 67
   },
   {
-    "id": "P1-exam-400",
     "number": 400,
     "ref": "7.6",
     "question": "保險事宜上的詐騙：",
@@ -6788,10 +5191,7 @@
       "c": "從來不會於人壽保險上發生",
       "d": "只會於涉及財產損害的索償時發生"
     },
-    "answer": "a",
-    "explanation": null,
-    "page": 67,
-    "source": "exam",
-    "sourceLabel": "2021年版"
+    "answer": "A",
+    "page": 67
   }
 ]
