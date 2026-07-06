@@ -43,7 +43,7 @@ type AttemptMeta = {
 
 export default function PracticePage() {
   return (
-    <Suspense fallback={<div className="max-w-3xl mx-auto px-4 py-8 text-zinc-500">載入中...</div>}>
+    <Suspense fallback={<div className="max-w-3xl mx-auto px-4 py-8 text-muted-foreground">載入中...</div>}>
       <PracticeInner />
     </Suspense>
   );
@@ -376,7 +376,7 @@ function PracticeInner() {
 
   if (!currentQ || !attempt) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-8 text-zinc-500">
+      <div className="max-w-3xl mx-auto px-4 py-8 text-muted-foreground">
         {loadError ?? "載入中..."}
       </div>
     );
@@ -450,8 +450,8 @@ function PracticeInner() {
                       isCur
                         ? "bg-blue-600 text-white border-blue-600"
                         : isAns
-                          ? "bg-green-50 border-green-300 text-green-700"
-                          : "bg-white border-zinc-200 hover:border-zinc-400"
+                          ? "bg-green-50 dark:bg-green-950/30 border-green-300 dark:border-green-700 text-green-700 dark:text-green-300"
+                          : "bg-card border-border hover:border-foreground/30"
                     )}
                   >
                     {i + 1}
@@ -466,10 +466,10 @@ function PracticeInner() {
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-base leading-relaxed">
-              <span className="text-zinc-400 mr-2">#{currentQ.number}</span>
-              {currentQ.question}
-            </CardTitle>
+          <CardTitle className="text-base leading-relaxed">
+            <span className="text-muted-foreground mr-2">#{currentQ.number}</span>
+            {currentQ.question}
+          </CardTitle>
             <div className="flex items-start gap-1 shrink-0 mt-0.5">
               <QuestionActions
                 number={currentQ.number}
@@ -496,21 +496,21 @@ function PracticeInner() {
                 onClick={() => submitAnswer(currentQ.id, letter)}
                 className={cn(
                   "w-full text-left p-3 rounded-lg border-2 transition-colors flex items-start gap-3",
-                  !showResult && "hover:border-blue-400 hover:bg-blue-50/50",
-                  !showResult && isSelected && "border-blue-500 bg-blue-50",
-                  showResult && isThisCorrect && "border-green-500 bg-green-50",
-                  showResult && isSelected && !isThisCorrect && "border-red-500 bg-red-50",
-                  showResult && !isSelected && !isThisCorrect && "border-zinc-200 opacity-60"
+                  !showResult && "hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/30",
+                  !showResult && isSelected && "border-blue-500 bg-blue-50 dark:bg-blue-950/30",
+                  showResult && isThisCorrect && "border-green-500 bg-green-50 dark:bg-green-950/30",
+                  showResult && isSelected && !isThisCorrect && "border-red-500 bg-red-50 dark:bg-red-950/30",
+                  showResult && !isSelected && !isThisCorrect && "border-border opacity-60"
                 )}
               >
                 <span
                   className={cn(
                     "shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-medium text-sm",
                     !showResult && isSelected && "bg-blue-600 text-white",
-                    !showResult && !isSelected && "bg-zinc-100 text-zinc-700",
+                    !showResult && !isSelected && "bg-muted text-foreground",
                     showResult && isThisCorrect && "bg-green-600 text-white",
                     showResult && isSelected && !isThisCorrect && "bg-red-600 text-white",
-                    showResult && !isSelected && !isThisCorrect && "bg-zinc-100 text-zinc-500"
+                    showResult && !isSelected && !isThisCorrect && "bg-muted text-muted-foreground"
                   )}
                 >
                   {letter.toUpperCase()}
@@ -552,7 +552,7 @@ function PracticeInner() {
                 )}
               </p>
               {currentQ.explanation && (
-                <p className="text-sm text-zinc-700 leading-relaxed">
+                <p className="text-sm text-foreground leading-relaxed">
                   {currentQ.explanation}
                 </p>
               )}
@@ -610,15 +610,15 @@ function PracticeInner() {
         )}
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-zinc-400 justify-center">
-        <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">←</kbd> 上一題</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">→</kbd> 下一題</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">1-4 / A-D</kbd> 選答</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">F</kbd> 收藏</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">N</kbd> 筆記</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">G</kbd> 跳題</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">X</kbd> 複製</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">S</kbd> Google 搜尋</span>
+      <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground justify-center">
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">←</kbd> 上一題</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">→</kbd> 下一題</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">1-4 / A-D</kbd> 選答</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">F</kbd> 收藏</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">N</kbd> 筆記</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">G</kbd> 跳題</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">X</kbd> 複製</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">S</kbd> Google 搜尋</span>
       </div>
 
       <ToastContainer toasts={toasts} />

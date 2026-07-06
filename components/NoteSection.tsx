@@ -21,18 +21,18 @@ export function NoteSection({ content, className, compact = false }: NoteSection
   return (
     <div
       className={cn(
-        "rounded-lg border border-amber-200 bg-amber-50/60",
+        "rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/30",
         compact ? "p-2" : "p-3",
         className
       )}
     >
-      <div className="flex items-center gap-1.5 text-xs font-medium text-amber-700 mb-1.5">
-        <NotebookPen className="w-3 h-3 fill-amber-100" />
+      <div className="flex items-center gap-1.5 text-xs font-medium text-amber-700 dark:text-amber-300 mb-1.5">
+        <NotebookPen className="w-3 h-3 fill-amber-100 dark:fill-amber-900/50" />
         <span>我的筆記</span>
       </div>
       <p
         className={cn(
-          "text-zinc-800 whitespace-pre-wrap break-words leading-relaxed",
+          "text-foreground whitespace-pre-wrap break-words leading-relaxed",
           compact ? "text-xs" : "text-sm"
         )}
       >

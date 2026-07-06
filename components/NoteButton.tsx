@@ -198,17 +198,20 @@ export const NoteButton = forwardRef<NoteButtonHandle, NoteButtonProps>(function
         size={size}
         onClick={handleTriggerClick}
         title={hasNote ? "查看/編輯筆記 (N)" : "新增筆記 (N)"}
-        className={cn(hasNote && "text-amber-600 hover:text-amber-700 hover:bg-amber-50")}
+        className={cn(
+          hasNote &&
+            "text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/30"
+        )}
       >
         <NotebookPen
-          className={cn(iconSize, "mr-1", hasNote && "fill-amber-100")}
+          className={cn(iconSize, "mr-1", hasNote && "fill-amber-100 dark:fill-amber-900/50")}
         />
         {hasNote ? "筆記" : "加筆記"}
       </Button>
 
       {/* Popover 面板(在按鈕右上方浮出) */}
       {open && (
-        <div className="absolute bottom-full right-0 mb-2 w-96 max-w-[calc(100vw-2rem)] p-3 rounded-lg border border-amber-200 bg-white shadow-lg text-left space-y-2 z-20">
+        <div className="absolute bottom-full right-0 mb-2 w-96 max-w-[calc(100vw-2rem)] p-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-popover shadow-lg text-left space-y-2 z-20">
           {editing ? (
             <>
               <textarea
@@ -224,7 +227,7 @@ export const NoteButton = forwardRef<NoteButtonHandle, NoteButtonProps>(function
                 }}
                 onKeyDown={handleKeyDown}
                 placeholder="輸入筆記... (Esc 取消, Cmd/Ctrl+Enter 儲存)"
-                className="w-full min-h-24 max-h-64 p-2 text-sm rounded border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-400/40 resize-y whitespace-pre-wrap break-words"
+                className="w-full min-h-24 max-h-64 p-2 text-sm rounded border border-amber-300 dark:border-amber-700 bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-amber-400/40 resize-y whitespace-pre-wrap break-words"
                 rows={4}
               />
               <div className="flex items-center justify-between text-xs">
@@ -232,8 +235,8 @@ export const NoteButton = forwardRef<NoteButtonHandle, NoteButtonProps>(function
                   className={cn(
                     "tabular-nums",
                     draft.length > MAX_LEN * 0.9
-                      ? "text-amber-700 font-medium"
-                      : "text-zinc-500"
+                      ? "text-amber-700 dark:text-amber-300 font-medium"
+                      : "text-muted-foreground"
                   )}
                 >
                   {draft.length}/{MAX_LEN}
@@ -256,7 +259,7 @@ export const NoteButton = forwardRef<NoteButtonHandle, NoteButtonProps>(function
                       size="xs"
                       onClick={handleDelete}
                       disabled={saving}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30"
                     >
                       <Trash2 className={iconSize} />
                       刪除
@@ -274,11 +277,11 @@ export const NoteButton = forwardRef<NoteButtonHandle, NoteButtonProps>(function
                   </Button>
                 </div>
               </div>
-              {error && <p className="text-xs text-red-600">{error}</p>}
+              {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
             </>
           ) : (
             <>
-              <p className="text-sm text-zinc-800 whitespace-pre-wrap break-words leading-relaxed">
+              <p className="text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed">
                 {content}
               </p>
               <div className="flex items-center justify-end gap-1">
@@ -289,7 +292,7 @@ export const NoteButton = forwardRef<NoteButtonHandle, NoteButtonProps>(function
                     size="xs"
                     onClick={handleDelete}
                     disabled={saving}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30"
                   >
                     <Trash2 className={iconSize} />
                     刪除

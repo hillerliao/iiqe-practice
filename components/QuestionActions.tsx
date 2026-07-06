@@ -88,7 +88,7 @@ export function QuestionActions({
         variant="ghost"
         size={size}
         title="用 Google 搜尋這題"
-        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/30"
       >
         <a href={googleUrl} target="_blank" rel="noopener noreferrer">
           <Search className={cn(iconSize, "mr-1")} />
@@ -110,14 +110,14 @@ export function QuestionActions({
       </Button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-lg border border-zinc-200 bg-white shadow-lg py-1">
+        <div className="absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-lg border border-border bg-popover shadow-lg py-1">
           <button
             type="button"
             onClick={handleCopy}
-            className="flex items-center gap-2 w-full px-3 py-1.5 text-left text-sm hover:bg-zinc-50 text-zinc-700"
+            className="flex items-center gap-2 w-full px-3 py-1.5 text-left text-sm hover:bg-muted text-foreground"
           >
             {copied ? (
-              <Check className={cn(itemIconSize, "text-green-600")} />
+              <Check className={cn(itemIconSize, "text-green-600 dark:text-green-400")} />
             ) : (
               <Copy className={itemIconSize} />
             )}
@@ -128,7 +128,7 @@ export function QuestionActions({
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+            className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
           >
             <Search className={itemIconSize} />
             百度搜尋
@@ -138,7 +138,7 @@ export function QuestionActions({
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-emerald-600 hover:bg-emerald-50"
+            className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
           >
             <MessageCircle className={itemIconSize} />
             ChatGPT

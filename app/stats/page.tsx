@@ -77,7 +77,7 @@ export default function StatsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-8 text-zinc-500">載入中...</div>
+      <div className="max-w-5xl mx-auto px-4 py-8 text-muted-foreground">載入中...</div>
     );
   }
   if (error) {
@@ -129,7 +129,7 @@ export default function StatsPage() {
             <CardTitle>尚未有作答紀錄</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-zinc-500">完成一次練習後,這裡會顯示你的表現統計</p>
+            <p className="text-muted-foreground">完成一次練習後,這裡會顯示你的表現統計</p>
           </CardContent>
         </Card>
       </div>
@@ -143,7 +143,7 @@ export default function StatsPage() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-zinc-500">總作答</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">總作答</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{stats.total}</p>
@@ -151,24 +151,24 @@ export default function StatsPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-zinc-500">答對</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">答對</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-green-600">{stats.correct}</p>
+            <p className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.correct}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-zinc-500">總正確率</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">總正確率</CardTitle>
           </CardHeader>
           <CardContent>
             <p
               className={`text-3xl font-bold ${
                 stats.accuracy >= 0.8
-                  ? "text-green-600"
+                  ? "text-green-600 dark:text-green-400"
                   : stats.accuracy >= 0.6
-                    ? "text-yellow-600"
-                    : "text-red-600"
+                    ? "text-yellow-600 dark:text-yellow-400"
+                    : "text-red-600 dark:text-red-400"
               }`}
             >
               {(stats.accuracy * 100).toFixed(1)}%
@@ -192,23 +192,23 @@ export default function StatsPage() {
                       <span className="font-medium">
                         {r.ref}
                         {info && (
-                          <span className="text-zinc-500 font-normal ml-1.5">
+                          <span className="text-muted-foreground font-normal ml-1.5">
                             {info.path}
                           </span>
                         )}
                       </span>
-                      <span className="text-zinc-500 shrink-0 ml-2">
+                      <span className="text-muted-foreground shrink-0 ml-2">
                         {r.correct}/{r.total} ({(r.accuracy * 100).toFixed(0)}%)
                       </span>
                     </div>
-                    <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div
                         className={`h-full ${
                           r.accuracy >= 0.8
-                            ? "bg-green-500"
+                            ? "bg-green-500 dark:bg-green-600"
                             : r.accuracy >= 0.6
-                              ? "bg-yellow-500"
-                              : "bg-red-500"
+                              ? "bg-yellow-500 dark:bg-yellow-600"
+                              : "bg-red-500 dark:bg-red-600"
                         }`}
                         style={{ width: `${r.accuracy * 100}%` }}
                       />
@@ -217,7 +217,7 @@ export default function StatsPage() {
                 );
               })}
               {stats.refStats.length === 0 && (
-                <p className="text-zinc-500 text-sm">尚無資料</p>
+                <p className="text-muted-foreground text-sm">尚無資料</p>
               )}
             </div>
           </CardContent>
@@ -231,11 +231,11 @@ export default function StatsPage() {
             {stats.paperStats.map((p) => (
               <div
                 key={p.paperId}
-                className="flex items-center justify-between p-3 bg-zinc-50 rounded-lg"
+                className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
               >
                 <div>
                   <p className="font-medium">{p.name}</p>
-                  <p className="text-xs text-zinc-500 mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     {p.correct} / {p.total} 題
                   </p>
                 </div>
@@ -253,7 +253,7 @@ export default function StatsPage() {
               </div>
             ))}
             {stats.paperStats.length === 0 && (
-              <p className="text-zinc-500 text-sm">尚無資料</p>
+              <p className="text-muted-foreground text-sm">尚無資料</p>
             )}
           </CardContent>
         </Card>
@@ -264,7 +264,7 @@ export default function StatsPage() {
           <CardTitle className="flex items-center justify-between">
             <span>最近的作答 session</span>
             {stats.unfinishedCount > 0 && (
-              <Badge variant="outline" className="text-amber-700 border-amber-300 bg-amber-50">
+              <Badge variant="outline" className="text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/30">
                 {stats.unfinishedCount} 個未交卷
               </Badge>
             )}
@@ -272,7 +272,7 @@ export default function StatsPage() {
         </CardHeader>
         <CardContent>
           {stats.recentAttempts.length === 0 ? (
-            <p className="text-zinc-500 text-sm">尚無紀錄</p>
+            <p className="text-muted-foreground text-sm">尚無紀錄</p>
           ) : (
             <div className="space-y-2">
               {stats.recentAttempts.map((a) => {
@@ -293,16 +293,16 @@ export default function StatsPage() {
                       <div className="flex items-center gap-2">
                         <p className="font-medium">{a.paperName}</p>
                         {isUnfinished && (
-                          <Badge variant="outline" className="text-amber-700 border-amber-300 bg-amber-50 text-[10px]">
+                          <Badge variant="outline" className="text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/30 text-[10px]">
                             未交卷
                           </Badge>
                         )}
                       </div>
-                      <p className="text-xs text-zinc-500 mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {new Date(a.startedAt).toLocaleString("zh-HK")}
                       </p>
                       <p
-                        className="text-xs text-zinc-600 mt-1 font-mono truncate"
+                        className="text-xs text-muted-foreground mt-1 font-mono truncate"
                         title={`題目序號: ${nums.join(", ") || "(無)"}`}
                       >
                         題目: {rangeLabel}
@@ -313,12 +313,12 @@ export default function StatsPage() {
                         <p className="font-medium">
                           {a.correct} / {isUnfinished ? a.answeredCount : a.totalQ}
                           {isUnfinished && a.answeredCount < a.totalQ && (
-                            <span className="text-xs text-zinc-400 ml-1">
+                            <span className="text-xs text-muted-foreground ml-1">
                               (共 {a.totalQ})
                             </span>
                           )}
                         </p>
-                        <p className="text-xs text-zinc-500">
+                        <p className="text-xs text-muted-foreground">
                           {a.answeredCount > 0
                             ? `${pct.toFixed(0)}%${isUnfinished ? " · 已答中" : ""}`
                             : "-"}

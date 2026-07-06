@@ -279,26 +279,26 @@ export function RedoPractice({
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-3 gap-3 text-center" aria-live="polite">
-              <div className="p-3 rounded-lg bg-green-50 border border-green-200">
-                <div className="text-2xl font-bold text-green-700">
+              <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
+                <div className="text-2xl font-bold text-green-700 dark:text-green-300">
                   {correctCount}
                 </div>
-                <div className="text-xs text-green-600">答對</div>
+                <div className="text-xs text-green-600 dark:text-green-400">答對</div>
               </div>
-              <div className="p-3 rounded-lg bg-red-50 border border-red-200">
-                <div className="text-2xl font-bold text-red-700">
+              <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
+                <div className="text-2xl font-bold text-red-700 dark:text-red-300">
                   {wrongCount}
                 </div>
-                <div className="text-xs text-red-600">答錯</div>
+                <div className="text-xs text-red-600 dark:text-red-400">答錯</div>
               </div>
-              <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200">
-                <div className="text-2xl font-bold text-zinc-700">{rate}%</div>
-                <div className="text-xs text-zinc-600">正確率</div>
+              <div className="p-3 rounded-lg bg-muted/50 border border-border">
+                <div className="text-2xl font-bold text-foreground">{rate}%</div>
+                <div className="text-xs text-muted-foreground">正確率</div>
               </div>
             </div>
 
             {answeredCount < total && (
-              <p className="text-sm text-amber-600">
+              <p className="text-sm text-amber-600 dark:text-amber-400">
                 ⚠ 有 {total - answeredCount} 題未作答
               </p>
             )}
@@ -318,7 +318,7 @@ export function RedoPractice({
         {wrongList.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-base text-red-700">
+              <CardTitle className="text-base text-red-700 dark:text-red-300">
                 答錯的題目 ({wrongList.length})
               </CardTitle>
             </CardHeader>
@@ -327,7 +327,7 @@ export function RedoPractice({
                 <button
                   key={it.questionId}
                   onClick={() => jumpToQuestion(it.questionId)}
-                  className="w-full text-left p-3 rounded-lg border border-red-200 bg-red-50/50 hover:bg-red-50 transition-colors"
+                  className="w-full text-left p-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-950/20 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                 >
                   <div className="flex items-center gap-2 text-xs mb-1 flex-wrap">
                     <Badge variant="secondary">{it.paperCode}</Badge>
@@ -337,12 +337,12 @@ export function RedoPractice({
                         {it.question.ref}
                       </Badge>
                     )}
-                    <span className="ml-auto text-red-600">
+                    <span className="ml-auto text-red-600 dark:text-red-400">
                       你的答案 {answers[it.questionId]?.toUpperCase()} → 正確{" "}
                       {it.question.answer.toUpperCase()}
                     </span>
                   </div>
-                  <p className="text-sm text-zinc-700 line-clamp-2">
+                  <p className="text-sm text-foreground line-clamp-2">
                     {it.question.question}
                   </p>
                 </button>
@@ -386,7 +386,7 @@ export function RedoPractice({
                 {current.question.ref}
               </Badge>
             )}
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-muted-foreground">
               {current.question.sourceLabel}
             </span>
             <div className="ml-auto">
@@ -427,14 +427,16 @@ export function RedoPractice({
               className={cn(
                 "mt-2 p-3 rounded-lg border text-sm",
                 isCorrect
-                  ? "bg-green-50 border-green-200"
-                  : "bg-red-50 border-red-200"
+                  ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800"
+                  : "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800"
               )}
             >
               <p
                 className={cn(
                   "font-medium",
-                  isCorrect ? "text-green-700" : "text-red-700"
+                  isCorrect
+                    ? "text-green-700 dark:text-green-300"
+                    : "text-red-700 dark:text-red-300"
                 )}
               >
                 {isCorrect ? (
@@ -442,7 +444,7 @@ export function RedoPractice({
                     <Check className="inline w-4 h-4 mr-1" />
                     答對了
                     {autoNextCountdown != null && (
-                      <span className="text-green-600 ml-2 font-normal">
+                      <span className="text-green-600 dark:text-green-400 ml-2 font-normal">
                         （{autoNextCountdown}s 後跳下一題…）
                       </span>
                     )}
@@ -455,16 +457,16 @@ export function RedoPractice({
                 )}
               </p>
               {hasPrevAnswer ? (
-                <p className="text-xs text-zinc-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   之前的答案:{prevRaw!.toUpperCase()}
                 </p>
               ) : prevRaw === "" ? (
-                <p className="text-xs text-zinc-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   之前的答案:(未作答)
                 </p>
               ) : null}
               {current.question.explanation && (
-                <p className="text-xs text-zinc-700 mt-2 leading-relaxed">
+                <p className="text-xs text-foreground mt-2 leading-relaxed">
                   💡 {current.question.explanation}
                 </p>
               )}
@@ -495,39 +497,39 @@ export function RedoPractice({
         )}
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-zinc-400 justify-center">
+      <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground justify-center">
         <span>
-          <kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
             ←
           </kbd>{" "}
           上一題
         </span>
         <span>
-          <kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
             →
           </kbd>{" "}
           下一題
         </span>
         <span>
-          <kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
             1-4 / A-D
           </kbd>{" "}
           選答
         </span>
         <span>
-          <kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
             Enter
           </kbd>{" "}
           下一題
         </span>
         <span>
-          <kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
             S
           </kbd>{" "}
           Google 搜尋
         </span>
         <span>
-          <kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
             X
           </kbd>{" "}
           複製題目

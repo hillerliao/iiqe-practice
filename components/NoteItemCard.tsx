@@ -73,7 +73,7 @@ export function NoteItemCard({ item, onDeleted }: NoteItemCardProps) {
                 {q.ref}
               </Badge>
             )}
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-muted-foreground">
               {new Date(item.updatedAt).toLocaleDateString("zh-HK")}
             </span>
           </div>
@@ -113,7 +113,7 @@ export function NoteItemCard({ item, onDeleted }: NoteItemCardProps) {
               size="xs"
               onClick={handleDelete}
               disabled={deleting}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30"
             >
               <Trash2 className="w-3 h-3 mr-1" />
               刪除
@@ -126,34 +126,34 @@ export function NoteItemCard({ item, onDeleted }: NoteItemCardProps) {
       </CardHeader>
       <CardContent className="space-y-3">
         {/* 筆記主塊 */}
-        <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-3">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-amber-700 mb-1.5">
-            <NotebookPen className="w-3 h-3 fill-amber-100" />
+        <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/30 p-3">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-amber-700 dark:text-amber-300 mb-1.5">
+            <NotebookPen className="w-3 h-3 fill-amber-100 dark:fill-amber-900/50" />
             <span>我的筆記</span>
           </div>
-          <p className="text-sm text-zinc-800 whitespace-pre-wrap break-words leading-relaxed">
+          <p className="text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed">
             {item.content}
           </p>
         </div>
 
         {/* 答案(可選展開) */}
         {showAnswer && (
-          <div className="p-3 rounded-lg border border-zinc-200 bg-zinc-50 text-sm space-y-1">
+          <div className="p-3 rounded-lg border border-border bg-muted/50 text-sm space-y-1">
             <p>
-              <span className="text-zinc-500">正確答案:</span>{" "}
-              <span className="text-green-700 font-medium">
+              <span className="text-muted-foreground">正確答案:</span>{" "}
+              <span className="text-green-700 dark:text-green-300 font-medium">
                 {correctLetter.toUpperCase()} — {q.options[correctLetter]}
               </span>
             </p>
             {q.explanation && (
-              <p className="text-zinc-700 text-xs mt-2 leading-relaxed">
+              <p className="text-foreground text-xs mt-2 leading-relaxed">
                 💡 {q.explanation}
               </p>
             )}
           </div>
         )}
 
-        {error && <p className="text-xs text-red-600">{error}</p>}
+        {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
       </CardContent>
     </Card>
   );

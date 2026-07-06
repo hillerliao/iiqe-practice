@@ -42,19 +42,19 @@ export function PracticeOption({
       className={cn(
         "w-full text-left p-3 rounded-lg border-2 transition-colors flex items-start gap-3",
         !showResult &&
-          "border-zinc-200 hover:border-blue-400 hover:bg-blue-50/50",
-        showResult && isThisCorrect && "border-green-500 bg-green-50",
-        showResult && isPicked && !isThisCorrect && "border-red-500 bg-red-50",
-        showResult && !isPicked && !isThisCorrect && "border-zinc-200 opacity-60"
+          "border-border hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/30",
+        showResult && isThisCorrect && "border-green-500 bg-green-50 dark:bg-green-950/30",
+        showResult && isPicked && !isThisCorrect && "border-red-500 bg-red-50 dark:bg-red-950/30",
+        showResult && !isPicked && !isThisCorrect && "border-border opacity-60"
       )}
     >
       <span
         className={cn(
           "shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-medium text-sm",
-          !showResult && "bg-zinc-100 text-zinc-700",
+          !showResult && "bg-muted text-foreground",
           showResult && isThisCorrect && "bg-green-600 text-white",
           showResult && isPicked && !isThisCorrect && "bg-red-600 text-white",
-          showResult && !isPicked && !isThisCorrect && "bg-zinc-100 text-zinc-500"
+          showResult && !isPicked && !isThisCorrect && "bg-muted text-muted-foreground"
         )}
       >
         {letter.toUpperCase()}

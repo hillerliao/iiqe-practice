@@ -32,7 +32,7 @@ export default async function HomePage() {
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">選擇卷別開始刷題</h1>
-        <p className="text-zinc-500 mt-2">
+        <p className="text-muted-foreground mt-2">
           香港保險業監管局 IIQE 考試考古題與模擬題練習
         </p>
       </div>
@@ -47,7 +47,7 @@ export default async function HomePage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-muted-foreground">
                 共 {p._count.questions} 題,涵蓋真題與模擬題
               </p>
               <div className="flex flex-col gap-2">

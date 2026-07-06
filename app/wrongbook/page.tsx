@@ -61,7 +61,7 @@ function WrongItemCard({ item }: { item: WrongItem }) {
               {q.ref}
             </Badge>
           )}
-          <span className="text-xs text-zinc-500">{q.sourceLabel}</span>
+          <span className="text-xs text-muted-foreground">{q.sourceLabel}</span>
           {isRepeated && (
             <Badge variant="destructive" className="text-xs">
               反覆錯 · 已錯 {item.wrongCount} 次
@@ -109,7 +109,7 @@ function WrongItemCard({ item }: { item: WrongItem }) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <p className="text-xs text-zinc-400">點選選項復習作答</p>
+        <p className="text-xs text-muted-foreground">點選選項復習作答</p>
         <div className="space-y-2">
           {(["a", "b", "c", "d"] as const).map((letter) => {
             const optText = q.options[letter];
@@ -133,8 +133,8 @@ function WrongItemCard({ item }: { item: WrongItem }) {
             className={cn(
               "p-3 rounded-lg border text-sm font-medium",
               pickedCorrect
-                ? "bg-green-50 border-green-200 text-green-700"
-                : "bg-red-50 border-red-200 text-red-700"
+                ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300"
+                : "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300"
             )}
           >
             {pickedCorrect
@@ -144,10 +144,10 @@ function WrongItemCard({ item }: { item: WrongItem }) {
         )}
 
         {revealed && (
-          <div className="p-3 rounded-lg border border-zinc-200 bg-zinc-50 text-sm space-y-1">
+          <div className="p-3 rounded-lg border border-border bg-muted/50 text-sm space-y-1">
             <p>
-              <span className="text-zinc-500">之前的答案:</span>{" "}
-              <span className="text-red-600 font-medium">
+              <span className="text-muted-foreground">之前的答案:</span>{" "}
+              <span className="text-red-600 dark:text-red-400 font-medium">
                 {userLetter
                   ? `${userLetter.toUpperCase()}${
                       q.options[userLetter] ? ` — ${q.options[userLetter]}` : ""
@@ -156,13 +156,13 @@ function WrongItemCard({ item }: { item: WrongItem }) {
               </span>
             </p>
             <p>
-              <span className="text-zinc-500">正確答案:</span>{" "}
-              <span className="text-green-700 font-medium">
+              <span className="text-muted-foreground">正確答案:</span>{" "}
+              <span className="text-green-700 dark:text-green-400 font-medium">
                 {correctLetter.toUpperCase()} — {q.options[correctLetter]}
               </span>
             </p>
             {q.explanation && (
-              <p className="text-zinc-700 text-xs mt-2 leading-relaxed">
+              <p className="text-muted-foreground text-xs mt-2 leading-relaxed">
                 💡 {q.explanation}
               </p>
             )}
@@ -201,7 +201,7 @@ export default function WrongbookPage() {
   }, []);
 
   if (loading) {
-    return <div className="max-w-4xl mx-auto px-4 py-8 text-zinc-500">載入中...</div>;
+    return <div className="max-w-4xl mx-auto px-4 py-8 text-muted-foreground">載入中...</div>;
   }
   if (error) {
     return <div className="max-w-4xl mx-auto px-4 py-8 text-red-600">{error}</div>;
@@ -235,7 +235,7 @@ export default function WrongbookPage() {
             {repeatedCount > 0 && (
               <Badge variant="destructive">反覆錯 {repeatedCount} 題</Badge>
             )}
-            <span className="text-zinc-500">共 {items.length} 題</span>
+            <span className="text-muted-foreground">共 {items.length} 題</span>
             <Button onClick={() => setPracticeMode(true)}>
               <Play className="w-4 h-4 mr-1" />
               做題模式
@@ -249,7 +249,7 @@ export default function WrongbookPage() {
             <CardTitle>尚無錯題</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-zinc-500 text-sm">
+            <p className="text-muted-foreground text-sm">
               你在練習中答錯的題會自動收錄在這裡
             </p>
           </CardContent>

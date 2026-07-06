@@ -30,7 +30,7 @@ type UnfinishedAttempt = {
 
 export default function PaperSetupPage() {
   return (
-    <Suspense fallback={<div className="max-w-3xl mx-auto px-4 py-8 text-zinc-500">載入中...</div>}>
+    <Suspense fallback={<div className="max-w-3xl mx-auto px-4 py-8 text-muted-foreground">載入中...</div>}>
       <PaperSetupInner />
     </Suspense>
   );
@@ -162,7 +162,7 @@ function PaperSetupInner() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-8 text-zinc-500">載入中...</div>
+      <div className="max-w-3xl mx-auto px-4 py-8 text-muted-foreground">載入中...</div>
     );
   }
   if (!paper) {
@@ -197,17 +197,17 @@ function PaperSetupInner() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-muted-foreground">
             共 {sourceCount} 題 · {paper.code === "P1" ? "保險原理及實務" : "長期保險"}
           </p>
 
           {unfinished && (
-            <div className="p-4 rounded-lg border-2 border-blue-200 bg-blue-50/50 space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-blue-700">
+            <div className="p-4 rounded-lg border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-blue-700 dark:text-blue-300">
                 <History className="w-4 h-4" />
                 上次未完成 · 已答 {unfinished.answers.length} / {unfinished.totalQ} 題
               </div>
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-muted-foreground">
                 開始於 {new Date(unfinished.startedAt).toLocaleString("zh-HK")}
               </p>
               <Button
@@ -242,16 +242,16 @@ function PaperSetupInner() {
                 }
               />
               {shuffle ? (
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-muted-foreground">
                   打亂順序時此項不生效
                 </p>
               ) : (
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-muted-foreground">
                   1 ~ {sourceCount} · 例如設為 51 即從第 51 題開始
                 </p>
               )}
               {!shuffle && startFrom > 1 && (
-                <p className="text-xs text-blue-600">
+                <p className="text-xs text-blue-600 dark:text-blue-400">
                   預設為「最新答過的題目序號 +1」({startFrom}),可手動調整
                 </p>
               )}
@@ -268,7 +268,7 @@ function PaperSetupInner() {
                 onChange={(e) => setLimit(parseInt(e.target.value, 10) || 1)}
               />
               {!shuffle && (
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-muted-foreground">
                   將取第 {startFrom} ~{" "}
                   {Math.min(startFrom + limit - 1, sourceCount)} 題,共{" "}
                   {Math.min(limit, sourceCount - startFrom + 1)} 題

@@ -37,7 +37,7 @@ type AttemptData = {
 
 export default function ResultPage() {
   return (
-    <Suspense fallback={<div className="max-w-4xl mx-auto px-4 py-8 text-zinc-500">載入中...</div>}>
+    <Suspense fallback={<div className="max-w-4xl mx-auto px-4 py-8 text-muted-foreground">載入中...</div>}>
       <ResultInner />
     </Suspense>
   );
@@ -77,7 +77,7 @@ function ResultInner() {
 
   if (loading || !attempt) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8 text-zinc-500">
+      <div className="max-w-4xl mx-auto px-4 py-8 text-muted-foreground">
         {error ?? "載入中..."}
       </div>
     );
@@ -98,26 +98,26 @@ function ResultInner() {
         <CardContent>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-3xl font-bold text-zinc-900">{attempt.totalQ}</p>
-              <p className="text-xs text-zinc-500 mt-1">總題數</p>
+              <p className="text-3xl font-bold text-foreground">{attempt.totalQ}</p>
+              <p className="text-xs text-muted-foreground mt-1">總題數</p>
             </div>
             <div>
-              <p className="text-3xl font-bold text-green-600">{attempt.correct}</p>
-              <p className="text-xs text-zinc-500 mt-1">答對</p>
+              <p className="text-3xl font-bold text-green-600 dark:text-green-400">{attempt.correct}</p>
+              <p className="text-xs text-muted-foreground mt-1">答對</p>
             </div>
             <div>
               <p
                 className={`text-3xl font-bold ${
                   accuracy >= 0.8
-                    ? "text-green-600"
+                    ? "text-green-600 dark:text-green-400"
                     : accuracy >= 0.6
-                      ? "text-yellow-600"
-                      : "text-red-600"
+                      ? "text-yellow-600 dark:text-yellow-400"
+                      : "text-red-600 dark:text-red-400"
                 }`}
               >
                 {(accuracy * 100).toFixed(1)}%
               </p>
-              <p className="text-xs text-zinc-500 mt-1">正確率</p>
+              <p className="text-xs text-muted-foreground mt-1">正確率</p>
             </div>
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
@@ -153,10 +153,10 @@ function ResultInner() {
             {wrongAnswers.map((a) => (
               <div
                 key={a.id}
-                className="border-l-4 border-red-300 pl-3 py-2 bg-red-50/50 rounded-r"
+                className="border-l-4 border-red-300 dark:border-red-700 pl-3 py-2 bg-red-50/50 dark:bg-red-950/20 rounded-r"
               >
                 <div className="flex items-center gap-2 text-sm mb-2">
-                  <XCircle className="w-4 h-4 text-red-600 shrink-0" />
+                  <XCircle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
                   <span className="font-medium">#{a.question.number}</span>
                   {a.question.ref && (
                     <Badge variant="outline" className="text-xs">
@@ -173,13 +173,13 @@ function ResultInner() {
                     />
                   </div>
                 </div>
-                <p className="text-sm text-zinc-800 mb-2 leading-relaxed">
+                <p className="text-sm text-foreground mb-2 leading-relaxed">
                   {a.question.question}
                 </p>
                 <div className="text-sm space-y-1">
                   <p>
-                    <span className="text-zinc-500">你的答案:</span>{" "}
-                    <span className="text-red-600 font-medium">
+                    <span className="text-muted-foreground">你的答案:</span>{" "}
+                    <span className="text-red-600 dark:text-red-400 font-medium">
                       {a.userAnswer || "(未作答)"}{" "}
                       {a.userAnswer &&
                         a.question.options[a.userAnswer] &&
@@ -187,13 +187,13 @@ function ResultInner() {
                     </span>
                   </p>
                   <p>
-                    <span className="text-zinc-500">正確答案:</span>{" "}
-                    <span className="text-green-700 font-medium">
+                    <span className="text-muted-foreground">正確答案:</span>{" "}
+                    <span className="text-green-700 dark:text-green-400 font-medium">
                       {a.question.answer} — {a.question.options[a.question.answer]}
                     </span>
                   </p>
                   {a.question.explanation && (
-                    <p className="text-zinc-700 text-xs mt-2 leading-relaxed">
+                    <p className="text-muted-foreground text-xs mt-2 leading-relaxed">
                       💡 {a.question.explanation}
                     </p>
                   )}
@@ -208,23 +208,23 @@ function ResultInner() {
       {answers.length > wrongAnswers.length && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base text-green-700">
-              ✓ 答對的題 ({answers.length - wrongAnswers.length} 題)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            {answers
-              .filter((a) => a.isCorrect)
-              .map((a) => (
-                <div
-                  key={a.id}
-                  className="flex items-center gap-2 text-zinc-700"
-                >
-                  <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0" />
-                  <span className="text-zinc-500">#{a.question.number}</span>
-                  <span className="truncate">{a.question.question}</span>
-                </div>
-              ))}
+          <CardTitle className="text-base text-green-700 dark:text-green-400">
+            ✓ 答對的題 ({answers.length - wrongAnswers.length} 題)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm">
+          {answers
+            .filter((a) => a.isCorrect)
+            .map((a) => (
+              <div
+                key={a.id}
+                className="flex items-center gap-2 text-foreground"
+              >
+                <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 shrink-0" />
+                <span className="text-muted-foreground">#{a.question.number}</span>
+                <span className="truncate">{a.question.question}</span>
+              </div>
+            ))}
           </CardContent>
         </Card>
       )}

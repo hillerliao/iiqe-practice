@@ -53,7 +53,7 @@ export default function NotesPage() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8 text-zinc-500">
+      <div className="max-w-4xl mx-auto px-4 py-8 text-muted-foreground">
         載入中...
       </div>
     );
@@ -72,7 +72,7 @@ export default function NotesPage() {
           筆記本
         </h1>
         {items.length > 0 && (
-          <span className="text-sm text-zinc-500">共 {items.length} 則</span>
+          <span className="text-sm text-muted-foreground">共 {items.length} 則</span>
         )}
       </div>
       {items.length === 0 ? (
@@ -81,7 +81,7 @@ export default function NotesPage() {
             <CardTitle>尚無筆記</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-zinc-500 text-sm">
+            <p className="text-muted-foreground text-sm">
               在答題頁面點 <NotebookPen className="w-3.5 h-3.5 inline" /> 加筆記,即可在此處查看與管理。
             </p>
             <Button asChild variant="link" className="px-0 mt-2">
