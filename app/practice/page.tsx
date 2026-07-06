@@ -14,14 +14,19 @@ import {
   ChevronLeft,
   ChevronRight,
   List,
+  Search,
+  MessageCircle,
+  Copy,
+  Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSessionId } from "@/lib/session";
-import { QuestionActions } from "@/components/QuestionActions";
 import { NoteButton, type NoteButtonHandle } from "@/components/NoteButton";
+import { ReportButton } from "@/components/ReportButton";
 import { buildSearchQuery } from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
 import { useToast, ToastContainer } from "@/components/useToast";
+import { getChapterInfo } from "@/lib/chapters";
 
 type Question = {
   id: string;
@@ -39,6 +44,9 @@ type AttemptMeta = {
   durationSec: number | null;
   startedAt: string;
   totalQ: number;
+  paperCode: string;
+  paperName: string;
+  source: "exam" | "mock";
 };
 
 export default function PracticePage() {
@@ -70,6 +78,9 @@ function PracticeInner() {
   const finishRef = useRef<() => void>(() => {});
   const autoNextTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const [copied, setCopied] = useState(false);
   const noteButtonRef = useRef<NoteButtonHandle>(null);
 
   const AUTO_NEXT_DELAY = 1200; // 答對後自動跳下一題的延遲(ms)
@@ -109,6 +120,9 @@ function PracticeInner() {
           durationSec: data.attempt.durationSec,
           startedAt: data.attempt.startedAt,
           totalQ: data.attempt.totalQ,
+          paperCode: data.attempt.paper?.code ?? "",
+          paperName: data.attempt.paper?.name ?? "",
+          source: (data.attempt.source as "exam" | "mock") ?? "exam",
         });
         const ans: Record<string, string> = {};
         data.attempt.answers.forEach((a: any) => {
@@ -262,6 +276,30 @@ function PracticeInner() {
     questionStartRef.current = Date.now();
   }
 
+  async function handleCopy() {
+    if (!currentQ) return;
+    const text = formatQuestionText({
+      number: currentQ.number,
+      question: currentQ.question,
+      options: currentQ.options,
+      ref: currentQ.ref || undefined,
+    });
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch { /* ignore */ }
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
+  }
+
   // 保持 finishRef 指向最新 handleFinish,供 timer 到期呼叫
   finishRef.current = handleFinish;
 
@@ -280,6 +318,18 @@ function PracticeInner() {
       if (autoNextTimerRef.current) clearTimeout(autoNextTimerRef.current);
     };
   }, []);
+
+  // 搜尋 dropdown 點擊外部關閉
+  useEffect(() => {
+    if (!searchOpen) return;
+    function onClick(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [searchOpen]);
 
   // 鍵盤快捷鍵
   useEffect(() => {
@@ -389,18 +439,41 @@ function PracticeInner() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
       <div className="mb-4 space-y-3">
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-2 text-sm flex-wrap">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1 flex-wrap">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
+              <span
+                className="truncate max-w-[160px] sm:max-w-[220px]"
+                title={attempt.paperName || undefined}
+              >
+                {attempt.paperName || "—"}
+              </span>
+              <span aria-hidden="true">·</span>
+              <span className="shrink-0">{attempt.paperCode || "?"}</span>
+              <span aria-hidden="true">·</span>
+              <span className="shrink-0">
+                {attempt.source === "mock" ? "模擬題" : "真題"}
+              </span>
+            </div>
+            <span className="text-border hidden sm:inline" aria-hidden="true">|</span>
             <span className="font-medium">
               第 {currentIdx + 1} / {questions.length} 題
             </span>
             {currentQ.ref && (
-              <Badge variant="outline" className="text-xs">
+              <Badge
+                variant="outline"
+                className="text-xs"
+                title={
+                  attempt?.paperCode
+                    ? getChapterInfo(attempt.paperCode, currentQ.ref)?.path
+                    : undefined
+                }
+              >
                 {currentQ.ref}
               </Badge>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {timeLeft != null && (
               <Badge
                 variant={timeLeft < 60 ? "destructive" : "secondary"}
@@ -466,19 +539,12 @@ function PracticeInner() {
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-base leading-relaxed">
-            <span className="text-muted-foreground mr-2">#{currentQ.number}</span>
-            {currentQ.question}
-          </CardTitle>
-            <div className="flex items-start gap-1 shrink-0 mt-0.5">
-              <QuestionActions
-                number={currentQ.number}
-                question={currentQ.question}
-                options={currentQ.options}
-                ref={currentQ.ref || undefined}
-                size="xs"
-              />
-            </div>
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-base leading-relaxed">
+              <span className="text-muted-foreground mr-2">#{currentQ.number}</span>
+              {currentQ.question}
+            </CardTitle>
+          </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -567,18 +633,52 @@ function PracticeInner() {
           onClick={goPrev}
           disabled={currentIdx === 0}
         >
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          上一題
+          <ChevronLeft className="w-4 h-4 md:mr-1" />
+          <span className="hidden md:inline">上一題</span>
         </Button>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0 md:gap-1">
           <Button variant="ghost" onClick={() => toggleFavorite(currentQ.id)}>
             <Star
               className={cn(
-                "w-4 h-4 mr-1",
+                "w-4 h-4 md:mr-1",
                 favorites.has(currentQ.id) && "fill-yellow-400 text-yellow-400"
               )}
             />
-            {favorites.has(currentQ.id) ? "已收藏" : "收藏"}
+            <span className="hidden md:inline">{favorites.has(currentQ.id) ? "已收藏" : "收藏"}</span>
+          </Button>
+          <div ref={searchRef} className="relative">
+            <Button
+              variant="ghost"
+              onClick={() => setSearchOpen((v) => !v)}
+              title="搜尋"
+            >
+              <Search className="w-4 h-4 md:mr-1" />
+              <span className="hidden md:inline">搜尋</span>
+            </Button>
+            {searchOpen && (() => {
+              const q = buildSearchQuery({ question: currentQ.question, options: currentQ.options, ref: currentQ.ref || undefined });
+              const enc = encodeURIComponent(q);
+              const urls = {
+                google: `https://www.google.com/search?q=${enc}`,
+                baidu: `https://www.baidu.com/s?wd=${enc}`,
+                chatgpt: `https://chatgpt.com/?q=${enc}&hints=search&ref=ext`,
+              };
+              return (
+                <div className="absolute bottom-full right-0 mb-1 z-50 min-w-[130px] rounded-lg border border-border bg-popover shadow-lg py-1">
+                  <a href={urls.google} target="_blank" rel="noopener noreferrer" onClick={() => setSearchOpen(false)} className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30">Google</a>
+                  <a href={urls.baidu} target="_blank" rel="noopener noreferrer" onClick={() => setSearchOpen(false)} className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30">百度</a>
+                  <a href={urls.chatgpt} target="_blank" rel="noopener noreferrer" onClick={() => setSearchOpen(false)} className="flex items-center gap-2 px-3 py-1.5 text-sm text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">ChatGPT</a>
+                </div>
+              );
+            })()}
+          </div>
+          <Button variant="ghost" onClick={handleCopy} title="複製題目">
+            {copied ? (
+              <Check className="w-4 h-4 md:mr-1 text-green-600 dark:text-green-400" />
+            ) : (
+              <Copy className="w-4 h-4 md:mr-1" />
+            )}
+            <span className="hidden md:inline">{copied ? "已複製" : "複製"}</span>
           </Button>
           <NoteButton
             ref={noteButtonRef}
@@ -597,20 +697,25 @@ function PracticeInner() {
               toast(newContent === null ? "筆記已刪除" : "筆記已儲存");
             }}
           />
+          <ReportButton
+            questionId={currentQ.id}
+            userAnswer={answers[currentQ.id] ?? null}
+            onSubmitted={() => toast("已收到您的回報,感謝!")}
+          />
         </div>
         {currentIdx < questions.length - 1 ? (
           <Button onClick={goNext}>
-            下一題
-            <ChevronRight className="w-4 h-4 ml-1" />
+            <span className="hidden md:inline mr-1">下一題</span>
+            <ChevronRight className="w-4 h-4" />
           </Button>
         ) : (
           <Button onClick={handleFinish} variant="default">
-            交卷
+            <span className="hidden md:inline">交卷</span>
           </Button>
         )}
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground justify-center">
+      <div className="hidden md:flex mt-3 flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground justify-center">
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">←</kbd> 上一題</span>
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">→</kbd> 下一題</span>
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">1-4 / A-D</kbd> 選答</span>
