@@ -52,3 +52,5 @@ next-env.d.ts
 
 # IDE / AI agent artifacts
 .codebuddy
+
+.vercel

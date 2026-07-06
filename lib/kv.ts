@@ -103,12 +103,11 @@ function createInMemoryClient(): KVClient {
   };
 }
 
-function createVercelKVClient(): KVClient {
+function createUpstashClient(): KVClient {
+  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_URL || "";
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || "";
   const { createClient } = require("@vercel/kv") as typeof import("@vercel/kv");
-  const client = createClient({
-    url: process.env.KV_URL!,
-    token: process.env.KV_REST_API_TOKEN!,
-  });
+  const client = createClient({ url, token });
   return {
     async get<T>(key: string): Promise<T | null> {
       return client.get<T>(key);
@@ -177,7 +176,8 @@ function createVercelKVClient(): KVClient {
   };
 }
 
-export const kv: KVClient = process.env.KV_URL ? createVercelKVClient() : createInMemoryClient();
+const hasUpstash = !!(process.env.UPSTASH_REDIS_REST_URL || process.env.KV_URL);
+export const kv: KVClient = hasUpstash ? createUpstashClient() : createInMemoryClient();
 
 export type AnswerRecord = {
   questionId: string;
