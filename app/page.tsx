@@ -1,32 +1,12 @@
 import Link from "next/link";
-import { prisma } from "@/lib/db";
+import { getPapers } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, FileText, FileQuestion, NotebookPen } from "lucide-react";
 
-async function getPapers() {
-  const papers = await prisma.paper.findMany({
-    include: { _count: { select: { questions: true } } },
-    orderBy: { code: "asc" },
-  });
-  const stats = await prisma.question.groupBy({
-    by: ["paperId", "source"],
-    _count: { _all: true },
-  });
-  return papers.map((p) => {
-    const bySource = stats
-      .filter((s) => s.paperId === p.id)
-      .reduce(
-        (acc, s) => ({ ...acc, [s.source]: s._count._all }),
-        {} as Record<string, number>
-      );
-    return { ...p, bySource };
-  });
-}
-
-export default async function HomePage() {
-  const papers = await getPapers();
+export default function HomePage() {
+  const papers = getPapers();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -48,7 +28,7 @@ export default async function HomePage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                共 {p._count.questions} 題,涵蓋真題與模擬題
+                共 {p.total} 題,涵蓋真題與模擬題
               </p>
               <div className="flex flex-col gap-2">
                 <Button asChild variant="default" className="w-full justify-between">

@@ -1,8 +1,6 @@
-// GET    /api/wrongbook?sessionId=... — 錯題本(此 session 答錯過的題)
-// POST   /api/wrongbook — 手動加入錯題
-// DELETE /api/wrongbook?sessionId=...&questionId=... — 從錯題本移除
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { listAttempts, updateAttempt } from "@/lib/kv";
+import { getQuestionById, getPapers } from "@/lib/data";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -11,60 +9,60 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
   }
 
-  // 找出此 session 所有答錯的題(同題多次作答,以最後一次為準)
-  const answers = await prisma.answer.findMany({
-    where: { attempt: { sessionId }, isCorrect: false },
-    include: {
-      question: {
-        include: {
-          paper: true,
-          // 重要:按 sessionId 過濾,避免讀到其他 session 的筆記
-          notes: { where: { sessionId } },
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const attempts = await listAttempts(sessionId);
+  const papers = getPapers();
 
-  // 統計每題在此 session 下的錯誤次數(跨多次 attempt 累積)
+  const wrongAnswers = attempts.flatMap((at) =>
+    at.answers
+      .filter((a) => !a.isCorrect)
+      .map((a) => ({
+        ...a,
+        paperId: at.paperId,
+        startedAt: at.startedAt,
+      }))
+  );
+
   const wrongCountMap = new Map<string, number>();
-  for (const a of answers) {
+  for (const a of wrongAnswers) {
     wrongCountMap.set(a.questionId, (wrongCountMap.get(a.questionId) ?? 0) + 1);
   }
 
-  // 去重(同題以最新一次為準)
   const seen = new Set<string>();
-  const unique: typeof answers = [];
-  for (const a of answers) {
+  const unique: typeof wrongAnswers = [];
+  for (const a of wrongAnswers) {
     if (seen.has(a.questionId)) continue;
     seen.add(a.questionId);
     unique.push(a);
   }
 
-  const items = unique.map((a) => ({
-    questionId: a.questionId,
-    userAnswer: a.userAnswer,
-    correctAnswer: a.question.answer?.toLowerCase() ?? "",
-    lastWrongAt: a.createdAt,
-    wrongCount: wrongCountMap.get(a.questionId) ?? 1,
-    paperCode: a.question.paper.code,
-    paperName: a.question.paper.name,
-    note: a.question.notes[0]?.content ?? null,
-    question: {
-      id: a.question.id,
-      number: a.question.number,
-      ref: a.question.ref,
-      question: a.question.question,
-      options: JSON.parse(a.question.options),
-      answer: a.question.answer?.toLowerCase() ?? "",
-      explanation: a.question.explanation,
-      page: a.question.page,
-      source: a.question.source,
-      sourceLabel: a.question.sourceLabel,
-    },
-  }));
+  const items = unique.map((a) => {
+    const q = getQuestionById(a.questionId);
+    if (!q) return null;
+    const paper = papers.find((p) => p.id === q.id.split("-")[0]);
+    return {
+      questionId: a.questionId,
+      userAnswer: a.userAnswer,
+      correctAnswer: q.answer?.toLowerCase() ?? "",
+      lastWrongAt: a.createdAt ?? a.startedAt,
+      wrongCount: wrongCountMap.get(a.questionId) ?? 1,
+      paperCode: paper?.code ?? "",
+      paperName: paper?.name ?? "",
+      note: null,
+      question: {
+        id: q.id,
+        number: q.number,
+        ref: q.ref,
+        question: q.question,
+        options: q.options,
+        answer: q.answer?.toLowerCase() ?? "",
+        explanation: q.explanation,
+        page: q.page,
+        source: q.source,
+        sourceLabel: q.sourceLabel,
+      },
+    };
+  }).filter((it): it is NonNullable<typeof it> => it != null);
 
-  // 反覆錯(≥2 次)的題排前面,且按錯誤次數降序
   items.sort((a, b) => b.wrongCount - a.wrongCount);
 
   return NextResponse.json({
@@ -78,24 +76,17 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { sessionId, questionId } = body;
   if (!sessionId || !questionId) {
-    return NextResponse.json(
-      { error: "sessionId, questionId 必填" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "sessionId, questionId 必填" }, { status: 400 });
   }
-  // 錯題本以「最後一次答錯」為準,這裡僅記錄標記,
-  // 實際內容由 GET 時從 answer 表彙整。此端點保留供未來擴充。
-  const existing = await prisma.answer.findFirst({
-    where: { attempt: { sessionId }, questionId },
-    orderBy: { createdAt: "desc" },
-  });
-  return NextResponse.json({
-    ok: true,
-    questionId,
-    lastAnswer: existing
-      ? { userAnswer: existing.userAnswer, isCorrect: existing.isCorrect }
-      : null,
-  });
+
+  const attempts = await listAttempts(sessionId);
+  let lastAnswer: { userAnswer: string; isCorrect: boolean } | null = null;
+  for (const at of attempts) {
+    const found = at.answers.find((a) => a.questionId === questionId);
+    if (found) lastAnswer = { userAnswer: found.userAnswer, isCorrect: found.isCorrect };
+  }
+
+  return NextResponse.json({ ok: true, questionId, lastAnswer });
 }
 
 export async function DELETE(req: NextRequest) {
@@ -103,18 +94,21 @@ export async function DELETE(req: NextRequest) {
   const sessionId = url.searchParams.get("sessionId");
   const questionId = url.searchParams.get("questionId");
   if (!sessionId || !questionId) {
-    return NextResponse.json(
-      { error: "sessionId, questionId 必填" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "sessionId, questionId 必填" }, { status: 400 });
   }
-  // 從錯題本移除 = 將此 session 下該題的錯誤作答紀錄刪除
-  const result = await prisma.answer.deleteMany({
-    where: {
-      attempt: { sessionId },
-      questionId,
-      isCorrect: false,
-    },
-  });
-  return NextResponse.json({ ok: true, deleted: result.count });
+
+  const attempts = await listAttempts(sessionId);
+  let deleted = 0;
+  for (const at of attempts) {
+    const before = at.answers.length;
+    at.answers = at.answers.filter(
+      (a) => !(a.questionId === questionId && !a.isCorrect)
+    );
+    if (at.answers.length !== before) {
+      deleted += before - at.answers.length;
+      await updateAttempt(at.id, { answers: at.answers });
+    }
+  }
+
+  return NextResponse.json({ ok: true, deleted });
 }
