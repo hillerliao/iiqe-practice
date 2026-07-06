@@ -19,7 +19,7 @@ type CopyQuestionButtonProps = {
 /**
  * 將題幹與選項格式化為純文字,方便貼到其他地方使用。
  * 格式:
- *   （香港保險中介人資格考試相關題目,請答題並作通俗解釋）
+ *   （香港保險中介人資格考試相關題目,請答題並作通俗解釋，如果可能也介绍相关规则背后的根本原因）
  *   #1 [REF]
  *   題幹
  *   A. 選項A
@@ -33,7 +33,7 @@ export function formatQuestionText(opts: {
   ref?: string;
 }): string {
   const { number, question, options, ref } = opts;
-  const lines: string[] = ["（香港保險中介人資格考試相關題目,請答題並作通俗解釋）"];
+  const lines: string[] = ["（香港保險中介人資格考試相關題目,請答題並作通俗解釋，如果可能也介绍相关规则背后的根本原因）"];
   const header = [
     number != null ? `#${number}` : "",
     ref ? `[${ref}]` : "",

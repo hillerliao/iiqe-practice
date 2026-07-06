@@ -446,3 +446,15 @@
  PATCH /api/attempt 200 in 33ms (next.js: 6ms, application-code: 27ms)
  GET /sw.js 404 in 131ms (next.js: 13ms, application-code: 118ms)
  PATCH /api/attempt 200 in 32ms (next.js: 6ms, application-code: 26ms)
+ GET /sw.js 404 in 86ms (next.js: 17ms, application-code: 69ms)
+✓ Compiled in 215ms
+ GET /practice?id=cmr90456x001m8stxw7znr4wv 200 in 473ms (next.js: 138ms, application-code: 335ms)
+ GET /practice?id=cmr90456x001m8stxw7znr4wv 200 in 211ms (next.js: 8ms, application-code: 203ms)
+ GET /practice?id=cmr90456x001m8stxw7znr4wv 200 in 145ms (next.js: 9ms, application-code: 136ms)
+ GET /practice?id=cmr90456x001m8stxw7znr4wv 200 in 145ms (next.js: 74ms, application-code: 72ms)
+✓ Compiled in 201ms
+ GET /practice?id=cmr90456x001m8stxw7znr4wv 200 in 482ms (next.js: 139ms, application-code: 342ms)
+ GET /practice?id=cmr90456x001m8stxw7znr4wv 200 in 240ms (next.js: 8ms, application-code: 232ms)
+ GET /practice?id=cmr90456x001m8stxw7znr4wv 200 in 122ms (next.js: 8ms, application-code: 115ms)
+ GET /practice?id=cmr90456x001m8stxw7znr4wv 200 in 123ms (next.js: 61ms, application-code: 62ms)
+ GET /sw.js 404 in 329ms (next.js: 45ms, application-code: 284ms)
