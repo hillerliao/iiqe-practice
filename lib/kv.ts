@@ -104,7 +104,7 @@ function createInMemoryClient(): KVClient {
 }
 
 function createUpstashClient(): KVClient {
-  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_URL || "";
+  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || "";
   const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || "";
   const { createClient } = require("@vercel/kv") as typeof import("@vercel/kv");
   const client = createClient({ url, token });
@@ -176,7 +176,7 @@ function createUpstashClient(): KVClient {
   };
 }
 
-const hasUpstash = !!(process.env.UPSTASH_REDIS_REST_URL || process.env.KV_URL);
+const hasUpstash = !!(process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL);
 export const kv: KVClient = hasUpstash ? createUpstashClient() : createInMemoryClient();
 
 export type AnswerRecord = {
