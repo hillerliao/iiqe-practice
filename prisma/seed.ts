@@ -82,7 +82,7 @@ async function loadPaper(item: SourceData) {
       const opts = Array.isArray(q.opts) ? optsArrayToObject(q.opts) : q.opts ?? {};
       records.push({
         paperId: paper.id,
-        number: q.q,
+        number: q.q ?? 0,
         ref: q.ref ?? "",
         question: stem,
         options: JSON.stringify(opts),
@@ -97,7 +97,7 @@ async function loadPaper(item: SourceData) {
       const opts = typeof q.options === "string" ? q.options : JSON.stringify(q.options);
       records.push({
         paperId: paper.id,
-        number: q.number,
+        number: q.number ?? 0,
         ref: q.ref ?? "",
         question: q.question ?? "",
         options: opts,
