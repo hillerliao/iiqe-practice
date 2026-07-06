@@ -29,9 +29,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+dev-err.log
+dev-out.log
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -46,3 +49,6 @@ next-env.d.ts
 # sqlite dev database
 *.db
 *.db-journal
+
+# IDE / AI agent artifacts
+.codebuddy
