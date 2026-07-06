@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { getSessionId } from "@/lib/session";
 import { NoteButton, type NoteButtonHandle } from "@/components/NoteButton";
 import { ReportButton } from "@/components/ReportButton";
+import { QuestionActions } from "@/components/QuestionActions";
 import { buildSearchQuery } from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
 import { useToast, ToastContainer } from "@/components/useToast";
@@ -52,9 +53,16 @@ type AttemptMeta = {
 export default function PracticePage() {
   return (
     <Suspense fallback={<div className="max-w-3xl mx-auto px-4 py-8 text-muted-foreground">載入中...</div>}>
-      <PracticeInner />
+      <PracticeRouter />
     </Suspense>
   );
+}
+
+function PracticeRouter() {
+  const searchParams = useSearchParams();
+  const questionId = searchParams.get("questionId");
+  if (questionId) return <SinglePracticeInner questionId={questionId} />;
+  return <PracticeInner />;
 }
 
 function PracticeInner() {
@@ -724,6 +732,338 @@ function PracticeInner() {
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">G</kbd> 跳題</span>
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">X</kbd> 複製</span>
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">S</kbd> Google 搜尋</span>
+      </div>
+
+      <ToastContainer toasts={toasts} />
+    </div>
+  );
+}
+
+type SingleQuestion = {
+  id: string;
+  number: number;
+  ref: string;
+  question: string;
+  options: Record<string, string>;
+  answer: string;
+  explanation: string | null;
+  page: number | null;
+  source: string;
+  sourceLabel: string | null;
+};
+
+function SinglePracticeInner({ questionId }: { questionId: string }) {
+  const router = useRouter();
+  const { toast, toasts } = useToast();
+
+  const [question, setQuestion] = useState<SingleQuestion | null>(null);
+  const [paperCode, setPaperCode] = useState<string>("");
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [picked, setPicked] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [note, setNote] = useState<string>("");
+  const noteButtonRef = useRef<NoteButtonHandle>(null);
+
+  // 載入題目
+  useEffect(() => {
+    let cancelled = false;
+    setLoadError(null);
+    setQuestion(null);
+    setPicked(null);
+    fetch(`/api/question?id=${encodeURIComponent(questionId)}`)
+      .then((r) => {
+        if (!r.ok) {
+          if (r.status === 404) throw new Error("找不到此題目");
+          throw new Error(`載入題目失敗 (HTTP ${r.status})`);
+        }
+        return r.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setQuestion(data.question);
+        setPaperCode(data.paper?.code ?? "");
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        setLoadError(e.message);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [questionId]);
+
+  // 載入收藏與筆記
+  useEffect(() => {
+    const sessionId = getSessionId();
+    fetch(`/api/favorites?sessionId=${sessionId}`)
+      .then((r) => (r.ok ? r.json() : { items: [] }))
+      .then((d: { items: { questionId: string }[] }) => {
+        setIsFavorite(d.items.some((it) => it.questionId === questionId));
+      })
+      .catch(() => {});
+    fetch(
+      `/api/notes?sessionId=${sessionId}&questionIds=${encodeURIComponent(questionId)}`
+    )
+      .then((r) => (r.ok ? r.json() : { items: [] }))
+      .then((d: { items: { questionId: string; content: string }[] }) => {
+        const found = d.items.find((it) => it.questionId === questionId);
+        setNote(found?.content ?? "");
+      })
+      .catch(() => {});
+  }, [questionId]);
+
+  async function toggleFavorite() {
+    if (!question) return;
+    const next = !isFavorite;
+    setIsFavorite(next);
+    const sessionId = getSessionId();
+    const res = await fetch("/api/favorites", {
+      method: next ? "POST" : "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId, questionId: question.id }),
+    });
+    if (!res.ok) {
+      setIsFavorite(!next);
+      toast("收藏操作失敗");
+    }
+  }
+
+  function pickAnswer(letter: string) {
+    if (!question || picked) return;
+    setPicked(letter);
+  }
+
+  // 鍵盤快捷鍵(僅答題、收藏、筆記、複製、搜尋;無導航類)
+  useEffect(() => {
+    if (!question) return;
+    function onKey(e: KeyboardEvent) {
+      const q = question;
+      if (!q) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      const key = e.key;
+      if (
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey &&
+        ["1", "2", "3", "4", "a", "b", "c", "d"].includes(key) &&
+        !picked
+      ) {
+        const letter =
+          ["1", "2", "3", "4"].includes(key)
+            ? ["a", "b", "c", "d"][parseInt(key, 10) - 1]
+            : key.toLowerCase();
+        if (q.options[letter]) {
+          e.preventDefault();
+          pickAnswer(letter);
+        }
+      } else if (key === "f" || key === "F") {
+        e.preventDefault();
+        toggleFavorite();
+      } else if (
+        (key === "n" || key === "N") &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey
+      ) {
+        e.preventDefault();
+        noteButtonRef.current?.toggleEditor();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question, picked, isFavorite]);
+
+  if (loadError) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8 space-y-3">
+        <p className="text-red-600 dark:text-red-400">{loadError}</p>
+        <Button variant="outline" onClick={() => router.back()}>
+          <ChevronLeft className="w-4 h-4 mr-1" />
+          返回
+        </Button>
+      </div>
+    );
+  }
+
+  if (!question) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8 text-muted-foreground">
+        載入中...
+      </div>
+    );
+  }
+
+  const correctLetter = (question.answer || "").toLowerCase();
+  const isAnswered = picked != null;
+  const isCorrect = isAnswered && picked === correctLetter;
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+      <div className="flex items-center justify-between text-sm flex-wrap gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {paperCode && <Badge variant="secondary">{paperCode}</Badge>}
+          <span className="font-medium">#{question.number}</span>
+          {question.ref && (
+            <Badge
+              variant="outline"
+              className="text-xs"
+              title={
+                paperCode ? getChapterInfo(paperCode, question.ref)?.path : undefined
+              }
+            >
+              {question.ref}
+            </Badge>
+          )}
+          {question.sourceLabel && (
+            <span className="text-xs text-muted-foreground">
+              {question.sourceLabel}
+            </span>
+          )}
+        </div>
+        <Button variant="ghost" size="sm" onClick={() => router.back()}>
+          <ChevronLeft className="w-4 h-4 mr-1" />
+          返回
+        </Button>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-start justify-between gap-2">
+            <CardTitle className="text-base leading-relaxed flex-1 min-w-0">
+              {question.question}
+            </CardTitle>
+            <QuestionActions
+              number={question.number}
+              question={question.question}
+              options={question.options}
+              ref={question.ref || undefined}
+              size="xs"
+            />
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {(["a", "b", "c", "d"] as const).map((letter) => {
+            const optText = question.options[letter];
+            if (!optText) return null;
+            const isSelected = picked === letter;
+            const isThisCorrect = correctLetter === letter;
+            const showResult = isAnswered;
+
+            return (
+              <button
+                key={letter}
+                disabled={isAnswered}
+                onClick={() => pickAnswer(letter)}
+                className={cn(
+                  "w-full text-left p-3 rounded-lg border-2 transition-colors flex items-start gap-3",
+                  !showResult && "hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/30",
+                  !showResult && isSelected && "border-blue-500 bg-blue-50 dark:bg-blue-950/30",
+                  showResult && isThisCorrect && "border-green-500 bg-green-50 dark:bg-green-950/30",
+                  showResult && isSelected && !isThisCorrect && "border-red-500 bg-red-50 dark:bg-red-950/30",
+                  showResult && !isSelected && !isThisCorrect && "border-border opacity-60"
+                )}
+              >
+                <span
+                  className={cn(
+                    "shrink-0 w-7 h-7 rounded-full flex items-center justify-center font-medium text-sm",
+                    !showResult && isSelected && "bg-blue-600 text-white",
+                    !showResult && !isSelected && "bg-muted text-foreground",
+                    showResult && isThisCorrect && "bg-green-600 text-white",
+                    showResult && isSelected && !isThisCorrect && "bg-red-600 text-white",
+                    showResult && !isSelected && !isThisCorrect && "bg-muted text-muted-foreground"
+                  )}
+                >
+                  {letter.toUpperCase()}
+                </span>
+                <span className="flex-1 text-sm leading-relaxed pt-0.5">
+                  {optText}
+                </span>
+                {showResult && isThisCorrect && (
+                  <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0 mt-1" />
+                )}
+                {showResult && isSelected && !isThisCorrect && (
+                  <XCircle className="w-5 h-5 text-red-600 shrink-0 mt-1" />
+                )}
+              </button>
+            );
+          })}
+
+          {isAnswered && (
+            <div
+              className={cn(
+                "mt-4 p-4 rounded-lg border",
+                isCorrect
+                  ? "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800"
+                  : "bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800"
+              )}
+            >
+              <p
+                className={cn(
+                  "text-sm font-medium mb-1",
+                  isCorrect ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"
+                )}
+              >
+                {isCorrect ? "✓ 答對了" : `✗ 答錯 · 正確答案:${correctLetter.toUpperCase()}`}
+              </p>
+              {question.explanation && (
+                <p className="text-sm text-foreground leading-relaxed">
+                  {question.explanation}
+                </p>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
+        <Button variant="ghost" onClick={toggleFavorite}>
+          <Star
+            className={cn(
+              "w-4 h-4 md:mr-1",
+              isFavorite && "fill-yellow-400 text-yellow-400"
+            )}
+          />
+          <span className="hidden md:inline">
+            {isFavorite ? "已收藏" : "收藏"}
+          </span>
+        </Button>
+        <NoteButton
+          ref={noteButtonRef}
+          questionId={question.id}
+          content={note}
+          onChange={(newContent) => {
+            setNote(newContent ?? "");
+            toast(newContent === null ? "筆記已刪除" : "筆記已儲存");
+          }}
+        />
+        <ReportButton
+          questionId={question.id}
+          userAnswer={picked}
+          onSubmitted={() => toast("已收到您的回報,感謝!")}
+        />
+      </div>
+
+      <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground justify-center">
+        <span>
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">
+            1-4 / A-D
+          </kbd>{" "}
+          選答
+        </span>
+        <span>
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">
+            F
+          </kbd>{" "}
+          收藏
+        </span>
+        <span>
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">
+            N
+          </kbd>{" "}
+          筆記
+        </span>
       </div>
 
       <ToastContainer toasts={toasts} />

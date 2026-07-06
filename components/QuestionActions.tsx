@@ -82,7 +82,6 @@ export function QuestionActions({
 
   return (
     <div ref={wrapRef} className={cn("relative inline-flex items-center gap-0.5", className)}>
-      {/* 預設 Google 搜尋入口 */}
       <Button
         asChild
         variant="ghost"
@@ -96,7 +95,6 @@ export function QuestionActions({
         </a>
       </Button>
 
-      {/* 更多操作(複製 / 百度 / ChatGPT) */}
       <Button
         type="button"
         variant="ghost"

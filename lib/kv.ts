@@ -208,17 +208,43 @@ export type NoteRecord = {
   updatedAt: string;
 };
 
+export type FeedbackCategory =
+  | "question_error"
+  | "answer_error"
+  | "explanation_unclear"
+  | "typo";
+
+export type FeedbackRecord = {
+  id: string;
+  sessionId: string;
+  questionId: string;
+  paperCode: string;
+  source: string;
+  sourceLabel: string | null;
+  number: number;
+  ref: string | null;
+  category: FeedbackCategory;
+  description: string;
+  userAnswer: string | null;
+  userAgent: string;
+  createdAt: string;
+};
+
 const AT = "attempt:";
 const SESS_AT = "session:attempts:";
 const SESS_FAV = "session:favs:";
 const SESS_FAV_META = "session:favs-meta:";
 const SESS_NOTES = "session:notes:";
+const FB = "feedback:";
+const SESS_FB = "feedback:session:";
 
 export function attemptKey(id: string) { return `${AT}${id}`; }
 function sessAttemptsKey(sid: string) { return `${SESS_AT}${sid}`; }
 function sessFavsKey(sid: string) { return `${SESS_FAV}${sid}`; }
 function sessFavMetaKey(sid: string) { return `${SESS_FAV_META}${sid}`; }
 function sessNotesKey(sid: string) { return `${SESS_NOTES}${sid}`; }
+function feedbackKey(id: string) { return `${FB}${id}`; }
+function sessFeedbackKey(sid: string) { return `${SESS_FB}${sid}`; }
 
 export async function createAttempt(record: AttemptRecord): Promise<void> {
   await kv.set(attemptKey(record.id), record);
@@ -365,4 +391,46 @@ export async function migrateSession(fromSessionId: string, toSessionId: string)
   }
 
   return result;
+}
+
+export async function createFeedback(rec: FeedbackRecord): Promise<void> {
+  await kv.set(feedbackKey(rec.id), rec);
+  await kv.lpush(sessFeedbackKey(rec.sessionId), rec.id);
+}
+
+export async function getFeedback(id: string): Promise<FeedbackRecord | null> {
+  return kv.get<FeedbackRecord>(feedbackKey(id));
+}
+
+export async function listFeedback(sessionId: string, limit = 100): Promise<FeedbackRecord[]> {
+  const ids = await kv.lrange<string>(sessFeedbackKey(sessionId), 0, limit - 1);
+  const out: FeedbackRecord[] = [];
+  for (const id of ids) {
+    const r = await getFeedback(id);
+    if (r) out.push(r);
+  }
+  return out;
+}
+
+export async function deleteFeedback(id: string): Promise<void> {
+  await kv.del(feedbackKey(id));
+  // 不清理 session 列表裡的 id(避免 lrem JSON 比對問題),
+  // 讀路徑統一走 get() 驗存在性,自然忽略 ghost id。
+}
+
+export async function listAllFeedback(limit = 100): Promise<FeedbackRecord[]> {
+  // 枚舉所有 session 的 feedback id 列表,合並去重 + 排序。
+  const sessionKeys = await kv.keys(`${SESS_FB}*`);
+  const idSets = await Promise.all(
+    sessionKeys.map((k) => kv.lrange<string>(k, 0, -1))
+  );
+  const idSet = new Set<string>();
+  for (const arr of idSets) for (const id of arr) idSet.add(id);
+
+  const details = await Promise.all(
+    Array.from(idSet).map((id) => getFeedback(id))
+  );
+  const items = details.filter((d): d is FeedbackRecord => d !== null);
+  items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return items.slice(0, limit);
 }

@@ -15,6 +15,7 @@ import {
   Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getChapterInfo } from "@/lib/chapters";
 import { QuestionActions } from "@/components/QuestionActions";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
 import { buildSearchQuery } from "@/components/QuestionSearchButtons";
@@ -333,7 +334,15 @@ export function RedoPractice({
                     <Badge variant="secondary">{it.paperCode}</Badge>
                     <span className="font-medium">#{it.question.number}</span>
                     {it.question.ref && (
-                      <Badge variant="outline" className="text-xs">
+                      <Badge
+                        variant="outline"
+                        className="text-xs"
+                        title={
+                          it.paperCode
+                            ? getChapterInfo(it.paperCode, it.question.ref)?.path
+                            : undefined
+                        }
+                      >
                         {it.question.ref}
                       </Badge>
                     )}
@@ -382,7 +391,15 @@ export function RedoPractice({
             <Badge variant="secondary">{current.paperCode}</Badge>
             <span className="font-medium">#{current.question.number}</span>
             {current.question.ref && (
-              <Badge variant="outline" className="text-xs">
+              <Badge
+                variant="outline"
+                className="text-xs"
+                title={
+                  current.paperCode
+                    ? getChapterInfo(current.paperCode, current.question.ref)?.path
+                    : undefined
+                }
+              >
                 {current.question.ref}
               </Badge>
             )}

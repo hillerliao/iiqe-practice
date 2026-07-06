@@ -54,6 +54,7 @@ export default function StatsPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [chapterFilter, setChapterFilter] = useState<string | null>(null);
   const [redoingId, setRedoingId] = useState<string | null>(null);
 
   const router = useRouter();
@@ -177,49 +178,108 @@ export default function StatsPage() {
         </Card>
       </div>
 
+      {stats.paperStats.length > 1 && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {stats.paperStats.map((p) => (
+            <Card key={p.paperId} className="bg-muted/30">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs text-muted-foreground">{p.name}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-baseline gap-3">
+                  <p className="text-2xl font-bold">{p.total}</p>
+                  <p className="text-sm text-muted-foreground">題</p>
+                  <p className="text-lg font-semibold text-green-600 dark:text-green-400 ml-auto">{p.correct}</p>
+                  <p className="text-sm text-muted-foreground">對</p>
+                  <p
+                    className={`text-xl font-bold ${
+                      p.accuracy >= 0.8
+                        ? "text-green-600 dark:text-green-400"
+                        : p.accuracy >= 0.6
+                          ? "text-yellow-600 dark:text-yellow-400"
+                          : "text-red-600 dark:text-red-400"
+                    }`}
+                  >
+                    {(p.accuracy * 100).toFixed(1)}%
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>各章節表現</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {stats.refStats.slice(0, 12).map((r) => {
-                const info = getChapterInfo(r.paperCode, r.ref);
-                return (
-                  <div key={`${r.paperCode}-${r.ref}`}>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="font-medium">
-                        {r.ref}
-                        {info && (
-                          <span className="text-muted-foreground font-normal ml-1.5">
-                            {info.path}
-                          </span>
-                        )}
-                      </span>
-                      <span className="text-muted-foreground shrink-0 ml-2">
-                        {r.correct}/{r.total} ({(r.accuracy * 100).toFixed(0)}%)
-                      </span>
+            {(() => {
+              const paperCodes = [...new Set(stats.refStats.map((r) => r.paperCode))].sort();
+              const active = chapterFilter ?? paperCodes[0] ?? null;
+              const filtered = active
+                ? stats.refStats.filter((r) => r.paperCode === active)
+                : stats.refStats;
+              return (
+                <>
+                  {paperCodes.length > 1 && (
+                    <div className="flex gap-2 mb-4">
+                      {paperCodes.map((code) => (
+                        <button
+                          key={code}
+                          onClick={() => setChapterFilter(code)}
+                          className={`px-3 py-1 text-sm rounded-md border transition-colors ${
+                            active === code
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "bg-background text-muted-foreground border-border hover:bg-muted"
+                          }`}
+                        >
+                          {code === "P1" ? "卷一" : code === "P3" ? "卷三" : code}
+                        </button>
+                      ))}
                     </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className={`h-full ${
-                          r.accuracy >= 0.8
-                            ? "bg-green-500 dark:bg-green-600"
-                            : r.accuracy >= 0.6
-                              ? "bg-yellow-500 dark:bg-yellow-600"
-                              : "bg-red-500 dark:bg-red-600"
-                        }`}
-                        style={{ width: `${r.accuracy * 100}%` }}
-                      />
-                    </div>
+                  )}
+                  <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+                    {filtered.map((r) => {
+                      const info = getChapterInfo(r.paperCode, r.ref);
+                      return (
+                        <div key={`${r.paperCode}-${r.ref}`}>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="font-medium">
+                              {r.ref}
+                              {info && (
+                                <span className="text-muted-foreground font-normal ml-1.5">
+                                  {info.path}
+                                </span>
+                              )}
+                            </span>
+                            <span className="text-muted-foreground shrink-0 ml-2">
+                              {r.correct}/{r.total} ({(r.accuracy * 100).toFixed(0)}%)
+                            </span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${
+                                r.accuracy >= 0.8
+                                  ? "bg-green-500 dark:bg-green-600"
+                                  : r.accuracy >= 0.6
+                                    ? "bg-yellow-500 dark:bg-yellow-600"
+                                    : "bg-red-500 dark:bg-red-600"
+                              }`}
+                              style={{ width: `${r.accuracy * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
-              {stats.refStats.length === 0 && (
-                <p className="text-muted-foreground text-sm">尚無資料</p>
-              )}
-            </div>
+                </>
+              );
+            })()}
+            {stats.refStats.length === 0 && (
+              <p className="text-muted-foreground text-sm">尚無資料</p>
+            )}
           </CardContent>
         </Card>
 

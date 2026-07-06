@@ -5,6 +5,7 @@ import "./globals.css";
 import { Home, BarChart3, BookOpen, Star, Settings } from "lucide-react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SetupReminder } from "@/components/SetupReminder";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,8 +19,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "IIQE 刷題",
-    template: "%s · IIQE 刷題",
+    default: "IIQE 做题家",
+    template: "%s · IIQE 做题家",
   },
   description: "香港保險業監管局 IIQE 考試刷題應用",
 };
@@ -66,51 +67,54 @@ export default function RootLayout({
                 className="font-semibold text-lg flex items-center gap-2 shrink-0 whitespace-nowrap"
               >
                 <BookOpen className="w-5 h-5" />
-                IIQE 刷題
+IIQE 做题家
               </Link>
-              <nav className="flex gap-1 text-sm overflow-x-auto items-center flex-1 min-w-0">
+              <nav className="flex gap-1 text-sm items-center shrink min-w-0">
                 <Link
                   href="/"
                   className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                 >
                   <Home className="w-4 h-4" />
-                  首頁
+                  <span className="hidden md:inline">首頁</span>
                 </Link>
                 <Link
                   href="/stats"
                   className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                 >
                   <BarChart3 className="w-4 h-4" />
-                  統計
+                  <span className="hidden md:inline">統計</span>
                 </Link>
                 <Link
                   href="/wrongbook"
                   className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                 >
                   <BookOpen className="w-4 h-4" />
-                  錯題本
+                  <span className="hidden md:inline">錯題本</span>
                 </Link>
                 <Link
                   href="/favorites"
                   className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                 >
                   <Star className="w-4 h-4" />
-                  收藏
+                  <span className="hidden md:inline">收藏</span>
                 </Link>
                 <Link
                   href="/settings"
                   className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                 >
                   <Settings className="w-4 h-4" />
-                  設定
+                  <span className="hidden md:inline">設定</span>
                 </Link>
               </nav>
-              <ThemeToggle />
+              <div className="ml-auto">
+                <ThemeToggle />
+              </div>
             </div>
           </header>
+          <SetupReminder />
           <main className="flex-1">{children}</main>
           <footer className="border-t py-3 text-center text-xs text-muted-foreground">
-            IIQE 刷題 · 個人複習用
+            IIQE 做題家· 讓刷題更簡單
           </footer>
         </ThemeProvider>
       </body>

@@ -1,12 +1,20 @@
 // 前端 sessionId 管理
-// 預設隨機生成 UUID;使用者可在設定頁自訂 ID,
+// 預設隨機生成 UUID;使用者可在設定頁自訂 Email 格式 ID,
 // 自訂後跨瀏覽器輸入同樣 ID 即可撈到同一份資料。
+// 為向後相容,保留少數舊的非 Email 格式 ID(例如管理員用的 iiqe2026)。
 "use client";
 
 const SESSION_KEY = "iiqe:sessionId";
 
 // 自訂 ID 命名空間前綴,用於與隨機 UUID 區分(僅供顯示判斷用)
 export const CUSTOM_PREFIX = "user:";
+
+// 驗證白名單:這些舊的非 Email 格式 ID 仍可設定,
+// 主要為保留管理員 sessionId 避免破壞既有流程。
+export const ADMIN_BYPASS_IDS = ["iiqe2026"] as const;
+
+// 簡單 Email 格式驗證;不求嚴格 RFC 5322,擋明顯錯誤即可
+const EMAIL_RE = /^[\w.+-]+@[\w-]+(\.[\w-]+)+$/;
 
 export function getSessionId(): string {
   if (typeof window === "undefined") return "";
@@ -36,8 +44,12 @@ export function validateCustomId(customId: string): string {
     trimmed = trimmed.slice(CUSTOM_PREFIX.length);
   }
   if (!trimmed) throw new Error("自訂 ID 不可為空");
-  if (!/^[A-Za-z0-9_-]{3,32}$/.test(trimmed)) {
-    throw new Error("自訂 ID 僅限 3~32 字元的英文、數字、底線或連字號");
+  // 向後相容:驗證白名單內的舊 ID 放行
+  if ((ADMIN_BYPASS_IDS as readonly string[]).includes(trimmed)) {
+    return CUSTOM_PREFIX + trimmed;
+  }
+  if (!EMAIL_RE.test(trimmed)) {
+    throw new Error("自訂 ID 須為有效的 Email 格式(例如 you@example.com)");
   }
   return CUSTOM_PREFIX + trimmed;
 }
@@ -48,6 +60,7 @@ export function setCustomSessionId(customId: string): string {
   if (typeof window === "undefined") return "";
   const newId = validateCustomId(customId);
   localStorage.setItem(SESSION_KEY, newId);
+  emitSessionChange(newId);
   return newId;
 }
 
@@ -56,5 +69,16 @@ export function resetSessionId(): string {
   if (typeof window === "undefined") return "";
   const id = crypto.randomUUID();
   localStorage.setItem(SESSION_KEY, id);
+  emitSessionChange(id);
   return id;
+}
+
+// sessionId 變更事件,讓 SetupReminder 等持久掛載的元件即時反應
+export const SESSION_CHANGE_EVENT = "iiqe:sessionchange";
+
+function emitSessionChange(id: string) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent(SESSION_CHANGE_EVENT, { detail: { id } })
+  );
 }

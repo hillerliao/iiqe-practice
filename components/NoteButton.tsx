@@ -156,6 +156,7 @@ export const NoteButton = forwardRef<NoteButtonHandle, NoteButtonProps>(function
   function handleCancel() {
     setDraft(content);
     setEditing(false);
+    setOpen(false);
     setError(null);
   }
 
@@ -204,9 +205,9 @@ export const NoteButton = forwardRef<NoteButtonHandle, NoteButtonProps>(function
         )}
       >
         <NotebookPen
-          className={cn(iconSize, "mr-1", hasNote && "fill-amber-100 dark:fill-amber-900/50")}
+          className={cn(iconSize, "md:mr-1", hasNote && "fill-amber-100 dark:fill-amber-900/50")}
         />
-        {hasNote ? "筆記" : "加筆記"}
+        <span className="hidden md:inline">{hasNote ? "筆記" : "加筆記"}</span>
       </Button>
 
       {/* Popover 面板(在按鈕右上方浮出) */}

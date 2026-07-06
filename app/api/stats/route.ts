@@ -46,7 +46,16 @@ export async function GET(req: NextRequest) {
       correct: v.correct,
       accuracy: v.total > 0 ? v.correct / v.total : 0,
     }))
-    .sort((a, b) => b.total - a.total);
+    .sort((a, b) => {
+      if (a.paperCode !== b.paperCode) return a.paperCode.localeCompare(b.paperCode);
+      const aParts = a.ref.split(".").map(Number);
+      const bParts = b.ref.split(".").map(Number);
+      for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+        const diff = (aParts[i] || 0) - (bParts[i] || 0);
+        if (diff !== 0) return diff;
+      }
+      return 0;
+    });
 
   const paperGroups: Record<string, { name: string; total: number; correct: number }> = {};
   for (const a of allAnswers) {
