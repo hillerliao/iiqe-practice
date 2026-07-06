@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAttempt, updateAttempt, getNote, listNotes, AnswerRecord } from "@/lib/kv";
-import { getQuestionById, getQuestions } from "@/lib/data";
+import { getQuestionById, getQuestions, getPapers } from "@/lib/data";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -24,10 +24,12 @@ export async function GET(req: NextRequest) {
   }
 
   const allQuestions = getQuestions(attempt.paperId, attempt.source ?? "exam");
+  const paperInfo = getPapers().find((p) => p.id === attempt.paperId);
 
   return NextResponse.json({
     attempt: {
       ...attempt,
+      paper: paperInfo ? { name: paperInfo.name, code: paperInfo.code } : { name: attempt.paperId, code: attempt.paperId },
       allQuestions: allQuestions.map((q) => ({
         id: q.id,
         number: q.number,

@@ -164,11 +164,7 @@ function createUpstashClient(): KVClient {
       return r === 1;
     },
     async rename(key: string, newKey: string): Promise<void> {
-      const val = await client.get(key);
-      if (val !== null) {
-        await client.set(newKey, val);
-        await client.del(key);
-      }
+      await client.rename(key, newKey);
     },
     async expire(key: string, seconds: number): Promise<void> {
       await client.expire(key, seconds);
@@ -310,34 +306,63 @@ export async function listNotes(sessionId: string, questionIds?: string[]): Prom
 export async function migrateSession(fromSessionId: string, toSessionId: string): Promise<{ attempts: number; favorites: number; notes: number }> {
   const result = { attempts: 0, favorites: 0, notes: 0 };
 
-  const fromKeys = await kv.keys(`${SESS_AT}${fromSessionId}*`);
-  const toKeys = new Set(await kv.keys(`${SESS_AT}${toSessionId}*`));
+  // 使用精確 key,避免 wildcard 誤匹配前綴相似的 session ID
+  const fromAtKey = sessAttemptsKey(fromSessionId);
+  const toAtKey = sessAttemptsKey(toSessionId);
 
-  for (const key of fromKeys) {
-    const newKey = key.replace(fromSessionId, toSessionId);
-    if (toKeys.has(newKey)) continue;
-    await kv.rename(key, newKey);
-    result.attempts++;
+  if (await kv.exists(fromAtKey)) {
+    const ids = await kv.lrange<string>(fromAtKey, 0, -1);
+
+    if (await kv.exists(toAtKey)) {
+      const existingIds = new Set(await kv.lrange<string>(toAtKey, 0, -1));
+      let merged = 0;
+      for (const id of ids) {
+        if (!existingIds.has(id)) {
+          await kv.lpush(toAtKey, id);
+          merged++;
+        }
+      }
+      await kv.del(fromAtKey);
+    } else {
+      await kv.rename(fromAtKey, toAtKey);
+    }
+
+    // 更新 attempt 記錄內的 sessionId 為新 ID
+    const allIds = await kv.lrange<string>(toAtKey, 0, -1);
+    for (const id of allIds) {
+      const at = await getAttempt(id);
+      if (at && at.sessionId === fromSessionId) {
+        await updateAttempt(id, { sessionId: toSessionId });
+      }
+    }
+
+    result.attempts = ids.length;
   }
 
   const favIds = await listFavorites(fromSessionId);
-  const toFavIds = new Set(await listFavorites(toSessionId));
-  for (const qid of favIds) {
-    if (toFavIds.has(qid)) continue;
-    await addFavorite(toSessionId, qid);
-    result.favorites++;
+  if (favIds.length > 0) {
+    const toFavIds = new Set(await listFavorites(toSessionId));
+    for (const qid of favIds) {
+      if (!toFavIds.has(qid)) {
+        await addFavorite(toSessionId, qid);
+      }
+    }
+    await kv.del(sessFavsKey(fromSessionId));
+    await kv.del(sessFavMetaKey(fromSessionId));
+    result.favorites = favIds.length;
   }
-  await kv.del(sessFavsKey(fromSessionId));
-  await kv.del(sessFavMetaKey(fromSessionId));
 
   const notes = await listNotes(fromSessionId);
-  const toNotes = await listNotes(toSessionId);
-  for (const [qid, note] of Object.entries(notes)) {
-    if (toNotes[qid]) continue;
-    await saveNote(toSessionId, qid, note.content);
-    result.notes++;
+  if (Object.keys(notes).length > 0) {
+    const toNotes = await listNotes(toSessionId);
+    for (const [qid, note] of Object.entries(notes)) {
+      if (!toNotes[qid]) {
+        await saveNote(toSessionId, qid, note.content);
+      }
+    }
+    await kv.del(sessNotesKey(fromSessionId));
+    result.notes = Object.keys(notes).length;
   }
-  await kv.del(sessNotesKey(fromSessionId));
 
   return result;
 }

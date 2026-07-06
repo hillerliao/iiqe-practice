@@ -28,22 +28,25 @@ export function getCustomIdDisplay(id: string): string {
   return id.startsWith(CUSTOM_PREFIX) ? id.slice(CUSTOM_PREFIX.length) : "";
 }
 
-// 設定自訂 ID:輸入純暱稱,內部自動加前綴避免與隨機 UUID 衝突
-// 若使用者貼入已含前綴的完整 ID(例如從「當前識別碼」複製),自動剝離前綴
-export function setCustomSessionId(customId: string): string {
-  if (typeof window === "undefined") return "";
-  let trimmed = customId.trim();
+// 驗證自訂 ID 格式,回傳完整 ID (含前綴),不寫入 localStorage
+export function validateCustomId(customId: string): string {
+  let trimmed = (customId ?? "").trim();
   if (!trimmed) throw new Error("自訂 ID 不可為空");
-  // 自動剝離前綴,允許使用者直接貼入完整 ID
   if (trimmed.startsWith(CUSTOM_PREFIX)) {
     trimmed = trimmed.slice(CUSTOM_PREFIX.length);
   }
   if (!trimmed) throw new Error("自訂 ID 不可為空");
-  // 僅允許英數字、底線、連字號,長度 3~32
   if (!/^[A-Za-z0-9_-]{3,32}$/.test(trimmed)) {
     throw new Error("自訂 ID 僅限 3~32 字元的英文、數字、底線或連字號");
   }
-  const newId = CUSTOM_PREFIX + trimmed;
+  return CUSTOM_PREFIX + trimmed;
+}
+
+// 設定自訂 ID:輸入純暱稱,內部自動加前綴避免與隨機 UUID 衝突
+// 若使用者貼入已含前綴的完整 ID(例如從「當前識別碼」複製),自動剝離前綴
+export function setCustomSessionId(customId: string): string {
+  if (typeof window === "undefined") return "";
+  const newId = validateCustomId(customId);
   localStorage.setItem(SESSION_KEY, newId);
   return newId;
 }
