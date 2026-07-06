@@ -36,6 +36,7 @@ model Question {
 
   answers   Answer[]
   favorites Favorite[]
+  notes     Note[]
 
   @@unique([paperId, number, source])
   @@index([paperId, source])
@@ -80,6 +81,19 @@ model Favorite {
   questionId String
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
+
+  @@unique([sessionId, questionId])
+  @@index([sessionId])
+}
+
+model Note {
+  id         String   @id @default(cuid())
+  sessionId  String
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  content    String   // 純文字,1000 字上限在 API 層校驗
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@unique([sessionId, questionId])
   @@index([sessionId])

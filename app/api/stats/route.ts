@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     where: { attempt: { sessionId } },
     include: {
       question: true,
-      attempt: true,
+      attempt: { include: { paper: true } },
     },
   });
 
@@ -22,18 +22,21 @@ export async function GET(req: NextRequest) {
   const correct = answers.filter((a) => a.isCorrect).length;
   const accuracy = total > 0 ? correct / total : 0;
 
-  // 各 ref prefix(取第一層,例如 "1.1.2a" → "1.1")
-  const refGroups: Record<string, { total: number; correct: number }> = {};
+  // 各 ref prefix(取前兩段 X.Y),依 (paperCode, ref) 區分不同卷別
+  const refGroups: Record<string, { paperCode: string; total: number; correct: number }> = {};
   for (const a of answers) {
     const ref = a.question.ref || "其他";
     const prefix = ref.split(".").slice(0, 2).join("."); // "1.1.2a" → "1.1"
-    if (!refGroups[prefix]) refGroups[prefix] = { total: 0, correct: 0 };
-    refGroups[prefix].total++;
-    if (a.isCorrect) refGroups[prefix].correct++;
+    const paperCode = a.attempt.paper.code;
+    const key = `${paperCode}::${prefix}`;
+    if (!refGroups[key]) refGroups[key] = { paperCode, total: 0, correct: 0 };
+    refGroups[key].total++;
+    if (a.isCorrect) refGroups[key].correct++;
   }
   const refStats = Object.entries(refGroups)
-    .map(([ref, v]) => ({
-      ref,
+    .map(([key, v]) => ({
+      ref: key.split("::")[1],
+      paperCode: v.paperCode,
       total: v.total,
       correct: v.correct,
       accuracy: v.total > 0 ? v.correct / v.total : 0,

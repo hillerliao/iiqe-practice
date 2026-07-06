@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { getSessionId } from "@/lib/session";
 import { QuestionActions } from "@/components/QuestionActions";
+import { NoteSection } from "@/components/NoteSection";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
 import { RedoPractice, type RedoItem } from "@/components/RedoPractice";
 
@@ -24,6 +25,7 @@ type WrongItem = {
   paperName: string;
   lastWrongAt: string;
   wrongCount: number;
+  note: string | null;
   question: {
     id: string;
     number: number;
@@ -166,6 +168,8 @@ function WrongItemCard({ item }: { item: WrongItem }) {
             )}
           </div>
         )}
+
+        <NoteSection content={item.note} compact />
       </CardContent>
     </Card>
   );

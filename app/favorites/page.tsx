@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { getSessionId } from "@/lib/session";
 import { QuestionActions } from "@/components/QuestionActions";
+import { NoteSection } from "@/components/NoteSection";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
 import { RedoPractice, type RedoItem } from "@/components/RedoPractice";
 
@@ -21,6 +22,7 @@ type FavItem = {
   questionId: string;
   paperCode: string;
   paperName: string;
+  note: string | null;
   question: {
     id: string;
     number: number;
@@ -161,6 +163,8 @@ function FavItemCard({
             )}
           </div>
         )}
+
+        <NoteSection content={item.note} compact />
       </CardContent>
     </Card>
   );

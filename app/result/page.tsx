@@ -6,14 +6,16 @@ import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle, Play } from "lucide-react";
 import { QuestionActions } from "@/components/QuestionActions";
+import { NoteSection } from "@/components/NoteSection";
 
 type AnswerData = {
   id: string;
   questionId: string;
   userAnswer: string;
   isCorrect: boolean;
+  note: string | null;
   question: {
     id: string;
     number: number;
@@ -29,6 +31,7 @@ type AttemptData = {
   id: string;
   totalQ: number;
   correct: number;
+  source: string | null;
   paper: { name: string; code: string };
 };
 
@@ -60,6 +63,7 @@ function ResultInner() {
           id: data.attempt.id,
           totalQ: data.attempt.totalQ,
           correct: data.attempt.correct,
+          source: data.attempt.source,
           paper: data.attempt.paper,
         });
         setAnswers(data.attempt.answers);
@@ -116,9 +120,17 @@ function ResultInner() {
               <p className="text-xs text-zinc-500 mt-1">正確率</p>
             </div>
           </div>
-          <div className="mt-6 flex gap-2">
+          <div className="mt-6 flex flex-wrap gap-2">
             <Button asChild>
               <Link href="/">返回首頁</Link>
+            </Button>
+            <Button asChild variant="default">
+              <Link
+                href={`/papers?code=${attempt.paper.code}&source=${attempt.source ?? "exam"}`}
+              >
+                <Play className="w-4 h-4 mr-1.5" />
+                繼續做題
+              </Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="/wrongbook">查看錯題本</Link>
@@ -186,6 +198,7 @@ function ResultInner() {
                     </p>
                   )}
                 </div>
+                <NoteSection content={a.note} className="mt-2" compact />
               </div>
             ))}
           </CardContent>

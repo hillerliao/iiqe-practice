@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Play, FileText, RotateCcw } from "lucide-react";
 import { getSessionId } from "@/lib/session";
+import { getChapterInfo } from "@/lib/chapters";
 
 // 把題目序號陣列壓縮成區段字串,例如 [110,111,118,119,120,126] → "110~111, 118~120, 126"
 function formatQuestionRanges(nums: number[]): string {
@@ -33,7 +34,7 @@ type Stats = {
   total: number;
   correct: number;
   accuracy: number;
-  refStats: { ref: string; total: number; correct: number; accuracy: number }[];
+  refStats: { ref: string; paperCode: string; total: number; correct: number; accuracy: number }[];
   paperStats: { paperId: string; name: string; total: number; correct: number; accuracy: number }[];
   recentAttempts: {
     id: string;
@@ -183,28 +184,38 @@ export default function StatsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {stats.refStats.slice(0, 12).map((r) => (
-                <div key={r.ref}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-medium">{r.ref}</span>
-                    <span className="text-zinc-500">
-                      {r.correct}/{r.total} ({(r.accuracy * 100).toFixed(0)}%)
-                    </span>
+              {stats.refStats.slice(0, 12).map((r) => {
+                const info = getChapterInfo(r.paperCode, r.ref);
+                return (
+                  <div key={`${r.paperCode}-${r.ref}`}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="font-medium">
+                        {r.ref}
+                        {info && (
+                          <span className="text-zinc-500 font-normal ml-1.5">
+                            {info.path}
+                          </span>
+                        )}
+                      </span>
+                      <span className="text-zinc-500 shrink-0 ml-2">
+                        {r.correct}/{r.total} ({(r.accuracy * 100).toFixed(0)}%)
+                      </span>
+                    </div>
+                    <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full ${
+                          r.accuracy >= 0.8
+                            ? "bg-green-500"
+                            : r.accuracy >= 0.6
+                              ? "bg-yellow-500"
+                              : "bg-red-500"
+                        }`}
+                        style={{ width: `${r.accuracy * 100}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${
-                        r.accuracy >= 0.8
-                          ? "bg-green-500"
-                          : r.accuracy >= 0.6
-                            ? "bg-yellow-500"
-                            : "bg-red-500"
-                      }`}
-                      style={{ width: `${r.accuracy * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
               {stats.refStats.length === 0 && (
                 <p className="text-zinc-500 text-sm">尚無資料</p>
               )}

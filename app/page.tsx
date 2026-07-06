@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, FileText, FileQuestion } from "lucide-react";
+import { ArrowRight, FileText, FileQuestion, NotebookPen } from "lucide-react";
 
 async function getPapers() {
   const papers = await prisma.paper.findMany({
@@ -79,12 +79,18 @@ export default async function HomePage() {
         <CardHeader>
           <CardTitle>其他功能</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-3 sm:grid-cols-3">
+        <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Button asChild variant="ghost" className="justify-start">
             <Link href="/wrongbook">📕 錯題本(依你曾答錯的題)</Link>
           </Button>
           <Button asChild variant="ghost" className="justify-start">
             <Link href="/favorites">⭐ 收藏題</Link>
+          </Button>
+          <Button asChild variant="ghost" className="justify-start">
+            <Link href="/notes">
+              <NotebookPen className="w-4 h-4 mr-1.5 text-amber-600" />
+              筆記本
+            </Link>
           </Button>
           <Button asChild variant="ghost" className="justify-start">
             <Link href="/stats">📊 統計與表現</Link>

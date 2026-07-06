@@ -18,6 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 import { getSessionId } from "@/lib/session";
 import { QuestionActions } from "@/components/QuestionActions";
+import { NoteButton, type NoteButtonHandle } from "@/components/NoteButton";
 import { buildSearchQuery } from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
 import { useToast, ToastContainer } from "@/components/useToast";
@@ -60,6 +61,8 @@ function PracticeInner() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [showFeedback, setShowFeedback] = useState(false);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  // 筆記:questionId -> 內容;空字串/不存在 = 無筆記
+  const [notes, setNotes] = useState<Record<string, string>>({});
   const [showJumpPanel, setShowJumpPanel] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -67,6 +70,7 @@ function PracticeInner() {
   const finishRef = useRef<() => void>(() => {});
   const autoNextTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
+  const noteButtonRef = useRef<NoteButtonHandle>(null);
 
   const AUTO_NEXT_DELAY = 1200; // 答對後自動跳下一題的延遲(ms)
 
@@ -130,6 +134,22 @@ function PracticeInner() {
             d.items.forEach((it: { questionId: string }) => favSet.add(it.questionId));
             setFavorites(favSet);
           });
+        // 批量載入此 attempt 所有題目的筆記(避免 N+1)
+        const questionIds = qs.map((q) => q.id).join(",");
+        if (questionIds) {
+          fetch(`/api/notes?sessionId=${sessionId}&questionIds=${encodeURIComponent(questionIds)}`)
+            .then((r) => (r.ok ? r.json() : { items: [] }))
+            .then((d: { items: { questionId: string; content: string }[] }) => {
+              const map: Record<string, string> = {};
+              d.items.forEach((it) => {
+                map[it.questionId] = it.content;
+              });
+              setNotes(map);
+            })
+            .catch(() => {
+              /* 載入失敗不影響主流程 */
+            });
+        }
       })
       .catch((e) => {
         setLoadError(e.message);
@@ -299,6 +319,14 @@ function PracticeInner() {
       } else if (key === "f" || key === "F") {
         e.preventDefault();
         toggleFavorite(currentQ.id);
+      } else if (
+        (key === "n" || key === "N") &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey
+      ) {
+        e.preventDefault();
+        noteButtonRef.current?.toggleEditor();
       } else if (key === "g" || key === "G") {
         e.preventDefault();
         setShowJumpPanel((v) => !v);
@@ -442,14 +470,15 @@ function PracticeInner() {
               <span className="text-zinc-400 mr-2">#{currentQ.number}</span>
               {currentQ.question}
             </CardTitle>
-            <QuestionActions
-              number={currentQ.number}
-              question={currentQ.question}
-              options={currentQ.options}
-              ref={currentQ.ref || undefined}
-              size="xs"
-              className="shrink-0 mt-0.5"
-            />
+            <div className="flex items-start gap-1 shrink-0 mt-0.5">
+              <QuestionActions
+                number={currentQ.number}
+                question={currentQ.question}
+                options={currentQ.options}
+                ref={currentQ.ref || undefined}
+                size="xs"
+              />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -541,15 +570,34 @@ function PracticeInner() {
           <ChevronLeft className="w-4 h-4 mr-1" />
           上一題
         </Button>
-        <Button variant="ghost" onClick={() => toggleFavorite(currentQ.id)}>
-          <Star
-            className={cn(
-              "w-4 h-4 mr-1",
-              favorites.has(currentQ.id) && "fill-yellow-400 text-yellow-400"
-            )}
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" onClick={() => toggleFavorite(currentQ.id)}>
+            <Star
+              className={cn(
+                "w-4 h-4 mr-1",
+                favorites.has(currentQ.id) && "fill-yellow-400 text-yellow-400"
+              )}
+            />
+            {favorites.has(currentQ.id) ? "已收藏" : "收藏"}
+          </Button>
+          <NoteButton
+            ref={noteButtonRef}
+            questionId={currentQ.id}
+            content={notes[currentQ.id] ?? ""}
+            onChange={(newContent) => {
+              setNotes((prev) => {
+                const next = { ...prev };
+                if (newContent === null) {
+                  delete next[currentQ.id];
+                } else {
+                  next[currentQ.id] = newContent;
+                }
+                return next;
+              });
+              toast(newContent === null ? "筆記已刪除" : "筆記已儲存");
+            }}
           />
-          {favorites.has(currentQ.id) ? "已收藏" : "收藏"}
-        </Button>
+        </div>
         {currentIdx < questions.length - 1 ? (
           <Button onClick={goNext}>
             下一題
@@ -567,6 +615,7 @@ function PracticeInner() {
         <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">→</kbd> 下一題</span>
         <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">1-4 / A-D</kbd> 選答</span>
         <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">F</kbd> 收藏</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">N</kbd> 筆記</span>
         <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">G</kbd> 跳題</span>
         <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">X</kbd> 複製</span>
         <span><kbd className="px-1 py-0.5 rounded border border-zinc-300 bg-zinc-50 font-mono">S</kbd> Google 搜尋</span>

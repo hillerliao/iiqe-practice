@@ -13,7 +13,15 @@ export async function GET(req: NextRequest) {
 
   const favs = await prisma.favorite.findMany({
     where: { sessionId },
-    include: { question: { include: { paper: true } } },
+    include: {
+      question: {
+        include: {
+          paper: true,
+          // 重要:按 sessionId 過濾,避免讀到其他 session 的筆記
+          notes: { where: { sessionId } },
+        },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 
@@ -24,6 +32,7 @@ export async function GET(req: NextRequest) {
       createdAt: f.createdAt,
       paperCode: f.question.paper.code,
       paperName: f.question.paper.name,
+      note: f.question.notes[0]?.content ?? null,
       question: {
         id: f.question.id,
         number: f.question.number,

@@ -14,7 +14,15 @@ export async function GET(req: NextRequest) {
   // 找出此 session 所有答錯的題(同題多次作答,以最後一次為準)
   const answers = await prisma.answer.findMany({
     where: { attempt: { sessionId }, isCorrect: false },
-    include: { question: { include: { paper: true } } },
+    include: {
+      question: {
+        include: {
+          paper: true,
+          // 重要:按 sessionId 過濾,避免讀到其他 session 的筆記
+          notes: { where: { sessionId } },
+        },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 
@@ -41,6 +49,7 @@ export async function GET(req: NextRequest) {
     wrongCount: wrongCountMap.get(a.questionId) ?? 1,
     paperCode: a.question.paper.code,
     paperName: a.question.paper.name,
+    note: a.question.notes[0]?.content ?? null,
     question: {
       id: a.question.id,
       number: a.question.number,

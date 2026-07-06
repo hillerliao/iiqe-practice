@@ -22,6 +22,21 @@ export async function GET(req: NextRequest) {
   if (!attempt) {
     return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
   }
+
+  // 單獨查詢此 attempt session 的筆記(避免 include 鏈中自引用)
+  const noteMap = new Map<string, string>();
+  if (attempt.answers.length > 0) {
+    const noteRows = await prisma.note.findMany({
+      where: {
+        sessionId: attempt.sessionId,
+        questionId: { in: attempt.answers.map((a) => a.questionId) },
+      },
+      select: { questionId: true, content: true },
+    });
+    for (const n of noteRows) {
+      noteMap.set(n.questionId, n.content);
+    }
+  }
   // 查詢完整題目列表(用於跨 session 恢復進度時,不依賴瀏覽器存儲)
   const allQuestions = await prisma.question.findMany({
     where: { paperId: attempt.paperId, source: attempt.source ?? "exam" },
@@ -46,6 +61,7 @@ export async function GET(req: NextRequest) {
         userAnswer: a.userAnswer,
         isCorrect: a.isCorrect,
         timeSpentMs: a.timeSpentMs,
+        note: noteMap.get(a.questionId) ?? null,
         question: {
           id: a.question.id,
           number: a.question.number,
