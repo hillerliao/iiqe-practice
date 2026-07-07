@@ -3,7 +3,8 @@ name: iiqe-app
 services:
   # ============================================================
   # 主應用:Next.js + Prisma + SQLite
-  # 宿主 nginx 反代到 127.0.0.1:3000,容器本身不對公網暴露
+  # 宿主 nginx 反代到 127.0.0.1:3001,容器本身不對公網暴露
+  # 注意:宿主 3000 已被 new-api 佔用,IIQE 用 3001;nginx 站點也指向 3001
   # ============================================================
   next-app:
     build:
@@ -28,9 +29,10 @@ services:
       NEXT_TELEMETRY_DISABLED: 1
     volumes:
       - iiqe-data:/data
-    # 僅綁定宿主 loopback,避免公網直連 3000;nginx 反代會從 127.0.0.1 訪問
+    # 僅綁定宿主 loopback,避免公網直連;nginx 反代會從 127.0.0.1 訪問
+    # 宿主端口選擇:避開已佔用的端口(3000 已被 new-api 佔用,這裡用 3001)
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3001:3000"
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/papers',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
       interval: 30s

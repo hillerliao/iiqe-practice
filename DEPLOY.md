@@ -159,7 +159,7 @@ docker compose exec next-app npx tsx prisma/seed.ts
 docker compose ps
 
 # 健康檢查(從宿主測容器端口)
-curl -s http://127.0.0.1:3000/api/papers | head
+curl -s http://127.0.0.1:3001/api/papers | head
 
 # 外部訪問
 curl -I https://your-domain.com
@@ -211,7 +211,7 @@ docker compose start next-app
 
 **症狀**:訪問 https://your-domain.com 返回 502。
 
-**原因**:nginx 反代的 `127.0.0.1:3000` 沒人接 — `next-app` 容器沒在跑。
+**原因**:nginx 反代的 `127.0.0.1:3001` 沒人接 — `next-app` 容器沒在跑。
 
 **排查**:
 ```bash
@@ -219,7 +219,7 @@ docker compose ps
 docker compose logs --tail=200 next-app
 
 # 直接測容器是否監聽 3000
-curl -I http://127.0.0.1:3000/api/papers
+curl -I http://127.0.0.1:3001/api/papers
 ```
 
 ### 4.2 next-app 容器反覆重啟
