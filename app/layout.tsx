@@ -99,6 +99,13 @@ IIQE 做题家
                   <span className="hidden md:inline">收藏</span>
                 </Link>
                 <Link
+                  href="/studynotes/exam1-2024"
+                  className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span className="hidden md:inline">研習手冊</span>
+                </Link>
+                <Link
                   href="/settings"
                   className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                 >
