@@ -68,21 +68,78 @@ def slugify(s: str) -> str:
     return re.sub(r"[^a-z0-9-]+", "-", s.lower()).strip("-")
 
 
+# ──────────────────────────────────────────────────────────────
+# 格式標記 / CJK 感知的跨行合併
+# 標記 token: \x01B\x01(開粗) \x01/B\x01(關粗) \x01I\x01(開斜) \x01/I\x01(關斜)
+_MARKER_RE = re.compile(r"\x01/?[BI]\x01")
+
+
+def _strip_markers(s: str) -> str:
+    """移除格式標記,只留下可見文字(供判斷用)。"""
+    return _MARKER_RE.sub("", s)
+
+
+def _is_cjk(ch: str) -> bool:
+    """是否為 CJK(含全角標點)。空格/控制字元回傳 False。"""
+    if not ch or ch.isspace():
+        return False
+    return ord(ch) >= 0x2E80
+
+
+def _need_space_between(prev_ch: str, next_ch: str) -> bool:
+    """兩行合併處是否插入空格。
+
+    原邏輯用 ' '.join 在每行間都插空格,造成「與 潛在損失」「一 部照相機」
+    這類中文句子被無故切開。修正:只要任一側是 CJK(含全角標點)就不插空格;
+    僅當兩側皆為 ASCII 文字/標點(英文)時才插空格,避免英文跨行 wrap 黏在一起。
+    """
+    if not prev_ch or not next_ch:
+        return False
+    if _is_cjk(prev_ch) or _is_cjk(next_ch):
+        return False
+    return True
+
+
+def smart_join_markdown(lines: list[str]) -> str:
+    """把多行 markdown 合併成一段,跨行 wrap 時依 CJK 規則決定是否空格。"""
+    pieces = [ln.strip() for ln in lines if ln.strip()]
+    if not pieces:
+        return ""
+    result = pieces[0]
+    for piece in pieces[1:]:
+        prev_vis = _strip_markers(result).rstrip()
+        next_vis = _strip_markers(piece).lstrip()
+        gap = " " if _need_space_between(
+            prev_vis[-1] if prev_vis else "",
+            next_vis[0] if next_vis else "",
+        ) else ""
+        result = result.rstrip() + gap + piece.lstrip()
+    return result
+
+
+# 裝飾性分隔線(如 'o - o - o -'、'----'、'–––')→ 轉為 <hr>
+_SEP_O_RE = re.compile(r"^o([-\s–—]+o)*[-\s–—]*$", re.IGNORECASE)
+_SEP_DASH_RE = re.compile(r"^[-–—=~•·*=\s]{3,}$")
+
+# 行首的內文編號子標籤(如 '1.1.2b '),應另起一段,不要黏在上一段
+SUBLABEL_RE = re.compile(r"^\d+\.\d+(\.\d+)?[a-z]?\s")
+
+
 def render_paragraph(lines: list[str], is_mock_exam_zone: bool) -> str:
     """把一塊連續的非標題文字行轉為 <p>...</p> 或 <ul><li>..."""
     if not lines:
         return ""
     # 純文字合併(移除格式標記後看是否為 bullet 列表)
-    plain_lines = [
-        re.sub(r"\x01[BI]\x01|[\x01/B\x01|\x01/I\x01]", "", line).strip()
-        for line in lines
-    ]
+    plain_lines = [_strip_markers(line).strip() for line in lines]
     plain_lines = [p for p in plain_lines if p]
     if not plain_lines:
         return ""
-    # 章節分隔符偵測:「o - o - o -」「- o - o -」等純裝飾行 → <hr>
-    # 模式:三個以上重複的「符號 空格」單元
-    if all(re.fullmatch(r"[\s]*(([oO•·\-\*]\s+){3,}).*", p) for p in plain_lines):
+    # 裝飾性分隔線(整段只有 'o - o - o -' 或一串 -/–/•,可能帶前導 bullet '- ')
+    # → 轉為 <hr>。必須在 bullet 偵測之前,且要先去掉前導 bullet 再判斷。
+    joined_md = smart_join_markdown(lines)
+    joined_plain = _strip_markers(joined_md).strip()
+    joined_nobullet = re.sub(r"^[•·\-\*]\s+", "", joined_plain)
+    if _SEP_O_RE.match(joined_nobullet) or _SEP_DASH_RE.match(joined_nobullet):
         return '<hr class="handbook-divider">'
     # bullet 偵測:所有 plain_lines 都以 - • · 開頭
     if all(re.match(r"^[•·\-\*]\s+", p) for p in plain_lines):
@@ -92,9 +149,10 @@ def render_paragraph(lines: list[str], is_mock_exam_zone: bool) -> str:
             stripped = re.sub(r"^[•·\-\*]\s+", "", line)
             items.append(f"<li>{_markdown_to_html(stripped)}</li>")
         return f"<ul>{''.join(items)}</ul>"
-    # 一般段落:用空格連接各行的 markdown,讓 _markdown_to_html 整段轉
-    joined = " ".join(line.strip() for line in lines if line.strip())
-    return f"<p>{_markdown_to_html(joined)}</p>"
+    # 一般段落:CJK 感知合併各行 markdown,長段落依句號自動切成多段
+    inner = _markdown_to_html(joined_md)
+    chunks = _split_long_paragraph(inner)
+    return "".join(f"<p>{c}</p>" for c in chunks)
 
 
 # 將 PDF 字型名映射為 (is_bold, is_italic)
@@ -274,7 +332,127 @@ def _markdown_to_html(s: str) -> str:
         s2,
         flags=re.DOTALL,
     )
+    # 清除空標籤(如跨行 wrap 產生的 <strong> </strong> / <em></em>)
+    s2 = re.sub(r"<strong>\s*</strong>", "", s2)
+    s2 = re.sub(r"<em>\s*</em>", "", s2)
+    # 移除兩個 CJK 字之間的空格(PDF 常有「可保權 益」這類斷詞空格)。
+    # 不影響 CJK 與標點/拉丁字之間的空格。標題不走這條路徑,故安全。
+    s2 = re.sub(r"(?<=[\u3400-\u9fff])\s+(?=[\u3400-\u9fff])", "", s2)
     return s2
+
+
+# ── 長段落自動斷句 ──────────────────────────────────────────────
+# PDF 常把整段說明(如 7.4.7a 引言)抽成一整塊文字,渲染後變成一個超長 <p>,
+# 擠在一起難以閱讀。這裡依句末標點把長 <p> 切成數個較短 <p>,並在極長的
+# 單句內用 ; ： 再切。切點會保持 <strong>/<em> 等 inline 標籤平衡。
+_PRIMARY_END = "。！？!?."   # 句末強斷點
+_SOFT_END = "；;：:"          # 句內軟斷點(目前段已夠長才切)
+_PARA_TARGET = 130           # 累積到這個可見字數才允許在強斷點切
+_PARA_SOFT_MIN = 220         # 累積到這個字數才允許在軟斷點切
+_PARA_HARD = 420             # 單段絕對上限,超過無論如何都在軟斷點切
+# 純接續連詞:絕不會出現在句首,若在軟斷點緊接其後,表示這是句子內部延續,
+# 不應在此切開(否則會產生「及(v) ...」「的保險機構...」這類殘句段落)。
+_SOFT_BAD_LEAD = "的而及或並且亦也仍則與"
+
+
+def _next_visible_char(s: str, from_idx: int) -> str:
+    """從 from_idx 之後找第一個可見文字字元(跳過標籤/實體/空白)。"""
+    i = from_idx + 1
+    n = len(s)
+    while i < n:
+        ch = s[i]
+        if ch == "<":
+            j = s.find(">", i)
+            if j == -1:
+                return ""
+            i = j + 1
+            continue
+        if ch == "&":
+            j = s.find(";", i)
+            if j != -1 and j - i <= 8:
+                i = j + 1
+                continue
+            return ch
+        if not ch.isspace():
+            return ch
+        i += 1
+    return ""
+
+
+def _split_long_paragraph(inner_html: str) -> list[str]:
+    """把一段內文 HTML 切成多段 inner HTML(inline 標籤保持平衡)。
+
+    只在總可見字數足夠長時才切,避免動到本來就短的段落。
+    回傳 list,長度 1 表示不需切。
+    """
+    # 粗略總可見字數(標籤/實體不計)
+    def total_visible(s: str) -> int:
+        t = re.sub(r"</?[^>]+>", "", s)
+        t = re.sub(r"&[a-zA-Z#0-9]+;", "X", t)
+        return len(t)
+
+    if total_visible(inner_html) < _PARA_TARGET:
+        return [inner_html]
+
+    chunks: list[str] = []
+    cur = ""                 # 當前段累積的 HTML
+    stack: list[str] = []    # 當前開著的 inline 標籤(strong/em),保持平衡
+    vlen = 0                 # 當前段可見字數
+    i, n = 0, len(inner_html)
+    while i < n:
+        ch = inner_html[i]
+        if ch == "<":
+            j = inner_html.find(">", i)
+            if j == -1:
+                cur += inner_html[i:]
+                break
+            tag = inner_html[i:j + 1]
+            cur += tag
+            m_open = re.match(r"<(strong|em)>", tag, re.IGNORECASE)
+            m_close = re.match(r"</(strong|em)>", tag, re.IGNORECASE)
+            if m_open:
+                stack.append(m_open.group(1).lower())
+            elif m_close:
+                nm = m_close.group(1).lower()
+                if stack and stack[-1] == nm:
+                    stack.pop()
+                elif nm in stack:
+                    stack.remove(nm)
+            i = j + 1
+            continue
+        if ch == "&":  # HTML 實體視為 1 字
+            j = inner_html.find(";", i)
+            if j != -1 and j - i <= 8:
+                cur += inner_html[i:j + 1]
+                vlen += 1
+                i = j + 1
+                continue
+        # 一般文字字元
+        cur += ch
+        vlen += 1
+        do_split = False
+        if ch in _PRIMARY_END and vlen >= _PARA_TARGET:
+            do_split = True
+        elif ch in _SOFT_END:
+            # 軟斷點:下一個可見字是純接續連詞就不切,避免殘句;
+            # 但若已超過絕對上限仍強制切,以免段落過長。
+            nxt = _next_visible_char(inner_html, i)
+            if vlen >= _PARA_HARD:
+                do_split = True
+            elif nxt and nxt in _SOFT_BAD_LEAD:
+                do_split = False
+            elif vlen >= _PARA_SOFT_MIN:
+                do_split = True
+        if do_split:
+            close = "".join(f"</{t}>" for t in reversed(stack))
+            reopen = "".join(f"<{t}>" for t in stack)
+            chunks.append(cur + close)
+            cur = reopen
+            vlen = 0
+        i += 1
+    if cur.strip():
+        chunks.append(cur)
+    return chunks or [inner_html]
 
 
 def detect_chapter_for_page(pdf_page: int) -> int | None:
@@ -316,6 +494,37 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
             is_sub7 = current_h1_id == "ch-7" and current_h2_id is None
             html_parts.append(render_paragraph(pending_lines, is_sub7))
             pending_lines = []
+
+    def flush_vocab():
+        """辭彙表專用 flush:把累積的行用 CSS 兩欄排版呈現。"""
+        nonlocal pending_lines
+        if not pending_lines:
+            return
+        # 分節標題偵測:整行只含 (一)(1)甲 等(可能後接章節編號)
+        # 還有「[按漢字筆劃排序]」「[按英文字母排序]」等次標題
+        SECTION_RE = re.compile(
+            r"^\s*(\([一二三四五六七八九]+\)|\(\d+\)|"
+            r"[甲乙丙丁戊己庚辛壬癸])\s*(\d+\.\d+[a-z]?(?:\([a-z](?:\([ivx]+\))?\))?)?\s*$"
+        )
+        SUBSECTION_RE = re.compile(r"^\s*\[[^\]]+\]\s*$")
+        items: list[str] = []
+        for line in pending_lines:
+            plain = re.sub(r"\x01[BI]\x01|[\x01/B\x01|\x01/I\x01]", "", line).strip()
+            if not plain:
+                continue
+            if SECTION_RE.match(plain):
+                # 分節標題
+                items.append(f'<span class="vocab-section">{_markdown_to_html(plain)}</span>')
+            elif SUBSECTION_RE.match(plain):
+                # 次標題(如 [按漢字筆劃排序])
+                items.append(f'<span class="vocab-subsection">{_markdown_to_html(plain)}</span>')
+            else:
+                items.append(_markdown_to_html(plain))
+        if items:
+            html_parts.append(
+                f'<div class="vocab-block">{"<br/>".join(items)}</div>'
+            )
+        pending_lines = []
 
     NEW_PARA_START_RE = re.compile(
         r"^(\([a-z]\)|\([ivx]+\)|\(\d+\)|註[:：]|"
@@ -447,7 +656,8 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
         for plain, markdown in line_pairs:
             if not plain:
                 # 空 pair = extract 偵測到的段分隔邊界 → flush 上一段
-                if pending_lines:
+                # 但辭彙表內空 pair 是詞條間距,不應切段
+                if pending_lines and current_h1_id != "apx-vocab":
                     flush_paragraph()
                 continue
             # 附錄 H1 標題偵測
@@ -518,10 +728,20 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
                 continue
             is_new_para = bool(NEW_PARA_START_RE.match(plain))
             is_bullet = bool(BULLET_RE.match(plain))
-            if (is_new_para or is_bullet) and pending_lines:
-                flush_paragraph()
+            is_sublabel = bool(SUBLABEL_RE.match(plain)) if current_h1_id != "apx-vocab" else False
+            # 辭彙表內:把這些視為「分節標題」,不觸發任何 flush(由 flush_vocab 處理)
+            # 但仍 append 進 pending,讓 flush_vocab 識別為 vocab-section
+            if (is_new_para or is_bullet or is_sublabel) and pending_lines:
+                if current_h1_id == "apx-vocab":
+                    pass  # 不 flush,留給頁結束
+                else:
+                    flush_paragraph()
             pending_lines.append(markdown)
-        flush_paragraph()
+        # 頁結束 → 強制 flush(辭彙表用專用,其他用通用)
+        if current_h1_id == "apx-vocab":
+            flush_vocab()
+        else:
+            flush_paragraph()
 
     return chapters, "\n".join(html_parts), sorted(CHAPTER_START_PAGES.values())
 
@@ -707,6 +927,42 @@ body {
 }
 .content p { margin: 10px 0; }
 .content ul { padding-left: 24px; }
+.content hr.handbook-divider {
+  border: none;
+  border-top: 1px dashed var(--border);
+  margin: 22px auto;
+  width: 60%;
+}
+/* 辭彙表區塊:PDF 兩欄(英文/中文),用 CSS columns 還原 */
+.vocab-block {
+  column-count: 2;
+  column-gap: 32px;
+  column-rule: 1px solid var(--border);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 12px 0;
+}
+.vocab-block strong { color: var(--accent); }
+.vocab-block .vocab-section {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--fg);
+  background: var(--code-bg);
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-top: 6px;
+}
+.vocab-block .vocab-subsection {
+  display: inline-block;
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+@media (max-width: 900px) {
+  .vocab-block { column-count: 1; }
+}
 """
 
     return f"""<!DOCTYPE html>

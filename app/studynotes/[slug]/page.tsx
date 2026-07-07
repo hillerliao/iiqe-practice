@@ -89,6 +89,48 @@ export default async function HandbookPage({
             .dark .handbook-content .page-badge {
               background: #1f2937; color: #9ca3af;
             }
+            .handbook-content hr.handbook-divider {
+              border: none;
+              border-top: 1px dashed var(--border, #e5e7eb);
+              margin: 22px auto;
+              width: 60%;
+            }
+            .dark .handbook-content hr.handbook-divider { border-top-color: #374151; }
+            /* 辭彙表兩欄排版(還原 PDF 兩欄版面) */
+            .handbook-content .vocab-block {
+              column-count: 2;
+              column-gap: 32px;
+              column-rule: 1px solid var(--border, #e5e7eb);
+              font-size: 14px;
+              line-height: 1.6;
+              margin: 12px 0;
+            }
+            .handbook-content .vocab-block strong { color: #2563eb; }
+            .dark .handbook-content .vocab-block strong { color: #60a5fa; }
+            .handbook-content .vocab-block .vocab-section {
+              display: inline-block;
+              font-weight: 600;
+              font-size: 15px;
+              background: var(--muted, #f3f4f6);
+              color: var(--foreground, #1a1a1a);
+              border-radius: 4px;
+              padding: 1px 6px;
+              margin-top: 6px;
+            }
+            .dark .handbook-content .vocab-block .vocab-section {
+              background: #1f2937;
+              color: #f3f4f6;
+            }
+            .handbook-content .vocab-block .vocab-subsection {
+              display: inline-block;
+              font-weight: 500;
+              color: var(--muted-foreground, #6b7280);
+              font-size: 13px;
+              margin-top: 4px;
+            }
+            @media (max-width: 768px) {
+              .handbook-content .vocab-block { column-count: 1; }
+            }
             /* Mobile 字級與行高優化 */
             @media (max-width: 640px) {
               .handbook-content h1 { font-size: 1.5rem; padding-bottom: 4px; }
