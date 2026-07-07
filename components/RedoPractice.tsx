@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +47,8 @@ type RedoPracticeProps = {
   prevUserAnswer?: (id: string) => string | undefined;
   /** 退出練習模式 */
   onExit: () => void;
+  /** 重做結束/退出時回傳作答結果,供上層做持久化(可選);只在有提供時才記錄 */
+  recordAnswers?: (answers: AnswerMap) => void | Promise<void>;
   /** 列表頁標題(顯示在頂部) */
   title?: string;
 };
@@ -60,6 +62,7 @@ export function RedoPractice({
   items,
   prevUserAnswer,
   onExit,
+  recordAnswers,
   title = "重做練習",
 }: RedoPracticeProps) {
   const { toast, toasts } = useToast();
@@ -68,6 +71,51 @@ export function RedoPractice({
   const [finished, setFinished] = useState(false);
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
   const autoNextTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // —— 重做結果持久化 ——
+  // answersRef 避免鍵盤 handler / 非同步閉包拿到過期的 answers
+  const answersRef = useRef<AnswerMap>(answers);
+  answersRef.current = answers;
+  const recordedRef = useRef(false);
+  const recordPromiseRef = useRef<Promise<void> | null>(null);
+  const recordAnswersRef = useRef(recordAnswers);
+  recordAnswersRef.current = recordAnswers;
+
+  // 把本次重做的作答寫回(由上層 recordAnswers 實作)。只會成功寫入一次;
+  // 失敗時解除鎖定允許重試。回傳 Promise 以便呼叫方能 await 後再重新整理列表。
+  function persistAnswers(): Promise<void> {
+    if (recordedRef.current) return recordPromiseRef.current ?? Promise.resolve();
+    const fn = recordAnswersRef.current;
+    if (!fn) return Promise.resolve();
+    const answered = Object.entries(answersRef.current).filter(([, v]) => v != null);
+    if (answered.length === 0) {
+      recordedRef.current = true; // 沒有作答也算處理過,避免重試
+      return Promise.resolve();
+    }
+    recordedRef.current = true;
+    const p = Promise.resolve(fn({ ...answersRef.current })).catch((e) => {
+      console.error("[RedoPractice] 記錄重做結果失敗:", e);
+      recordedRef.current = false;
+      recordPromiseRef.current = null;
+    });
+    recordPromiseRef.current = p;
+    return p;
+  }
+
+  // 結束重做:記錄結果並進入總結頁
+  const finishPractice = useCallback(() => {
+    persistAnswers();
+    setFinished(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  // 退出重做:等待記錄完成後,再交給上層退出(上層會重新整理錯題本)
+  const handleExit = useCallback(async () => {
+    try {
+      await persistAnswers();
+    } catch {}
+    onExit();
+  }, [onExit]);
 
   const total = items.length;
   const current = items[currentIdx];
@@ -109,8 +157,7 @@ export function RedoPractice({
   function goNext() {
     clearAutoNext();
     if (currentIdx >= total - 1) {
-      setFinished(true);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      finishPractice();
       return;
     }
     setCurrentIdx((i) => i + 1);
@@ -121,6 +168,9 @@ export function RedoPractice({
     setAnswers({});
     setCurrentIdx(0);
     setFinished(false);
+    // 允許新一輪重做再次記錄結果
+    recordedRef.current = false;
+    recordPromiseRef.current = null;
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -181,8 +231,7 @@ export function RedoPractice({
         e.preventDefault();
         if (s.currentIdx >= s.total - 1) {
           clearAutoNext();
-          setFinished(true);
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          finishPractice();
         } else {
           clearAutoNext();
           setCurrentIdx((i) => i + 1);
@@ -272,7 +321,7 @@ export function RedoPractice({
                 <ListChecks className="w-5 h-5" />
                 {title} · 完成
               </CardTitle>
-              <Button variant="ghost" size="sm" onClick={onExit}>
+              <Button variant="ghost" size="sm" onClick={handleExit}>
                 <X className="w-4 h-4 mr-1" />
                 退出
               </Button>
@@ -309,7 +358,7 @@ export function RedoPractice({
                 <RotateCcw className="w-4 h-4 mr-1" />
                 再做一次
               </Button>
-              <Button variant="outline" onClick={onExit} className="flex-1">
+              <Button variant="outline" onClick={handleExit} className="flex-1">
                 返回列表
               </Button>
             </div>
@@ -377,7 +426,7 @@ export function RedoPractice({
           <span className="font-medium">
             第 {currentIdx + 1} / {total} 題
           </span>
-          <Button variant="ghost" size="sm" onClick={onExit}>
+          <Button variant="ghost" size="sm" onClick={handleExit}>
             <X className="w-4 h-4 mr-1" />
             退出練習
           </Button>

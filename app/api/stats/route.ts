@@ -9,7 +9,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
   }
 
-  const attempts = await listAttempts(sessionId);
+  // 排除錯題本重做練習(source=wrongbook-redo),避免復習刷題污染總正確率
+  const attempts = (await listAttempts(sessionId)).filter(
+    (a) => a.source !== "wrongbook-redo"
+  );
   const papers = getPapers();
 
   const allAnswers = attempts.flatMap((at) =>
