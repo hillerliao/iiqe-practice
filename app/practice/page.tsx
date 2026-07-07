@@ -457,8 +457,6 @@ function PracticeInner() {
                 {attempt.paperName || "—"}
               </span>
               <span aria-hidden="true">·</span>
-              <span className="shrink-0">{attempt.paperCode || "?"}</span>
-              <span aria-hidden="true">·</span>
               <span className="shrink-0">
                 {attempt.source === "mock" ? "模擬題" : "真題"}
               </span>
