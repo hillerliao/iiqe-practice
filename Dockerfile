@@ -71,7 +71,11 @@ RUN sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list.d/debia
     openssl \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd -f --system --gid ${GID} nextjs \
-    && useradd --system --uid ${UID} --gid nextjs --home /app --shell /sbin/nologin nextjs \
+    && if id node >/dev/null 2>&1; then \
+         usermod -l nextjs -d /app -s /sbin/nologin node; \
+       elif ! id nextjs >/dev/null 2>&1; then \
+         useradd --system --uid ${UID} --gid nextjs --home /app --shell /sbin/nologin nextjs; \
+       fi \
     && mkdir -p /data \
     && chown -R nextjs:nextjs /data
 
