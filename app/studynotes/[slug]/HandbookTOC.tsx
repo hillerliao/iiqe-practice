@@ -1,9 +1,10 @@
 // app/studynotes/[slug]/HandbookTOC.tsx
-// 側邊欄章節目錄(用 client component 處理捲動高亮與 hash 滾動)
+// 側邊欄章節目錄(client component,處理捲動高亮 + hash 滾動 + mobile drawer)
 
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ChapterEntry } from "@/lib/handbook";
 
@@ -13,6 +14,7 @@ type Props = {
 
 export function HandbookTOC({ chapters }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const tocRef = useRef<HTMLElement>(null);
 
   // 進入時若有 hash,捲動到該錨點
@@ -21,7 +23,6 @@ export function HandbookTOC({ chapters }: Props) {
     if (hash) {
       const el = document.getElementById(hash);
       if (el) {
-        // 延遲一點讓 layout 完成
         setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
         setActiveId(hash);
       }
@@ -39,7 +40,6 @@ export function HandbookTOC({ chapters }: Props) {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // 找出最靠近頂部且可見的 heading
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
@@ -53,54 +53,116 @@ export function HandbookTOC({ chapters }: Props) {
     return () => observer.disconnect();
   }, [chapters]);
 
-  // 點擊側邊欄項時,主區捲動;側邊欄內部跟隨
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    e.preventDefault();
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-      history.replaceState(null, "", `#${id}`);
-      setActiveId(id);
-    }
-  };
+  // 點擊側邊欄項時捲動 + 在 mobile 自動關閉 drawer
+  const handleClick = useCallback(
+    (id: string) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.replaceState(null, "", `#${id}`);
+        setActiveId(id);
+        setMobileOpen(false);
+      }
+    },
+    [],
+  );
+
+  const navList = (
+    <ul className="space-y-0.5">
+      {chapters.map((ch) => {
+        const isActive = ch.id === activeId;
+        const indent = ch.level === 1 ? "" : ch.level === 2 ? "pl-3" : "pl-6";
+        const size =
+          ch.level === 1
+            ? "font-semibold text-foreground"
+            : ch.level === 2
+              ? "text-foreground/90"
+              : "text-muted-foreground text-xs";
+        return (
+          <li key={ch.id} className={indent}>
+            <a
+              href={`#${ch.id}`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleClick(ch.id);
+              }}
+              className={cn(
+                "block rounded px-2 py-1.5 leading-snug transition-colors",
+                size,
+                isActive
+                  ? "bg-primary/10 text-primary"
+                  : "hover:bg-muted hover:text-foreground",
+              )}
+            >
+              <span className="text-muted-foreground mr-1.5">{ch.number}</span>
+              {ch.title}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  );
 
   return (
-    <aside
-      ref={tocRef}
-      className="hidden lg:block sticky top-14 self-start h-[calc(100vh-3.5rem)] overflow-y-auto border-r bg-muted/30 py-4 px-3 text-sm"
-    >
-      <h2 className="font-semibold mb-3 px-2 text-foreground">目錄</h2>
-      <nav>
-        <ul className="space-y-0.5">
-          {chapters.map((ch) => {
-            const isActive = ch.id === activeId;
-            const indent = ch.level === 1 ? "" : ch.level === 2 ? "pl-3" : "pl-6";
-            const size = ch.level === 1
-              ? "font-semibold text-foreground"
-              : ch.level === 2
-                ? "text-foreground/90"
-                : "text-muted-foreground text-xs";
-            return (
-              <li key={ch.id} className={indent}>
-                <a
-                  href={`#${ch.id}`}
-                  onClick={(e) => handleClick(e, ch.id)}
-                  className={cn(
-                    "block rounded px-2 py-1 leading-snug transition-colors",
-                    size,
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "hover:bg-muted hover:text-foreground",
-                  )}
-                >
-                  <span className="text-muted-foreground mr-1.5">{ch.number}</span>
-                  {ch.title}
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-    </aside>
+    <>
+      {/* Mobile floating button:固定在左下,點擊切換 drawer */}
+      <button
+        type="button"
+        onClick={() => setMobileOpen((v) => !v)}
+        className="lg:hidden fixed bottom-4 left-4 z-40 inline-flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground shadow-lg px-4 h-11 text-sm font-medium hover:bg-primary/90 transition-colors"
+        aria-label={mobileOpen ? "關閉目錄" : "開啟目錄"}
+        aria-expanded={mobileOpen}
+      >
+        {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+        <span>{mobileOpen ? "關閉" : "目錄"}</span>
+      </button>
+
+      {/* Mobile drawer:點擊 backdrop 或連結時關閉 */}
+      {mobileOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-30 bg-black/40"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden
+        />
+      )}
+
+      <aside
+        ref={tocRef}
+        data-state={mobileOpen ? "open" : "closed"}
+        className={cn(
+          // 基礎 layout
+          "bg-muted/30 text-sm border-r",
+          // Desktop:sticky sidebar
+          "hidden lg:block lg:sticky lg:top-14 lg:self-start lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto lg:py-4 lg:px-3",
+          // Mobile:抽屜式 drawer(transform 控制顯隱)
+          "lg:transform-none",
+        )}
+        style={
+          // 在 mobile 時用 inline style 控制顯隱(lg 之下 hidden)
+          // 用 data-state 與 CSS attribute selector 處理
+          undefined
+        }
+      >
+        <h2 className="font-semibold mb-3 px-2 text-foreground">目錄</h2>
+        <nav>{navList}</nav>
+      </aside>
+
+      {/* Mobile 專用 drawer(用 fixed 定位獨立於 desktop sidebar) */}
+      <aside
+        data-mobile-toc
+        className={cn(
+          "lg:hidden fixed top-14 left-0 z-30 w-72 max-w-[85vw] h-[calc(100vh-3.5rem)]",
+          "bg-background border-r overflow-y-auto",
+          "transition-transform duration-200 ease-out",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+        )}
+        aria-hidden={!mobileOpen}
+      >
+        <div className="py-4 px-3">
+          <h2 className="font-semibold mb-3 px-2 text-foreground">目錄</h2>
+          <nav>{navList}</nav>
+        </div>
+      </aside>
+    </>
   );
 }

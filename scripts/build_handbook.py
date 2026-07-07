@@ -80,6 +80,10 @@ def render_paragraph(lines: list[str], is_mock_exam_zone: bool) -> str:
     plain_lines = [p for p in plain_lines if p]
     if not plain_lines:
         return ""
+    # 章節分隔符偵測:「o - o - o -」「- o - o -」等純裝飾行 → <hr>
+    # 模式:三個以上重複的「符號 空格」單元
+    if all(re.fullmatch(r"[\s]*(([oO•·\-\*]\s+){3,}).*", p) for p in plain_lines):
+        return '<hr class="handbook-divider">'
     # bullet 偵測:所有 plain_lines 都以 - • · 開頭
     if all(re.match(r"^[•·\-\*]\s+", p) for p in plain_lines):
         items = []
@@ -188,12 +192,14 @@ def extract_pdf_pages() -> list[tuple[int, list[tuple[str, str]]]]:
             if not row_pairs:
                 pages.append((i, []))
                 continue
-            # 合併差距 < 15pt 的行為同一段(line 段),> 15pt 切段
+            # 合併差距 < 32pt 的行為同一段(line 段),> 32pt 切段
+            # (依實測:內文 wrap 行間距 15.5pt,段內空行 29.5pt,詞條間距 39-43pt,
+            #  故 32pt 為安全分界 — 只切明顯的視覺空行)
             segments: list[list[tuple[str, str]]] = []
             current: list[tuple[str, str]] = []
             prev_y: float | None = None
             for y, plain, mk in row_pairs:
-                if prev_y is None or (y - prev_y) <= 15.0:
+                if prev_y is None or (y - prev_y) <= 32.0:
                     current.append((plain, mk))
                 else:
                     if current:
@@ -605,6 +611,10 @@ body {
   cursor: pointer; user-select: none; font-size: 18px;
   transition: all 0.2s;
 }
+@media (max-width: 900px) {
+  .theme-toggle-label { right: 16px; }
+  .back-to-top { right: 16px; bottom: 16px; }
+}
 .theme-toggle-label:hover {
   background: var(--accent);
   color: white;
@@ -626,6 +636,48 @@ body {
   border-color: var(--accent);
 }
 .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; background: var(--bg); }
+/* Mobile:sidebar 預設隱藏,點漢堡按鈕展開;漢堡按鈕是 #menu-toggle 的 label */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar {
+    position: fixed; top: 0; left: 0;
+    width: 280px; height: 100vh;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    padding-top: 70px;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+  }
+  /* 當 #menu-toggle checked,sidebar 滑入 */
+  #menu-toggle:checked ~ .layout .sidebar { transform: translateX(0); }
+  /* 背景遮罩(用 .layout::before 充當) */
+  .layout::before {
+    content: ""; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 199;
+  }
+  #menu-toggle:checked ~ .layout::before { opacity: 1; pointer-events: auto; }
+  .menu-toggle-label { display: flex; }
+  .content { padding: 56px 16px 80px; }
+  .content h1 { font-size: 22px; }
+  .content h2 { font-size: 19px; }
+  .content h3 { font-size: 17px; }
+}
+/* 漢堡按鈕:在 desktop 完全隱藏 */
+.menu-toggle-label {
+  display: none;
+  position: fixed; top: 14px; left: 16px; z-index: 250;
+  width: 38px; height: 38px;
+  align-items: center; justify-content: center;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg); color: var(--fg);
+  cursor: pointer; user-select: none; font-size: 20px;
+  line-height: 1;
+}
+.menu-toggle-label:hover { background: var(--accent); color: white; border-color: var(--accent); }
+#menu-toggle { display: none; }
 .sidebar {
   position: sticky; top: 0; align-self: start;
   height: 100vh; overflow-y: auto;
@@ -666,7 +718,9 @@ body {
 <style>{css}</style>
 </head>
 <body>
+<input type="checkbox" id="menu-toggle">
 <input type="checkbox" id="theme-toggle">
+<label for="menu-toggle" class="menu-toggle-label" title="開啟目錄" aria-label="開啟目錄">☰</label>
 <label for="theme-toggle" class="theme-toggle-label" title="切換深色模式"></label>
 <div class="layout" id="top">
   <aside class="sidebar">
