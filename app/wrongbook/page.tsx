@@ -200,13 +200,6 @@ export default function WrongbookPage() {
       });
   }, []);
 
-  if (loading) {
-    return <div className="max-w-4xl mx-auto px-4 py-8 text-muted-foreground">載入中...</div>;
-  }
-  if (error) {
-    return <div className="max-w-4xl mx-auto px-4 py-8 text-red-600">{error}</div>;
-  }
-
   // 將重做練習的作答寫回後端(/api/wrongbook/record),讓「又錯了」累積進 wrongCount
   // 注意:失敗時要拋出(而非吞掉),persistAnswers 的 .catch 才會重置 recordedRef 以便重試
   const recordRedo = useCallback(
@@ -243,6 +236,13 @@ export default function WrongbookPage() {
     }
     setPracticeMode(false);
   }, []);
+
+  if (loading) {
+    return <div className="max-w-4xl mx-auto px-4 py-8 text-muted-foreground">載入中...</div>;
+  }
+  if (error) {
+    return <div className="max-w-4xl mx-auto px-4 py-8 text-red-600">{error}</div>;
+  }
 
   // 做題模式
   if (practiceMode) {
