@@ -54,7 +54,7 @@ ENV HOSTNAME=0.0.0.0
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # 创建非 root 用户(uid/gid 通过 build arg 提供,默认 1000)
-# 与阿里云 Ubuntu 默认 ecs-user 对齐,避免 volume 权限问题
+# 1000 与大多数 Linux 发行版默认登录用户对齐,避免 volume 权限问题
 ARG UID=1000
 ARG GID=1000
 

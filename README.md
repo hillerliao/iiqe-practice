@@ -72,7 +72,7 @@ PDF 題庫的提取腳本見 `scripts/` 目錄下的 Python 檔。
 生產環境以 Docker + nginx + certbot 部署到任意 Linux VPS,支援自動 HTTPS 與零停機升級。
 
 完整部署文檔見 [DEPLOY.md](./DEPLOY.md),涵蓋:
-- VPS 前置條件(Docker、DNS、安全組)
+- VPS 前置條件(Docker、DNS、防火牆)
 - 首次部署步驟
 - 升級流程
 - 數據備份與恢復

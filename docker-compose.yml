@@ -11,7 +11,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        # 與宿主 ecs-user 對齊;若 id 命令輸出不是 1000,
+        # 與宿主用戶對齊;若 id 命令輸出不是 1000,
         # 在 .env.production 用 UID/GID 環境變量覆蓋
         UID: ${UID:-1000}
         GID: ${GID:-1000}
@@ -30,7 +30,7 @@ services:
     volumes:
       - iiqe-data:/data
     # 僅綁定宿主 loopback,避免公網直連;nginx 反代會從 127.0.0.1 訪問
-    # 宿主端口選擇:避開已被佔用的 3000
+    # 宿主端口選擇:避開已被佔用的端口(若 3000 衝突,可改為 3001/8080 等)
     ports:
       - "127.0.0.1:3001:3000"
     healthcheck:

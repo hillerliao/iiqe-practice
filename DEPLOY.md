@@ -1,6 +1,6 @@
 # 部署到 VPS
 
-本文檔介紹如何把 IIQE App 部署到一台阿里雲 Ubuntu VPS。
+本文檔介紹如何把 IIQE App 部署到任意 Linux VPS(Ubuntu 22.04+ 為例)。
 
 架構:
 - **宿主 nginx**(已預裝):反向代理 + HTTPS 終結 + certbot 證書管理
@@ -13,7 +13,7 @@
 
 ### VPS 端
 - 系統:Ubuntu 22.04+ (推薦 24.04)
-- 用戶:`ecs-user`(阿里雲 Ubuntu 默認用戶),具備 `sudo` 權限
+- 用戶:具備 `sudo` 權限的登入帳號
 - 已裝:
   - Docker Engine 24+
   - Docker Compose plugin(`docker compose version` 可用)
@@ -23,7 +23,7 @@
 
 ### 網絡
 - 域名 A 記錄指向 VPS 公網 IP
-- 阿里雲安全組放行 **80 / 443** 端口
+- VPS 防火牆(雲提供商安全組 / iptables / ufw)放行 **80 / 443** 端口
 
 ---
 
@@ -32,9 +32,9 @@
 ### 1.1 SSH 登入 VPS 並確認環境
 
 ```bash
-ssh ecs-user@<your-vps-ip>
+ssh <your-username>@<your-vps-ip>
 
-id ecs-user              # 確認 uid(預期 1000)
+id <your-username>       # 確認 uid(預期 1000)
 docker --version
 docker compose version
 nginx -v                 # 確認 nginx 已裝
@@ -44,7 +44,7 @@ certbot --version        # 確認 certbot 已裝
 ### 1.2 拉取代碼
 
 ```bash
-cd /home/ecs-user
+cd /home/<your-username>
 git clone <your-repo-url> iiqe-app
 cd iiqe-app
 ```
@@ -139,8 +139,8 @@ All migrations applied successfully.
 
 ```bash
 # 1. 把真題 JSON 上傳到 VPS(若尚未上傳)
-scp .cache_paper1.json ecs-user@<vps>:/home/ecs-user/iiqe-app/
-scp _p3_clean.json ecs-user@<vps>:/home/ecs-user/iiqe-app/
+scp .cache_paper1.json <your-username>@<vps>:/home/<your-username>/iiqe-app/
+scp _p3_clean.json <your-username>@<vps>:/home/<your-username>/iiqe-app/
 
 # 2. 複製到容器內(seed.ts 從 /app/../ 即 /app/ 讀取)
 docker cp .cache_paper1.json iiqe-app:/app/.cache_paper1.json
@@ -170,7 +170,7 @@ curl -I https://your-domain.com
 ## 2. 升級
 
 ```bash
-cd /home/ecs-user/iiqe-app
+cd /home/<your-username>/iiqe-app
 git pull
 docker compose up -d --build
 # 僅在 schema 變更時:
@@ -275,7 +275,7 @@ sudo certbot --nginx -d your-domain.com --email your-email --agree-tos --no-eff-
 
 常見原因:
 - DNS A 記錄尚未生效
-- 阿里雲安全組未放行 80
+- VPS 防火牆(雲安全組 / iptables / ufw)未放行 80
 - `nginx -t` 之後忘記 `systemctl reload nginx`,nginx 還在用舊站點
 
 ### 4.5 SQLite "database is locked"
@@ -292,7 +292,7 @@ sudo certbot --nginx -d your-domain.com --email your-email --agree-tos --no-eff-
 
 **修復**:
 ```bash
-id ecs-user
+id <your-username>
 # 編輯 .env.production 設 UID/GID 為該值
 
 # 重建容器,並重建 volume(會丟失現有數據,請先備份!)
@@ -308,7 +308,7 @@ docker compose exec next-app npx tsx prisma/seed.ts   # 若需要重新導入題
 ## 5. 卸載
 
 ```bash
-cd /home/ecs-user/iiqe-app
+cd /home/<your-username>/iiqe-app
 docker compose down --remove-orphans
 docker image rm iiqe-app:latest
 
@@ -323,7 +323,7 @@ sudo systemctl reload nginx
 sudo certbot delete --cert-name your-domain.example.com
 
 # 刪除代碼
-cd /home/ecs-user
+cd /home/<your-username>
 rm -rf iiqe-app
 ```
 
@@ -332,11 +332,11 @@ rm -rf iiqe-app
 ## 6. 安全建議
 
 1. **SSH**:VPS 關閉密碼登錄,僅允許密鑰;必要時改 SSH 端口
-2. **防火牆**:阿里雲安全組僅放行 80/443;VPS 本地用 ufw 進一步收緊
+2. **防火牆**:雲提供商安全組僅放行 80/443;VPS 本地用 ufw 進一步收緊
 3. **自動更新**:Ubuntu 啟用 `unattended-upgrades`
 4. **密鑰輪換**:定期更換 `AUTH_SECRET`(目前應用未使用,留作日後)
 5. **HTTPS 強制**:已通過 80 → 301 HTTPS 跳轉實現
-6. **密鑰管理**:`.env.production` 不進 git;定期從 Vercel 後台清理舊 token
+6. **密鑰管理**:`.env.production` 不進 git;若曾部署到其他平台,清理對應 token
 
 ---
 
