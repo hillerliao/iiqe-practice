@@ -66,53 +66,29 @@ AUTH_SECRET=<隨機 32 字元以上字符串>
 
 `DOMAIN` / `LETSENCRYPT_EMAIL` 僅作記錄用,**容器內不讀取**。
 
-### 1.4 申請 HTTPS 證書(certbot webroot 模式)
+### 1.4 安裝 nginx 站點 + 申請證書
 
 ```bash
-# 1. 創建 webroot 目錄
-sudo mkdir -p /var/www/letsencrypt
-sudo chown ecs-user:ecs-user /var/www/letsencrypt
-
-# 2. 安裝 nginx 站點配置
-#    先把 nginx/iiqe.conf 裡的 your-domain.example.com 改成真實域名
+# 1. 把 nginx/iiqe.conf 裡的 your-domain.example.com 改成真實域名
 sed -i 's/your-domain.example.com/你的真實域名/g' nginx/iiqe.conf
 
-# 拷貝到 nginx
+# 2. 安裝站點(此時只有 HTTP 段,先 reload nginx)
 sudo cp nginx/iiqe.conf /etc/nginx/conf.d/iiqe.conf
+sudo nginx -t && sudo systemctl reload nginx
 
-# 3. 測試配置(此時還沒證書,可能報錯,先做臨時佔位)
-sudo nginx -t
+# 3. 一鍵申請證書 + 自動補上 HTTPS 段 + 80→443 跳轉
+sudo certbot --nginx -d 你的真實域名 --email 你的郵箱 --agree-tos --no-eff-email
 ```
 
-若 `nginx -t` 報「無法加載證書」,先用佔位自簽證書讓 nginx 啟動:
+`certbot --nginx` 會自動:
+- 申請並部署 Let's Encrypt 證書
+- 在 `iiqe.conf` 裡加一個 `server { listen 443 ssl; ... }` 塊
+- 把 80 端口的 `location /` 改成 `301 https://$host$request_uri`
 
+執行後檢查:
 ```bash
-sudo mkdir -p /etc/ssl/private
-sudo openssl req -x509 -nodes -days 1 \
-    -newkey rsa:2048 \
-    -keyout /etc/ssl/private/iiqe-selfsigned.key \
-    -out /etc/ssl/private/iiqe-selfsigned.crt \
-    -subj "/CN=placeholder"
-
-# 臨時把證書路徑改為自簽證書
-sudo sed -i 's|/etc/letsencrypt/live/.*/fullchain.pem|/etc/ssl/private/iiqe-selfsigned.crt|' /etc/nginx/conf.d/iiqe.conf
-sudo sed -i 's|/etc/letsencrypt/live/.*/privkey.pem|/etc/ssl/private/iiqe-selfsigned.key|' /etc/nginx/conf.d/iiqe.conf
-
-sudo nginx -t && sudo systemctl reload nginx
-
-# 4. 申請 Let's Encrypt 證書
-sudo certbot certonly --webroot \
-    -w /var/www/letsencrypt \
-    -d 你的真實域名 \
-    --email 你的郵箱 \
-    --agree-tos \
-    --no-eff-email
-
-# 5. 把證書路徑改回 Let's Encrypt 位置
-sudo sed -i 's|/etc/ssl/private/iiqe-selfsigned.crt|/etc/letsencrypt/live/你的真實域名/fullchain.pem|' /etc/nginx/conf.d/iiqe.conf
-sudo sed -i 's|/etc/ssl/private/iiqe-selfsigned.key|/etc/letsencrypt/live/你的真實域名/privkey.pem|' /etc/nginx/conf.d/iiqe.conf
-
-sudo nginx -t && sudo systemctl reload nginx
+sudo nginx -t
+sudo cat /etc/nginx/conf.d/iiqe.conf    # 應該看到 HTTPS 段
 ```
 
 ### 1.5 配置自動續期
@@ -153,12 +129,26 @@ All migrations applied successfully.
 
 ### 1.8 (可選)導入題庫
 
-若首次部署且 SQLite 為空,需導入初始題目:
+若首次部署且 SQLite 為空,需導入初始題目。
+
+**模擬題**(`scripts/mock_p1.json`、`scripts/mock_p3.json`)已在鏡像內,可直接導入。
+**真題**(`../.cache_paper1.json`、`../_p3_clean.json`)位於專案父目錄,
+不在 Docker build context 內,**需手動 cp 進容器**:
 
 ```bash
-# 把題庫 JSON 上傳到 VPS 後(見 README.md「題庫資料來源」章節)
+# 1. 把真題 JSON 上傳到 VPS(若尚未上傳)
+scp .cache_paper1.json ecs-user@<vps>:/home/ecs-user/iiqe-app/
+scp _p3_clean.json ecs-user@<vps>:/home/ecs-user/iiqe-app/
+
+# 2. 複製到容器內(seed.ts 從 /app/../ 即 / 讀取)
+docker cp .cache_paper1.json iiqe-app:/.cache_paper1.json
+docker cp _p3_clean.json iiqe-app:/_p3_clean.json
+
+# 3. 執行 seed
 docker compose exec next-app npx tsx prisma/seed.ts
 ```
+
+> seed.ts 找不到檔案時會自動跳過,不影響已有數據。若只導入模擬題,直接執行第 3 步即可。
 
 ### 1.9 驗證
 
@@ -166,8 +156,8 @@ docker compose exec next-app npx tsx prisma/seed.ts
 # 查看容器狀態(應為 Up / healthy)
 docker compose ps
 
-# 健康檢查
-docker compose exec next-app wget -qO- http://localhost:3000/api/papers | head
+# 健康檢查(從宿主測容器端口)
+curl -s http://127.0.0.1:3000/api/papers | head
 
 # 外部訪問
 curl -I https://your-domain.com

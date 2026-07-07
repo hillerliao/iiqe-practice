@@ -69,7 +69,7 @@ PDF 題庫的提取腳本見 `scripts/` 目錄下的 Python 檔。
 
 ## 部署
 
-生產環境以 Docker + Caddy 部署到任意 Linux VPS,支援自動 HTTPS 與零停機升級。
+生產環境以 Docker + nginx + certbot 部署到任意 Linux VPS,支援自動 HTTPS 與零停機升級。
 
 完整部署文檔見 [DEPLOY.md](./DEPLOY.md),涵蓋:
 - VPS 前置條件(Docker、DNS、安全組)
@@ -84,10 +84,10 @@ git clone <repo-url> iiqe-app && cd iiqe-app
 cp .env.production.example .env.production
 $EDITOR .env.production
 
-# 安裝 nginx 站點並申請證書(假設域名已 DNS 解析)
 sed -i 's/your-domain.example.com/<your-domain>/g' nginx/iiqe.conf
 sudo cp nginx/iiqe.conf /etc/nginx/conf.d/iiqe.conf
-# ... 完整 certbot webroot 流程見 DEPLOY.md
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d <your-domain> --email <your-email> --agree-tos --no-eff-email
 
 docker compose up -d --build
 docker compose --profile init run --rm migrate
