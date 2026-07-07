@@ -62,7 +62,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     openssl \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --system --gid ${GID} nextjs \
+    && groupadd -f --system --gid ${GID} nextjs \
     && useradd --system --uid ${UID} --gid nextjs --home /app --shell /sbin/nologin nextjs \
     && mkdir -p /data \
     && chown -R nextjs:nextjs /data
