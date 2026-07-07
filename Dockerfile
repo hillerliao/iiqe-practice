@@ -46,10 +46,13 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # next build 需要 prisma client 已生成(deps 阶段已完成)
-# --webpack: 显式使用 webpack 而非 Turbopack(Next.js 16 默认就是 webpack,此处显式声明)
+# 不加任何 --turbo/--webpack 等版本相关 flag:
+#   Next.js 16 的 next build 仅支持 --webpack / --turbo(--turbopack),
+#   不存在 --no-turbo(老版本写法会直接报错 "unknown option")。
+#   不传 flag 时 Next 16 默认即 webpack 构建,可跨版本稳定运行。
 # NODE_OPTIONS: 限制 V8 堆内存,小规格机器避免 OOM
 ENV NODE_OPTIONS="--max-old-space-size=512"
-RUN npm run build -- --webpack
+RUN npm run build
 
 # ============================================================
 # runner: production runtime image

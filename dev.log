@@ -1,0 +1,61 @@
+▲ Next.js 16.2.10 (Turbopack)
+- Local:         http://localhost:3939
+- Network:       http://198.18.0.1:3939
+- Environments: .env
+✓ Ready in 639ms
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of d:\Downloads\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * d:\Downloads\IIQE\iiqe-app\package-lock.json
+
+
+○ Compiling /wrongbook ...
+ GET /wrongbook 200 in 8.0s (next.js: 7.2s, application-code: 753ms)
+⨯ ./IIQE/iiqe-app/lib/kv.ts:109:28
+Module not found: Can't resolve '@vercel/kv'
+  [90m107 |[0m   [36mconst[0m url = process.env.[33mUPSTASH_REDIS_REST_URL[0m || process.env.[33mKV_REST_API_URL[0m || [32m""[0m;
+  [90m108 |[0m   [36mconst[0m token = process.env.[33mUPSTASH_REDIS_REST_TOKEN[0m || process.env.[33mKV_REST_API_TOKEN[0m || [32m""[0m;
+[31m[1m>[0m [90m109 |[0m   [36mconst[0m { createClient } = require([32m"@vercel/kv"[0m) [36mas[0m [36mtypeof[0m [36mimport[0m([32m"@vercel/kv"[0m);
+  [90m    |[0m                            [31m[1m^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m110 |[0m   [36mconst[0m client = createClient({ url, token });
+  [90m111 |[0m   [36mreturn[0m {
+  [90m112 |[0m     [36masync[0m get<[33mT[0m>(key: string): [33mPromise[0m<[33mT[0m | [36mnull[0m> {
+
+
+
+Import trace:
+  App Route:
+    ./IIQE/iiqe-app/lib/kv.ts
+    ./IIQE/iiqe-app/app/api/wrongbook/route.ts
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ GET /api/wrongbook?sessionId=test 500 in 2.5s (next.js: 2.2s, application-code: 331ms)
+⨯ ./IIQE/iiqe-app/lib/kv.ts:109:28
+Module not found: Can't resolve '@vercel/kv'
+  [90m107 |[0m   [36mconst[0m url = process.env.[33mUPSTASH_REDIS_REST_URL[0m || process.env.[33mKV_REST_API_URL[0m || [32m""[0m;
+  [90m108 |[0m   [36mconst[0m token = process.env.[33mUPSTASH_REDIS_REST_TOKEN[0m || process.env.[33mKV_REST_API_TOKEN[0m || [32m""[0m;
+[31m[1m>[0m [90m109 |[0m   [36mconst[0m { createClient } = require([32m"@vercel/kv"[0m) [36mas[0m [36mtypeof[0m [36mimport[0m([32m"@vercel/kv"[0m);
+  [90m    |[0m                            [31m[1m^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m110 |[0m   [36mconst[0m client = createClient({ url, token });
+  [90m111 |[0m   [36mreturn[0m {
+  [90m112 |[0m     [36masync[0m get<[33mT[0m>(key: string): [33mPromise[0m<[33mT[0m | [36mnull[0m> {
+
+
+
+Import trace:
+  App Route:
+    ./IIQE/iiqe-app/lib/kv.ts
+    ./IIQE/iiqe-app/app/api/wrongbook/record/route.ts
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ POST /api/wrongbook/record 500 in 228ms (next.js: 203ms, application-code: 25ms)
+ GET /wrongbook 500 in 199ms (next.js: 177ms, application-code: 23ms)
+[?25h
+
+d:\Downloads\IIQE\iiqe-app>
