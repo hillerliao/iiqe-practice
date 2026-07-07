@@ -5,6 +5,9 @@
 # ============================================================
 FROM node:22-bookworm-slim AS deps
 
+# 大陆环境:替换 apt/npm 源为国内镜像
+RUN sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list.d/debian.sources
+
 # python3 + build-essential 是 better-sqlite3 prebuild fallback 时需要
 # ca-certificates 让 npm 可以走 HTTPS 到 registry
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -21,9 +24,13 @@ COPY package.json package-lock.json ./
 COPY prisma ./prisma
 COPY prisma.config.ts ./
 
+# Prisma 引擎二进制也走国内镜像
+ENV PRISMA_ENGINES_MIRROR=https://registry.npmmirror.com/-/binary/prisma
+
 # npm ci 会触发 postinstall: "prisma generate"
 # 需要 prisma.config.ts 和 prisma/ 已经在上面 COPY
-RUN npm ci
+RUN npm config set registry https://registry.npmmirror.com \
+    && npm ci
 
 # ============================================================
 # builder: build the Next.js production bundle
@@ -58,7 +65,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ARG UID=1000
 ARG GID=1000
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list.d/debian.sources \
+    && apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     openssl \
     && rm -rf /var/lib/apt/lists/* \
