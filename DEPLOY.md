@@ -4,7 +4,7 @@
 
 架構:
 - **宿主 nginx**(已預裝):反向代理 + HTTPS 終結 + certbot 證書管理
-- **next-app 容器**:Next.js 16 + Prisma 7 + SQLite,監聽 `127.0.0.1:3000`
+- **next-app 容器**:Next.js 16 + Prisma 7 + SQLite,監聽 `127.0.0.1:3001`
 - **SQLite** 文件:Docker named volume `iiqe-data`,持久化在宿主
 
 ---
@@ -218,7 +218,7 @@ docker compose start next-app
 docker compose ps
 docker compose logs --tail=200 next-app
 
-# 直接測容器是否監聽 3000
+# 直接測容器是否監聽
 curl -I http://127.0.0.1:3001/api/papers
 ```
 
