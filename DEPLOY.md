@@ -19,7 +19,7 @@
   - Docker Compose plugin(`docker compose version` 可用)
   - Git
   - **nginx**(`/etc/nginx/conf.d/` 風格,已有其他站共存)
-  - **certbot**(`apt install certbot`)
+  - **certbot + nginx 插件**(`apt install certbot python3-certbot-nginx`)
 
 ### 網絡
 - 域名 A 記錄指向 VPS 公網 IP
@@ -73,7 +73,9 @@ AUTH_SECRET=<隨機 32 字元以上字符串>
 sed -i 's/your-domain.example.com/你的真實域名/g' nginx/iiqe.conf
 
 # 2. 安裝站點(此時只有 HTTP 段,先 reload nginx)
+#    連同 snippets/ 一起拷貝,include 才能找到 header 片段
 sudo cp nginx/iiqe.conf /etc/nginx/conf.d/iiqe.conf
+sudo cp -r nginx/snippets /etc/nginx/
 sudo nginx -t && sudo systemctl reload nginx
 
 # 3. 一鍵申請證書 + 自動補上 HTTPS 段 + 80→443 跳轉
@@ -82,13 +84,13 @@ sudo certbot --nginx -d 你的真實域名 --email 你的郵箱 --agree-tos --no
 
 `certbot --nginx` 會自動:
 - 申請並部署 Let's Encrypt 證書
-- 在 `iiqe.conf` 裡加一個 `server { listen 443 ssl; ... }` 塊
+- 在 `iiqe.conf` 裡加一個 `server { listen 443 ssl; ... }` 塊(連同 `include snippets/iiqe-headers.conf;` 一起複製)
 - 把 80 端口的 `location /` 改成 `301 https://$host$request_uri`
 
 執行後檢查:
 ```bash
 sudo nginx -t
-sudo cat /etc/nginx/conf.d/iiqe.conf    # 應該看到 HTTPS 段
+sudo cat /etc/nginx/conf.d/iiqe.conf    # 應該看到 HTTPS 段和 snippets include
 ```
 
 ### 1.5 配置自動續期
@@ -140,9 +142,9 @@ All migrations applied successfully.
 scp .cache_paper1.json ecs-user@<vps>:/home/ecs-user/iiqe-app/
 scp _p3_clean.json ecs-user@<vps>:/home/ecs-user/iiqe-app/
 
-# 2. 複製到容器內(seed.ts 從 /app/../ 即 / 讀取)
-docker cp .cache_paper1.json iiqe-app:/.cache_paper1.json
-docker cp _p3_clean.json iiqe-app:/_p3_clean.json
+# 2. 複製到容器內(seed.ts 從 /app/../ 即 /app/ 讀取)
+docker cp .cache_paper1.json iiqe-app:/app/.cache_paper1.json
+docker cp _p3_clean.json iiqe-app:/app/_p3_clean.json
 
 # 3. 執行 seed
 docker compose exec next-app npx tsx prisma/seed.ts
@@ -254,19 +256,27 @@ sudo systemctl status certbot.timer
 
 ### 4.4 certbot 申請失敗
 
-**症狀**:`certbot certonly --webroot` 報錯。
+**症狀**:`sudo certbot --nginx -d your-domain.com` 報錯(常見:`Challenge failed for domain`、`Timeout during connect`)。
 
 **排查**:
 ```bash
-# 確認 80 端口從公網可達
-curl -I http://your-domain.com/.well-known/acme-challenge/test
-
 # 確認 DNS 解析正確
 dig +short your-domain.com
 
-# 確認 webroot 目錄存在且 nginx 用戶可讀
-ls -ld /var/www/letsencrypt
+# 確認 80 端口從公網可達,且返回的是這台 nginx(而非默認站)
+curl -I http://your-domain.com/
+
+# 看 nginx 錯誤日誌
+sudo tail -50 /var/log/nginx/iiqe.error.log
+
+# 手動乾跑,看詳細錯誤
+sudo certbot --nginx -d your-domain.com --email your-email --agree-tos --no-eff-email --dry-run
 ```
+
+常見原因:
+- DNS A 記錄尚未生效
+- 阿里雲安全組未放行 80
+- `nginx -t` 之後忘記 `systemctl reload nginx`,nginx 還在用舊站點
 
 ### 4.5 SQLite "database is locked"
 
