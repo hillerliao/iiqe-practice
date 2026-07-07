@@ -22,6 +22,7 @@ import { NoteButton, type NoteButtonHandle } from "@/components/NoteButton";
 import { buildSearchQuery } from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
 import { useToast, ToastContainer } from "@/components/useToast";
+import { getHandbookHref } from "@/lib/handbook-refs";
 
 type Question = {
   id: string;
@@ -394,11 +395,27 @@ function PracticeInner() {
             <span className="font-medium">
               第 {currentIdx + 1} / {questions.length} 題
             </span>
-            {currentQ.ref && (
-              <Badge variant="outline" className="text-xs">
-                {currentQ.ref}
-              </Badge>
-            )}
+            {currentQ.ref && (() => {
+              const handbookHref = getHandbookHref("exam1-2024", currentQ.ref);
+              if (!handbookHref) {
+                return (
+                  <Badge variant="outline" className="text-xs">
+                    {currentQ.ref}
+                  </Badge>
+                );
+              }
+              return (
+                <a
+                  href={handbookHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="在新分頁開啟研習手冊對應章節"
+                  className="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium text-foreground/80 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
+                >
+                  {currentQ.ref}
+                </a>
+              );
+            })()}
           </div>
           <div className="flex items-center gap-2">
             {timeLeft != null && (
