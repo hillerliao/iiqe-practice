@@ -16,6 +16,7 @@ import {
   getCustomIdDisplay,
   setCustomSessionId,
   resetSessionId,
+  validateCustomId,
 } from "@/lib/session";
 
 export default function SettingsPage() {
@@ -44,44 +45,50 @@ export default function SettingsPage() {
     setMigrateMsg(null);
     const oldId = currentId;
     try {
-      setCustomSessionId(inputId);
-      const newId = getSessionId();
-      setCurrentId(newId);
+      // 先驗證 ID 格式,但不寫入 localStorage
+      const newId = validateCustomId(inputId);
+      if (oldId === newId) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 4000);
+        return;
+      }
 
-      // 把舊 sessionId 的資料遷移到新 ID
-      if (oldId && oldId !== newId) {
+      // 先遷移資料,成功後才切換 ID
+      if (oldId) {
         setMigrating(true);
-        try {
-          const res = await fetch("/api/migrate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ fromSessionId: oldId, toSessionId: newId }),
-          });
-          const data = await res.json();
-          if (data.ok) {
-            const m = data.migrated;
+        const res = await fetch("/api/migrate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fromSessionId: oldId, toSessionId: newId }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "遷移請求失敗");
+        }
+        const data = await res.json();
+        if (data.ok && data.migrated) {
+          const m = data.migrated;
+          if (m.attempts > 0 || m.favorites > 0 || m.notes > 0) {
             setMigrateMsg(
-              `已遷移 ${m.attempts} 次作答記錄、${m.favorites} 個收藏${
-                m.conflicts > 0 ? `(合併衝突 ${m.conflicts} 個)` : ""
-              }`
+              `已遷移 ${m.attempts} 次作答記錄、${m.favorites} 個收藏`
             );
           }
-        } catch {
-          // 遷移失敗不阻塞,ID 已切換成功,下次再試
-        } finally {
-          setMigrating(false);
         }
       }
 
+      // 遷移成功,寫入 localStorage 切換 ID
+      setCustomSessionId(inputId);
+      setCurrentId(getSessionId());
       setSaved(true);
       setTimeout(() => {
         setSaved(false);
         setMigrateMsg(null);
       }, 4000);
-      // 觸發整頁刷新,讓所有元件重新拉取新 session 的資料
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "儲存失敗");
+    } finally {
+      setMigrating(false);
     }
   }
 
@@ -97,7 +104,7 @@ export default function SettingsPage() {
 
   async function handleCopy() {
     try {
-      await navigator.clipboard.writeText(currentId);
+      await navigator.clipboard.writeText(displayId);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
@@ -106,6 +113,7 @@ export default function SettingsPage() {
   }
 
   const isCustom = isCustomSessionId(currentId);
+  const displayId = isCustom ? getCustomIdDisplay(currentId) : currentId;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
@@ -124,6 +132,20 @@ export default function SettingsPage() {
 
       <Card className="mb-4">
         <CardHeader>
+          <CardTitle className="text-base">題目反饋</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-3">
+            練習時遇到題目、答案或排版的錯誤?前往反饋頁提交,管理員會在後台處理。
+          </p>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/settings/feedback">查看反饋記錄</Link>
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card id="device-id" className="mb-4 scroll-mt-20">
+        <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             裝置識別碼
             {isCustom ? (
@@ -138,7 +160,7 @@ export default function SettingsPage() {
             <Label>當前識別碼</Label>
             <div className="flex items-center gap-2">
               <code className="flex-1 px-3 py-2 bg-muted rounded text-xs font-mono break-all">
-                {currentId}
+                {displayId}
               </code>
               <Button variant="outline" size="sm" onClick={handleCopy}>
                 {copied ? (
@@ -149,7 +171,7 @@ export default function SettingsPage() {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              所有作答記錄、收藏、錯題本都綁定此識別碼。換瀏覽器時,在下方輸入同樣的自訂 ID 即可同步資料。
+              換瀏覽器時,在下方設定同樣的自訂 ID 即可同步資料。
             </p>
           </div>
 
@@ -157,14 +179,14 @@ export default function SettingsPage() {
             <Label htmlFor="customId">自訂識別碼</Label>
             <Input
               id="customId"
-              type="text"
+              type="email"
               value={inputId}
               onChange={(e) => setInputId(e.target.value)}
-              placeholder="例如:bruce2026"
-              maxLength={32}
+              placeholder="例如:you@example.com"
+              maxLength={64}
             />
             <p className="text-xs text-muted-foreground">
-              僅限 3~32 字元的英文、數字、底線或連字號。可直接貼上上方「當前識別碼」的完整值(含 <code className="text-xs">user:</code> 前綴)。設定後,在其他瀏覽器輸入同樣的 ID 即可共用同一份資料。
+              須為有效的 Email 格式（例如 you@example.com）。設定後，在其他瀏覽器輸入同樣的 ID 即可共用同一份資料。
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               <Button
@@ -234,7 +256,7 @@ export default function SettingsPage() {
           <div className="space-y-1">
             <p className="font-medium text-foreground">步驟:</p>
             <ol className="list-decimal list-inside space-y-1 ml-2">
-              <li>在第一個瀏覽器設定一個自訂 ID(例如 <code className="text-xs bg-muted px-1 rounded">bruce2026</code>)</li>
+              <li>在第一個瀏覽器設定一個自訂 ID(例如 <code className="text-xs bg-muted px-1 rounded">you@example.com</code>)</li>
               <li>作答、收藏等資料會綁定到這個 ID</li>
               <li>在另一個瀏覽器打開本頁,輸入同樣的自訂 ID</li>
               <li>儲存後即會切換到同一份資料,繼續之前的進度</li>

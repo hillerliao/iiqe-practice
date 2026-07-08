@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
+import { Home, BarChart3, BookOpen, Star, Settings } from "lucide-react";
 import { ThemeProvider } from "@/components/theme-provider";
-import { HeaderNav } from "@/components/HeaderNav";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { SetupReminder } from "@/components/SetupReminder";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,10 +60,68 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider>
-          <HeaderNav />
+          <header className="border-b bg-background/80 backdrop-blur sticky top-0 z-10">
+            <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-4 sm:gap-6">
+              <Link
+                href="/"
+                className="font-semibold text-lg flex items-center gap-2 shrink-0 whitespace-nowrap"
+              >
+                <BookOpen className="w-5 h-5" />
+IIQE 做题家
+              </Link>
+              <nav className="flex gap-1 text-sm items-center shrink min-w-0">
+                <Link
+                  href="/"
+                  className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+                >
+                  <Home className="w-4 h-4" />
+                  <span className="hidden md:inline">首頁</span>
+                </Link>
+                <Link
+                  href="/stats"
+                  className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  <span className="hidden md:inline">統計</span>
+                </Link>
+                <Link
+                  href="/wrongbook"
+                  className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span className="hidden md:inline">錯題本</span>
+                </Link>
+                <Link
+                  href="/favorites"
+                  className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+                >
+                  <Star className="w-4 h-4" />
+                  <span className="hidden md:inline">收藏</span>
+                </Link>
+                <Link
+                  href="/studynotes/exam1-2024"
+                  className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span className="hidden md:inline">研習手冊</span>
+                </Link>
+                <Link
+                  href="/settings"
+                  className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+                >
+                  <Settings className="w-4 h-4" />
+                  <span className="hidden md:inline">設定</span>
+                </Link>
+              </nav>
+              <div className="ml-auto">
+                <ThemeToggle />
+              </div>
+            </div>
+          </header>
+          <SetupReminder />
           <main className="flex-1">{children}</main>
           <footer className="border-t py-3 text-center text-xs text-muted-foreground">
-            IIQE 做题家 · 讓刷題更簡單
+            IIQE 做題家· 讓刷題更簡單
           </footer>
         </ThemeProvider>
       </body>

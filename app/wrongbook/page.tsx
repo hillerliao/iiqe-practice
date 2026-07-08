@@ -200,6 +200,43 @@ export default function WrongbookPage() {
       });
   }, []);
 
+  // 將重做練習的作答寫回後端(/api/wrongbook/record),讓「又錯了」累積進 wrongCount
+  // 注意:失敗時要拋出(而非吞掉),persistAnswers 的 .catch 才會重置 recordedRef 以便重試
+  const recordRedo = useCallback(
+    async (answers: Record<string, string>) => {
+      const sessionId = getSessionId();
+      const payload = items
+        .map((it) => ({ questionId: it.questionId, userAnswer: answers[it.questionId] }))
+        .filter((a) => a.userAnswer != null && a.userAnswer !== "");
+      if (payload.length === 0) return;
+      const r = await fetch("/api/wrongbook/record", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, answers: payload }),
+      });
+      if (!r.ok) {
+        throw new Error(`記錄重做結果失敗: ${r.status}`);
+      }
+    },
+    [items]
+  );
+
+  // 退出重做模式:重新整理錯題本,使更新後的 wrongCount / 反覆錯標籤立即反映
+  const handleExit = useCallback(async () => {
+    const sessionId = getSessionId();
+    try {
+      const r = await fetch(`/api/wrongbook?sessionId=${sessionId}`);
+      if (r.ok) {
+        const data = await r.json();
+        setItems(data.items);
+        setRepeatedCount(data.repeatedCount ?? 0);
+      }
+    } catch {
+      /* 重新整理失敗不阻斷退出 */
+    }
+    setPracticeMode(false);
+  }, []);
+
   if (loading) {
     return <div className="max-w-4xl mx-auto px-4 py-8 text-muted-foreground">載入中...</div>;
   }

@@ -1,8 +1,6 @@
-// GET    /api/favorites?sessionId=... — 收藏題
-// POST   /api/favorites — 加入收藏
-// DELETE /api/favorites?sessionId=...&questionId=... — 移除
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { addFavorite, removeFavorite, listFavorites, getFavoriteMeta } from "@/lib/kv";
+import { getQuestionById, getPapers } from "@/lib/data";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -11,59 +9,53 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
   }
 
-  const favs = await prisma.favorite.findMany({
-    where: { sessionId },
-    include: {
+  const favIds = await listFavorites(sessionId);
+  const papers = getPapers();
+
+  const items = [];
+  for (const qid of favIds) {
+    const q = getQuestionById(qid);
+    if (!q) continue;
+    const meta = await getFavoriteMeta(sessionId, qid);
+    const paper = papers.find((p) => p.id === qid.split("-")[0]);
+    const noteData = qid ? null : null;
+    items.push({
+      questionId: qid,
+      createdAt: meta?.createdAt ?? null,
+      paperCode: paper?.code ?? "",
+      paperName: paper?.name ?? "",
+      note: null,
       question: {
-        include: {
-          paper: true,
-          // 重要:按 sessionId 過濾,避免讀到其他 session 的筆記
-          notes: { where: { sessionId } },
-        },
+        id: q.id,
+        number: q.number,
+        ref: q.ref,
+        question: q.question,
+        options: q.options,
+        answer: q.answer?.toLowerCase() ?? "",
+        explanation: q.explanation,
+        page: q.page,
+        source: q.source,
+        sourceLabel: q.sourceLabel,
       },
-    },
-    orderBy: { createdAt: "desc" },
+    });
+  }
+
+  items.sort((a, b) => {
+    if (a.createdAt && b.createdAt) return b.createdAt.localeCompare(a.createdAt);
+    return 0;
   });
 
-  return NextResponse.json({
-    count: favs.length,
-    items: favs.map((f) => ({
-      questionId: f.questionId,
-      createdAt: f.createdAt,
-      paperCode: f.question.paper.code,
-      paperName: f.question.paper.name,
-      note: f.question.notes[0]?.content ?? null,
-      question: {
-        id: f.question.id,
-        number: f.question.number,
-        ref: f.question.ref,
-        question: f.question.question,
-        options: JSON.parse(f.question.options),
-        answer: f.question.answer?.toLowerCase() ?? "",
-        explanation: f.question.explanation,
-        page: f.question.page,
-        source: f.question.source,
-        sourceLabel: f.question.sourceLabel,
-      },
-    })),
-  });
+  return NextResponse.json({ count: items.length, items });
 }
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const { sessionId, questionId } = body;
   if (!sessionId || !questionId) {
-    return NextResponse.json(
-      { error: "sessionId, questionId 必填" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "sessionId, questionId 必填" }, { status: 400 });
   }
-  const fav = await prisma.favorite.upsert({
-    where: { sessionId_questionId: { sessionId, questionId } },
-    create: { sessionId, questionId },
-    update: {},
-  });
-  return NextResponse.json({ favorite: fav });
+  await addFavorite(sessionId, questionId);
+  return NextResponse.json({ favorite: { sessionId, questionId } });
 }
 
 export async function DELETE(req: NextRequest) {
@@ -71,13 +63,8 @@ export async function DELETE(req: NextRequest) {
   const sessionId = url.searchParams.get("sessionId");
   const questionId = url.searchParams.get("questionId");
   if (!sessionId || !questionId) {
-    return NextResponse.json(
-      { error: "sessionId, questionId 必填" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "sessionId, questionId 必填" }, { status: 400 });
   }
-  await prisma.favorite.deleteMany({
-    where: { sessionId, questionId },
-  });
+  await removeFavorite(sessionId, questionId);
   return NextResponse.json({ ok: true });
 }
