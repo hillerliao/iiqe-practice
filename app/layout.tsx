@@ -6,6 +6,7 @@ import { Home, BarChart3, BookOpen, Star, Settings } from "lucide-react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SetupReminder } from "@/components/SetupReminder";
+import { Analytics } from "@/components/Analytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -119,6 +120,7 @@ IIQE 做题家
             </div>
           </header>
           <SetupReminder />
+          <Analytics />
           <main className="flex-1">{children}</main>
           <footer className="border-t py-3 text-center text-xs text-muted-foreground">
             IIQE 做題家· 讓刷題更簡單
