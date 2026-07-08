@@ -9,9 +9,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
   }
 
-  // 取此 session 所有作答
+  // 取此 session 所有作答(排除錯題本重做)
   const answers = await prisma.answer.findMany({
-    where: { attempt: { sessionId } },
+    where: { attempt: { sessionId, source: { not: "wrongbook-redo" } } },
     include: {
       question: true,
       attempt: { include: { paper: true } },
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
   // 最近 10 次 attempts
   // 即時從 Answer 表聚合 correct(避免未交卷 attempt 的 Attempt.correct=0 誤判)
   const recent = await prisma.attempt.findMany({
-    where: { sessionId },
+    where: { sessionId, source: { not: "wrongbook-redo" } },
     orderBy: { startedAt: "desc" },
     take: 10,
     include: {

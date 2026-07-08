@@ -53,3 +53,11 @@ next-env.d.ts
 
 # IDE / AI agent artifacts
 .codebuddy
+
+# build/deploy artifacts
+/iiqe-deploy/
+*.tar
+*.tar.gz
+build.log
+build_check.log
+dev_err*.log

@@ -1,8 +1,9 @@
 // 灌入題庫
-// 1. 卷一真題(來自 ../.cache_paper1.json)
-// 2. 卷一模擬題(來自 scripts/mock_p1.json)
-// 3. 卷三真題(來自 ../_p3_clean.json,需欄位轉換)
-// 4. 卷三模擬題(來自 scripts/mock_p3.json)
+// 所有資料檔統一放在 scripts/ 目錄下
+// 1. 卷一真題(scripts/cache_paper1.json)
+// 2. 卷一模擬題(scripts/mock_p1.json)
+// 3. 卷三真題(scripts/p3_clean.json,需欄位轉換)
+// 4. 卷三模擬題(scripts/mock_p3.json)
 import "dotenv/config";
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -122,7 +123,6 @@ async function loadPaper(item: SourceData) {
 
 async function main() {
   const ROOT = path.dirname(__dirname);
-  const PARENT = path.dirname(ROOT);
 
   function readJsonIfExists(filePath: string): unknown[] | null {
     if (!fs.existsSync(filePath)) {
@@ -134,7 +134,7 @@ async function main() {
 
   const sources: SourceData[] = [];
 
-  const p1Exam = readJsonIfExists(path.join(PARENT, ".cache_paper1.json"));
+  const p1Exam = readJsonIfExists(path.join(ROOT, "scripts/cache_paper1.json"));
   if (p1Exam) {
     sources.push({
       paperCode: "P1",
@@ -154,7 +154,7 @@ async function main() {
     });
   }
 
-  const p3Exam = readJsonIfExists(path.join(PARENT, "_p3_clean.json"));
+  const p3Exam = readJsonIfExists(path.join(ROOT, "scripts/p3_clean.json"));
   if (p3Exam) {
     sources.push({
       paperCode: "P3",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -216,12 +216,40 @@ export default function WrongbookPage() {
       question: it.question,
     }));
     const prevAnswerMap = new Map(items.map((it) => [it.questionId, it.userAnswer]));
+
+    async function recordRedo(answers: Record<string, string>) {
+      try {
+        const sid = getSessionId();
+        await fetch("/api/wrongbook/record", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId: sid, answers }),
+        });
+      } catch (e) {
+        console.error("記錄重做結果失敗:", e);
+      }
+    }
+
+    async function handleExit() {
+      setPracticeMode(false);
+      // 重新載入錯題本列表以反映記錄結果
+      try {
+        const r = await fetch(`/api/wrongbook?sessionId=${getSessionId()}`);
+        if (r.ok) {
+          const data = await r.json();
+          setItems(data.items);
+          setRepeatedCount(data.repeatedCount ?? 0);
+        }
+      } catch {}
+    }
+
     return (
       <RedoPractice
         items={redoItems}
         title="錯題本 · 重做練習"
         prevUserAnswer={(id) => prevAnswerMap.get(id)}
-        onExit={() => setPracticeMode(false)}
+        recordAnswers={recordRedo}
+        onExit={handleExit}
       />
     );
   }
