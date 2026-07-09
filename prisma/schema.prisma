@@ -1,0 +1,123 @@
+// Prisma schema: 兼容已存在的 prod.db(由最初 main 分支创建过),
+// 任何修改都不得破坏旧表名 / 主键 / 已有字段。新增字段只能 nullable 或带 default。
+// 表名用 @@map 显式映射,避免 Prisma 默认复数命名。
+
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../lib/generated/prisma"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Paper {
+  id        String     @id
+  code      String     @unique
+  name      String
+  createdAt DateTime   @default(now())
+  questions Question[]
+
+  @@map("Paper")
+}
+
+model Question {
+  id          String   @id
+  paperId     String
+  number      Int
+  ref         String?
+  question    String
+  options     String
+  answer      String
+  explanation String?
+  page        Int?
+  source      String
+  sourceLabel String?
+  createdAt   DateTime @default(now())
+  paper       Paper    @relation(fields: [paperId], references: [id])
+  answers     Answer[]
+
+  @@index([paperId, source])
+  @@index([paperId, number])
+  @@map("Question")
+}
+
+model Attempt {
+  id          String    @id
+  sessionId   String
+  paperId     String
+  mode        String
+  source      String?
+  startedAt   DateTime
+  finishedAt  DateTime?
+  durationSec Int?
+  totalQ      Int
+  correct     Int       @default(0)
+  answers     Answer[]
+
+  @@index([sessionId])
+  @@index([sessionId, paperId, source])
+  @@index([startedAt])
+  @@map("Attempt")
+}
+
+model Answer {
+  id          String   @id
+  attemptId   String
+  questionId  String
+  userAnswer  String
+  isCorrect   Boolean
+  timeSpentMs Int?
+  createdAt   DateTime @default(now())
+  attempt     Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question    Question @relation(fields: [questionId], references: [id])
+
+  @@index([attemptId])
+  @@index([questionId])
+  @@map("Answer")
+}
+
+model Favorite {
+  id         String   @id
+  sessionId  String
+  questionId String
+  createdAt  DateTime @default(now())
+
+  @@unique([sessionId, questionId])
+  @@index([sessionId])
+  @@map("Favorite")
+}
+
+model Note {
+  id         String   @id
+  sessionId  String
+  questionId String
+  content    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([sessionId, questionId])
+  @@index([sessionId])
+  @@map("Note")
+}
+
+model Feedback {
+  id          String   @id
+  sessionId   String
+  questionId  String
+  paperCode   String
+  source      String
+  sourceLabel String?
+  number      Int
+  ref         String?
+  category    String
+  description String
+  userAnswer  String?
+  userAgent   String   @default("")
+  createdAt   DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("Feedback")
+}

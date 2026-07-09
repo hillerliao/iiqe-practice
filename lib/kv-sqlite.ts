@@ -1,0 +1,433 @@
+// SQLite 业务实现:对应 lib/kv.ts 中的高层函数,只在 backend === "sqlite" 时被调用。
+// 关键决策:不模拟 Redis 整套原语,而是把 Attempt / Answer / Favorite / Note / Feedback
+// 用关系表表达,migrateSession / listAllFeedback 改为直接 SQL 事务和聚合查询。
+//
+// 表与字段由 prisma/schema.prisma 决定;这里用 Prisma client 操作,避免写裸 SQL。
+
+import { getPrisma } from "@/lib/db";
+import type { AttemptRecord, AnswerRecord, FavoriteRecord, NoteRecord, FeedbackRecord } from "@/lib/kv";
+import type { Prisma } from "@/lib/generated/prisma";
+
+type TransactionClient = Prisma.TransactionClient;
+
+type FeedbackRow = {
+  id: string;
+  sessionId: string;
+  questionId: string;
+  paperCode: string;
+  source: string;
+  sourceLabel: string | null;
+  number: number;
+  ref: string | null;
+  category: string;
+  description: string;
+  userAnswer: string | null;
+  userAgent: string;
+  createdAt: Date;
+};
+
+function toAnswerRecord(a: {
+  questionId: string;
+  userAnswer: string;
+  isCorrect: boolean;
+  timeSpentMs: number | null;
+  createdAt: Date;
+}): AnswerRecord {
+  return {
+    questionId: a.questionId,
+    userAnswer: a.userAnswer ?? "",
+    isCorrect: a.isCorrect,
+    timeSpentMs: a.timeSpentMs,
+    createdAt: a.createdAt instanceof Date ? a.createdAt.toISOString() : String(a.createdAt),
+  };
+}
+
+function toAttemptRecord(a: {
+  id: string;
+  sessionId: string;
+  paperId: string;
+  mode: string;
+  source: string | null;
+  startedAt: Date;
+  finishedAt: Date | null;
+  durationSec: number | null;
+  totalQ: number;
+  correct: number;
+  answers: Array<{
+    questionId: string;
+    userAnswer: string;
+    isCorrect: boolean;
+    timeSpentMs: number | null;
+    createdAt: Date;
+  }>;
+}): AttemptRecord {
+  return {
+    id: a.id,
+    sessionId: a.sessionId,
+    paperId: a.paperId,
+    mode: a.mode,
+    source: a.source,
+    startedAt: a.startedAt instanceof Date ? a.startedAt.toISOString() : String(a.startedAt),
+    finishedAt: a.finishedAt instanceof Date ? a.finishedAt.toISOString() : a.finishedAt,
+    durationSec: a.durationSec,
+    totalQ: a.totalQ,
+    correct: a.correct,
+    answers: a.answers.map(toAnswerRecord),
+  };
+}
+
+function toFeedbackRecord(r: FeedbackRow): FeedbackRecord {
+  return {
+    id: r.id,
+    sessionId: r.sessionId,
+    questionId: r.questionId,
+    paperCode: r.paperCode,
+    source: r.source,
+    sourceLabel: r.sourceLabel,
+    number: r.number,
+    ref: r.ref,
+    category: r.category as FeedbackRecord["category"],
+    description: r.description,
+    userAnswer: r.userAnswer,
+    userAgent: r.userAgent,
+    createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : String(r.createdAt),
+  };
+}
+
+
+export async function createAttemptSqlite(record: AttemptRecord): Promise<void> {
+  const prisma = getPrisma();
+  await prisma.$transaction(async (tx: TransactionClient) => {
+    await tx.attempt.upsert({
+      where: { id: record.id },
+      create: {
+        id: record.id,
+        sessionId: record.sessionId,
+        paperId: record.paperId,
+        mode: record.mode,
+        source: record.source ?? "exam",
+        startedAt: new Date(record.startedAt),
+        finishedAt: record.finishedAt ? new Date(record.finishedAt) : null,
+        durationSec: record.durationSec,
+        totalQ: record.totalQ,
+        correct: record.correct,
+      },
+      update: {},
+    });
+    for (const ans of record.answers) {
+      const answerId = `${record.id}::${ans.questionId}`;
+      await tx.answer.upsert({
+        where: { id: answerId },
+        create: {
+          id: answerId,
+          attemptId: record.id,
+          questionId: ans.questionId,
+          userAnswer: ans.userAnswer,
+          isCorrect: ans.isCorrect,
+          timeSpentMs: ans.timeSpentMs,
+          createdAt: new Date(ans.createdAt),
+        },
+        update: {
+          userAnswer: ans.userAnswer,
+          isCorrect: ans.isCorrect,
+          timeSpentMs: ans.timeSpentMs,
+        },
+      });
+    }
+  });
+}
+
+export async function getAttemptSqlite(id: string): Promise<AttemptRecord | null> {
+  const prisma = getPrisma();
+  const a = await prisma.attempt.findUnique({
+    where: { id },
+    include: { answers: { orderBy: { createdAt: "asc" } } },
+  });
+  return a ? toAttemptRecord(a) : null;
+}
+
+export async function updateAttemptSqlite(
+  id: string,
+  data: Partial<AttemptRecord>
+): Promise<void> {
+  const prisma = getPrisma();
+  await prisma.$transaction(async (tx: TransactionClient) => {
+    const existing = await tx.attempt.findUnique({ where: { id } });
+    if (!existing) return;
+    await tx.attempt.update({
+      where: { id },
+      data: {
+        sessionId: data.sessionId ?? existing.sessionId,
+        paperId: data.paperId ?? existing.paperId,
+        mode: data.mode ?? existing.mode,
+        source: data.source ?? existing.source,
+        startedAt: data.startedAt ? new Date(data.startedAt) : existing.startedAt,
+        finishedAt: data.finishedAt === undefined
+          ? existing.finishedAt
+          : data.finishedAt
+          ? new Date(data.finishedAt)
+          : null,
+        durationSec: data.durationSec === undefined ? existing.durationSec : data.durationSec,
+        totalQ: data.totalQ ?? existing.totalQ,
+        correct: data.correct ?? existing.correct,
+      },
+    });
+    if (data.answers) {
+      // 简化策略:删除旧 answer,重写;Answer 主键是 attemptId::questionId
+      await tx.answer.deleteMany({ where: { attemptId: id } });
+      for (const ans of data.answers) {
+        const answerId = `${id}::${ans.questionId}`;
+        await tx.answer.create({
+          data: {
+            id: answerId,
+            attemptId: id,
+            questionId: ans.questionId,
+            userAnswer: ans.userAnswer,
+            isCorrect: ans.isCorrect,
+            timeSpentMs: ans.timeSpentMs,
+            createdAt: new Date(ans.createdAt),
+          },
+        });
+      }
+    }
+  });
+}
+
+export async function findUnfinishedAttemptSqlite(
+  sessionId: string,
+  paperId?: string,
+  source?: string
+): Promise<AttemptRecord | null> {
+  const prisma = getPrisma();
+  const rows = await prisma.attempt.findMany({
+    where: {
+      sessionId,
+      finishedAt: null,
+      ...(paperId ? { paperId } : {}),
+      ...(source ? { source } : {}),
+    },
+    orderBy: { startedAt: "desc" },
+    include: { answers: { orderBy: { createdAt: "asc" } } },
+    take: 1,
+  });
+  return rows[0] ? toAttemptRecord(rows[0]) : null;
+}
+
+export async function listAttemptsSqlite(sessionId: string): Promise<AttemptRecord[]> {
+  const prisma = getPrisma();
+  const rows = await prisma.attempt.findMany({
+    where: { sessionId },
+    orderBy: { startedAt: "asc" },
+    include: { answers: { orderBy: { createdAt: "asc" } } },
+  });
+  return rows.map(toAttemptRecord);
+}
+
+export async function addFavoriteSqlite(
+  sessionId: string,
+  questionId: string
+): Promise<void> {
+  const prisma = getPrisma();
+  const id = `${sessionId}::${questionId}`;
+  await prisma.favorite.upsert({
+    where: { id },
+    create: { id, sessionId, questionId },
+    update: {},
+  });
+}
+
+export async function removeFavoriteSqlite(
+  sessionId: string,
+  questionId: string
+): Promise<void> {
+  const prisma = getPrisma();
+  await prisma.favorite.deleteMany({ where: { sessionId, questionId } });
+}
+
+export async function listFavoritesSqlite(sessionId: string): Promise<string[]> {
+  const prisma = getPrisma();
+  const rows = await prisma.favorite.findMany({
+    where: { sessionId },
+    select: { questionId: true },
+  });
+  return rows.map((r: { questionId: string }) => r.questionId);
+}
+
+export async function getFavoriteMetaSqlite(
+  sessionId: string,
+  questionId: string
+): Promise<{ createdAt: string } | null> {
+  const prisma = getPrisma();
+  const row = await prisma.favorite.findUnique({
+    where: { id: `${sessionId}::${questionId}` },
+  });
+  if (!row) return null;
+  return {
+    createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : String(row.createdAt),
+  };
+}
+
+export async function saveNoteSqlite(
+  sessionId: string,
+  questionId: string,
+  content: string
+): Promise<void> {
+  const prisma = getPrisma();
+  const id = `${sessionId}::${questionId}`;
+  const now = new Date();
+  const existing = await prisma.note.findUnique({ where: { id } });
+  await prisma.note.upsert({
+    where: { id },
+    create: { id, sessionId, questionId, content, createdAt: now, updatedAt: now },
+    update: { content, updatedAt: now, createdAt: existing?.createdAt ?? now },
+  });
+}
+
+export async function deleteNoteSqlite(
+  sessionId: string,
+  questionId: string
+): Promise<void> {
+  const prisma = getPrisma();
+  await prisma.note.deleteMany({ where: { sessionId, questionId } });
+}
+
+export async function getNoteSqlite(
+  sessionId: string,
+  questionId: string
+): Promise<NoteRecord | null> {
+  const prisma = getPrisma();
+  const row = await prisma.note.findUnique({ where: { id: `${sessionId}::${questionId}` } });
+  if (!row) return null;
+  return {
+    content: row.content,
+    createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : String(row.createdAt),
+    updatedAt: row.updatedAt instanceof Date ? row.updatedAt.toISOString() : String(row.updatedAt),
+  };
+}
+
+export async function listNotesSqlite(
+  sessionId: string,
+  questionIds?: string[]
+): Promise<Record<string, NoteRecord>> {
+  const prisma = getPrisma();
+  const rows = await prisma.note.findMany({
+    where: {
+      sessionId,
+      ...(questionIds && questionIds.length > 0 ? { questionId: { in: questionIds } } : {}),
+    },
+  });
+  const out: Record<string, NoteRecord> = {};
+  for (const r of rows) {
+    out[r.questionId] = {
+      content: r.content,
+      createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : String(r.createdAt),
+      updatedAt: r.updatedAt instanceof Date ? r.updatedAt.toISOString() : String(r.updatedAt),
+    };
+  }
+  return out;
+}
+
+export async function createFeedbackSqlite(rec: FeedbackRecord): Promise<void> {
+  const prisma = getPrisma();
+  await prisma.feedback.upsert({
+    where: { id: rec.id },
+    create: {
+      id: rec.id,
+      sessionId: rec.sessionId,
+      questionId: rec.questionId,
+      paperCode: rec.paperCode,
+      source: rec.source,
+      sourceLabel: rec.sourceLabel,
+      number: rec.number,
+      ref: rec.ref,
+      category: rec.category,
+      description: rec.description,
+      userAnswer: rec.userAnswer,
+      userAgent: rec.userAgent,
+    },
+    update: {},
+  });
+}
+
+export async function getFeedbackSqlite(id: string): Promise<FeedbackRecord | null> {
+  const prisma = getPrisma();
+  const r = await prisma.feedback.findUnique({ where: { id } });
+  return r ? toFeedbackRecord(r) : null;
+}
+
+export async function listFeedbackSqlite(
+  sessionId: string,
+  limit = 100
+): Promise<FeedbackRecord[]> {
+  const prisma = getPrisma();
+  const rows = await prisma.feedback.findMany({
+    where: { sessionId },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+  return rows.map(toFeedbackRecord);
+}
+
+export async function listAllFeedbackSqlite(limit = 100): Promise<FeedbackRecord[]> {
+  // SQLite 没有"按 session 分组再合并"的 KV 概念,直接按 createdAt 倒序拉取即可。
+  const prisma = getPrisma();
+  const rows = await prisma.feedback.findMany({
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+  return rows.map(toFeedbackRecord);
+}
+
+export async function deleteFeedbackSqlite(id: string): Promise<void> {
+  const prisma = getPrisma();
+  await prisma.feedback.deleteMany({ where: { id } });
+}
+
+export async function migrateSessionSqlite(
+  fromSessionId: string,
+  toSessionId: string
+): Promise<{ attempts: number; favorites: number; notes: number }> {
+  if (fromSessionId === toSessionId) {
+    return { attempts: 0, favorites: 0, notes: 0 };
+  }
+  const prisma = getPrisma();
+  return prisma.$transaction(async (tx: TransactionClient) => {
+    // Attempts
+    const fromAttempts = await tx.attempt.findMany({ where: { sessionId: fromSessionId } });
+    let attemptCount = 0;
+    for (const a of fromAttempts) {
+      await tx.attempt.update({ where: { id: a.id }, data: { sessionId: toSessionId } });
+      attemptCount++;
+    }
+
+    // Favorites
+    const fromFavs = await tx.favorite.findMany({ where: { sessionId: fromSessionId } });
+    let favoriteCount = 0;
+    for (const f of fromFavs) {
+      const newId = `${toSessionId}::${f.questionId}`;
+      const conflict = await tx.favorite.findUnique({ where: { id: newId } });
+      if (!conflict) {
+        await tx.favorite.update({ where: { id: f.id }, data: { sessionId: toSessionId, id: newId } });
+        favoriteCount++;
+      } else {
+        await tx.favorite.delete({ where: { id: f.id } });
+      }
+    }
+
+    // Notes
+    const fromNotes = await tx.note.findMany({ where: { sessionId: fromSessionId } });
+    let noteCount = 0;
+    for (const n of fromNotes) {
+      const newId = `${toSessionId}::${n.questionId}`;
+      const conflict = await tx.note.findUnique({ where: { id: newId } });
+      if (!conflict) {
+        await tx.note.update({ where: { id: n.id }, data: { sessionId: toSessionId, id: newId } });
+        noteCount++;
+      } else {
+        await tx.note.delete({ where: { id: n.id } });
+      }
+    }
+
+    return { attempts: attemptCount, favorites: favoriteCount, notes: noteCount };
+  });
+}

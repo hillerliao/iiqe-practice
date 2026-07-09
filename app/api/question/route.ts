@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getQuestionById, getPapers } from "@/lib/data";
+import { getQuestionByIdAsync, getPapersAsync } from "@/lib/data";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -8,12 +8,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "id 必填" }, { status: 400 });
   }
 
-  const q = getQuestionById(id);
+  const q = await getQuestionByIdAsync(id);
   if (!q) {
     return NextResponse.json({ error: "Question not found" }, { status: 404 });
   }
 
-  const paper = getPapers().find((p) => p.id === q.id.split("-")[0]);
+  const papers = await getPapersAsync();
+  const paper = papers.find((p) => p.id === q.id.split("-")[0]);
 
   return NextResponse.json({
     question: {

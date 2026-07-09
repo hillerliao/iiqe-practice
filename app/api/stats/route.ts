@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listAttempts } from "@/lib/kv";
-import { getQuestionById, getPapers } from "@/lib/data";
+import { getQuestionByIdAsync, getPapersAsync } from "@/lib/data";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const attempts = (await listAttempts(sessionId)).filter(
     (a) => a.source !== "wrongbook-redo"
   );
-  const papers = getPapers();
+  const papers = await getPapersAsync();
 
   const allAnswers = attempts.flatMap((at) =>
     at.answers.map((a) => ({
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 
   const refGroups: Record<string, { paperCode: string; total: number; correct: number }> = {};
   for (const a of allAnswers) {
-    const q = getQuestionById(a.questionId);
+    const q = await getQuestionByIdAsync(a.questionId);
     if (!q) continue;
     const ref = q.ref || "其他";
     const prefix = ref.split(".").slice(0, 2).join(".");
@@ -89,29 +89,35 @@ export async function GET(req: NextRequest) {
       correct: v.correct,
       accuracy: v.total > 0 ? v.correct / v.total : 0,
     })),
-    recentAttempts: recent.map((a) => {
-      const questionNumbers = Array.from(
-        new Set(a.answers.map((x) => {
-          const q = getQuestionById(x.questionId);
-          return q?.number ?? 0;
-        }))
-      ).sort((x, y) => x - y);
-      const liveCorrect = a.answers.filter((x) => x.isCorrect).length;
-      const paper = papers.find((p) => p.id === a.paperId);
-      return {
-        id: a.id,
-        paperName: paper?.name ?? "",
-        paperCode: paper?.code ?? "",
-        mode: a.mode,
-        source: a.source,
-        totalQ: a.totalQ,
-        answeredCount: a.answers.length,
-        correct: liveCorrect,
-        questionNumbers,
-        startedAt: a.startedAt,
-        finishedAt: a.finishedAt,
-      };
-    }),
+    recentAttempts: await Promise.all(
+      recent.map(async (a) => {
+        const questionNumbers = Array.from(
+          new Set(
+            await Promise.all(
+              a.answers.map(async (x) => {
+                const q = await getQuestionByIdAsync(x.questionId);
+                return q?.number ?? 0;
+              })
+            )
+          )
+        ).sort((x, y) => x - y);
+        const liveCorrect = a.answers.filter((x) => x.isCorrect).length;
+        const paper = papers.find((p) => p.id === a.paperId);
+        return {
+          id: a.id,
+          paperName: paper?.name ?? "",
+          paperCode: paper?.code ?? "",
+          mode: a.mode,
+          source: a.source,
+          totalQ: a.totalQ,
+          answeredCount: a.answers.length,
+          correct: liveCorrect,
+          questionNumbers,
+          startedAt: a.startedAt,
+          finishedAt: a.finishedAt,
+        };
+      })
+    ),
     unfinishedCount,
   });
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getPapers } from "@/lib/data";
+import { getPapersAsync } from "@/lib/data";
 
 export async function GET() {
-  const papers = getPapers();
+  const papers = await getPapersAsync();
   return NextResponse.json({ papers });
 }

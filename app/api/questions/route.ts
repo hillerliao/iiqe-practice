@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPapers, getQuestions, getQuestionById } from "@/lib/data";
+import { getPapersAsync, getQuestionsAsync, getQuestionByIdAsync } from "@/lib/data";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -13,16 +13,19 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "paperCode 必填" }, { status: 400 });
   }
 
-  const papers = getPapers();
+  const papers = await getPapersAsync();
   const paper = papers.find((p) => p.code === code);
   if (!paper) {
     return NextResponse.json({ error: "Paper not found" }, { status: 404 });
   }
 
   const effectiveOffset = shuffle ? 0 : offset;
-  const questions = getQuestions(code, source, { shuffle, limit, offset: effectiveOffset });
-
-  const total = getQuestions(code, source).length;
+  const questions = await getQuestionsAsync(code, source, {
+    shuffle,
+    limit,
+    offset: effectiveOffset,
+  });
+  const total = (await getQuestionsAsync(code, source)).length;
 
   return NextResponse.json({
     paper: { id: paper.id, code: paper.code, name: paper.name },

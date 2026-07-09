@@ -61,7 +61,7 @@ export default function StatsPage() {
 
   useEffect(() => {
     const sessionId = getSessionId();
-    fetch(`/api/stats?sessionId=${sessionId}`)
+    fetch(`/api/stats?sessionId=${encodeURIComponent(sessionId)}`)
       .then((r) => {
         if (!r.ok) throw new Error("載入統計失敗");
         return r.json();

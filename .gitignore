@@ -56,8 +56,10 @@ next-env.d.ts
 
 # build/deploy artifacts
 /iiqe-deploy/
+/deploy-stage/
 *.tar
 *.tar.gz
+*.log
 build.log
 build_check.log
 dev_err*.log

@@ -175,6 +175,15 @@ function createUpstashClient(): KVClient {
 const hasUpstash = !!(process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL);
 export const kv: KVClient = hasUpstash ? createUpstashClient() : createInMemoryClient();
 
+import type { StorageBackend } from "@/lib/storage-backend";
+// 在顶层 import 一次 storage-backend,避免循环依赖问题(getPrisma -> lib/db -> 不会反向依赖 kv)
+import { pickStorageBackend } from "@/lib/storage-backend";
+import * as sqlite from "@/lib/kv-sqlite";
+
+function backend(): StorageBackend {
+  return pickStorageBackend();
+}
+
 export type AnswerRecord = {
   questionId: string;
   userAnswer: string;
@@ -247,21 +256,25 @@ function feedbackKey(id: string) { return `${FB}${id}`; }
 function sessFeedbackKey(sid: string) { return `${SESS_FB}${sid}`; }
 
 export async function createAttempt(record: AttemptRecord): Promise<void> {
+  if (backend() === "sqlite") return sqlite.createAttemptSqlite(record);
   await kv.set(attemptKey(record.id), record);
   await kv.lpush(sessAttemptsKey(record.sessionId), record.id);
 }
 
 export async function getAttempt(id: string): Promise<AttemptRecord | null> {
+  if (backend() === "sqlite") return sqlite.getAttemptSqlite(id);
   return kv.get<AttemptRecord>(attemptKey(id));
 }
 
 export async function updateAttempt(id: string, data: Partial<AttemptRecord>): Promise<void> {
+  if (backend() === "sqlite") return sqlite.updateAttemptSqlite(id, data);
   const existing = await getAttempt(id);
   if (!existing) return;
   await kv.set(attemptKey(id), { ...existing, ...data });
 }
 
 export async function findUnfinishedAttempt(sessionId: string, paperId?: string, source?: string): Promise<AttemptRecord | null> {
+  if (backend() === "sqlite") return sqlite.findUnfinishedAttemptSqlite(sessionId, paperId, source);
   const ids = await kv.lrange<string>(sessAttemptsKey(sessionId), 0, -1);
   for (const id of ids) {
     const at = await getAttempt(id);
@@ -275,6 +288,7 @@ export async function findUnfinishedAttempt(sessionId: string, paperId?: string,
 }
 
 export async function listAttempts(sessionId: string): Promise<AttemptRecord[]> {
+  if (backend() === "sqlite") return sqlite.listAttemptsSqlite(sessionId);
   const ids = await kv.lrange<string>(sessAttemptsKey(sessionId), 0, -1);
   const results: AttemptRecord[] = [];
   for (const id of ids) {
@@ -285,24 +299,29 @@ export async function listAttempts(sessionId: string): Promise<AttemptRecord[]> 
 }
 
 export async function addFavorite(sessionId: string, questionId: string): Promise<void> {
+  if (backend() === "sqlite") return sqlite.addFavoriteSqlite(sessionId, questionId);
   await kv.sadd(sessFavsKey(sessionId), questionId);
   await kv.hset(sessFavMetaKey(sessionId), questionId, { createdAt: new Date().toISOString() });
 }
 
 export async function removeFavorite(sessionId: string, questionId: string): Promise<void> {
+  if (backend() === "sqlite") return sqlite.removeFavoriteSqlite(sessionId, questionId);
   await kv.srem(sessFavsKey(sessionId), questionId);
   await kv.hdel(sessFavMetaKey(sessionId), questionId);
 }
 
 export async function listFavorites(sessionId: string): Promise<string[]> {
+  if (backend() === "sqlite") return sqlite.listFavoritesSqlite(sessionId);
   return kv.smembers(sessFavsKey(sessionId));
 }
 
 export async function getFavoriteMeta(sessionId: string, questionId: string): Promise<{ createdAt: string } | null> {
+  if (backend() === "sqlite") return sqlite.getFavoriteMetaSqlite(sessionId, questionId);
   return kv.hget<{ createdAt: string }>(sessFavMetaKey(sessionId), questionId);
 }
 
 export async function saveNote(sessionId: string, questionId: string, content: string): Promise<void> {
+  if (backend() === "sqlite") return sqlite.saveNoteSqlite(sessionId, questionId, content);
   const existing = await kv.hget<NoteRecord>(sessNotesKey(sessionId), questionId);
   await kv.hset(sessNotesKey(sessionId), questionId, {
     content,
@@ -312,14 +331,17 @@ export async function saveNote(sessionId: string, questionId: string, content: s
 }
 
 export async function deleteNote(sessionId: string, questionId: string): Promise<void> {
+  if (backend() === "sqlite") return sqlite.deleteNoteSqlite(sessionId, questionId);
   await kv.hdel(sessNotesKey(sessionId), questionId);
 }
 
 export async function getNote(sessionId: string, questionId: string): Promise<NoteRecord | null> {
+  if (backend() === "sqlite") return sqlite.getNoteSqlite(sessionId, questionId);
   return kv.hget<NoteRecord>(sessNotesKey(sessionId), questionId);
 }
 
 export async function listNotes(sessionId: string, questionIds?: string[]): Promise<Record<string, NoteRecord>> {
+  if (backend() === "sqlite") return sqlite.listNotesSqlite(sessionId, questionIds);
   const all = await kv.hgetall<NoteRecord>(sessNotesKey(sessionId));
   if (!questionIds) return all;
   const filtered: Record<string, NoteRecord> = {};
@@ -330,6 +352,7 @@ export async function listNotes(sessionId: string, questionIds?: string[]): Prom
 }
 
 export async function migrateSession(fromSessionId: string, toSessionId: string): Promise<{ attempts: number; favorites: number; notes: number }> {
+  if (backend() === "sqlite") return sqlite.migrateSessionSqlite(fromSessionId, toSessionId);
   const result = { attempts: 0, favorites: 0, notes: 0 };
 
   // 使用精確 key,避免 wildcard 誤匹配前綴相似的 session ID
@@ -394,15 +417,18 @@ export async function migrateSession(fromSessionId: string, toSessionId: string)
 }
 
 export async function createFeedback(rec: FeedbackRecord): Promise<void> {
+  if (backend() === "sqlite") return sqlite.createFeedbackSqlite(rec);
   await kv.set(feedbackKey(rec.id), rec);
   await kv.lpush(sessFeedbackKey(rec.sessionId), rec.id);
 }
 
 export async function getFeedback(id: string): Promise<FeedbackRecord | null> {
+  if (backend() === "sqlite") return sqlite.getFeedbackSqlite(id);
   return kv.get<FeedbackRecord>(feedbackKey(id));
 }
 
 export async function listFeedback(sessionId: string, limit = 100): Promise<FeedbackRecord[]> {
+  if (backend() === "sqlite") return sqlite.listFeedbackSqlite(sessionId, limit);
   const ids = await kv.lrange<string>(sessFeedbackKey(sessionId), 0, limit - 1);
   const out: FeedbackRecord[] = [];
   for (const id of ids) {
@@ -413,12 +439,14 @@ export async function listFeedback(sessionId: string, limit = 100): Promise<Feed
 }
 
 export async function deleteFeedback(id: string): Promise<void> {
+  if (backend() === "sqlite") return sqlite.deleteFeedbackSqlite(id);
   await kv.del(feedbackKey(id));
   // 不清理 session 列表裡的 id(避免 lrem JSON 比對問題),
   // 讀路徑統一走 get() 驗存在性,自然忽略 ghost id。
 }
 
 export async function listAllFeedback(limit = 100): Promise<FeedbackRecord[]> {
+  if (backend() === "sqlite") return sqlite.listAllFeedbackSqlite(limit);
   // 枚舉所有 session 的 feedback id 列表,合並去重 + 排序。
   const sessionKeys = await kv.keys(`${SESS_FB}*`);
   const idSets = await Promise.all(

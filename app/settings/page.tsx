@@ -179,14 +179,14 @@ export default function SettingsPage() {
             <Label htmlFor="customId">自訂識別碼</Label>
             <Input
               id="customId"
-              type="email"
+              type="text"
               value={inputId}
               onChange={(e) => setInputId(e.target.value)}
-              placeholder="例如:you@example.com"
+              placeholder="例如:hillerliao 或 you@example.com"
               maxLength={64}
             />
             <p className="text-xs text-muted-foreground">
-              須為有效的 Email 格式（例如 you@example.com）。設定後，在其他瀏覽器輸入同樣的 ID 即可共用同一份資料。
+              須為有效 Email 或 3-32 位英數帳號（可含 _ 或 -）。設定後，在其他瀏覽器輸入同樣的 ID 即可共用同一份資料。
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               <Button
@@ -256,7 +256,7 @@ export default function SettingsPage() {
           <div className="space-y-1">
             <p className="font-medium text-foreground">步驟:</p>
             <ol className="list-decimal list-inside space-y-1 ml-2">
-              <li>在第一個瀏覽器設定一個自訂 ID(例如 <code className="text-xs bg-muted px-1 rounded">you@example.com</code>)</li>
+              <li>在第一個瀏覽器設定一個自訂 ID(例如 <code className="text-xs bg-muted px-1 rounded">hillerliao</code> 或 <code className="text-xs bg-muted px-1 rounded">you@example.com</code>)</li>
               <li>作答、收藏等資料會綁定到這個 ID</li>
               <li>在另一個瀏覽器打開本頁,輸入同樣的自訂 ID</li>
               <li>儲存後即會切換到同一份資料,繼續之前的進度</li>

@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { getPapers } from "@/lib/data";
+import { getPapersAsync } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, FileText, FileQuestion, NotebookPen } from "lucide-react";
 
-export default function HomePage() {
-  const papers = getPapers();
+export default async function HomePage() {
+  const papers = await getPapersAsync();
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">

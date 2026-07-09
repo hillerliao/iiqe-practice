@@ -7,10 +7,16 @@
     "dev:webpack": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "prep-data": "tsx scripts/prep-data.ts"
+    "prep-data": "tsx scripts/prep-data.ts",
+    "prisma:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "verify:storage": "tsx scripts/verify-storage.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@prisma/adapter-better-sqlite3": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "@radix-ui/react-dialog": "^1.1.18",
     "@radix-ui/react-label": "^2.1.11",
     "@radix-ui/react-progress": "^1.1.11",
@@ -34,7 +40,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^16.4.5",
+    "prisma": "^7.8.0",
     "tailwindcss": "^4",
+    "tsx": "^4.22.5",
     "typescript": "^5"
   }
 }
