@@ -61,11 +61,27 @@ if [ -f "$APP/.env" ]; then
   cp -a "$APP/.env" "iiqe-app-runtime-new/.env"
 fi
 
+# 复用上一份 node_modules(避免 npm ci 在低 CPU VPS 上锁死 sshd / T5 突发型 OOM)
+# 仅当:lock 存在 + prev 存在 + prev 里有 node_modules 时复用
+# 升级 next/react/prisma 大版本时,prev 不匹配,会自动 fall back 走 npm ci
+SKIP_NPM_CI=0
+if [ -f iiqe-app-runtime-new/package-lock.json ] && [ -d "$APP-prev/node_modules" ]; then
+  echo "copying node_modules from $APP-prev (skip npm ci)..."
+  cp -a "$APP-prev/node_modules" iiqe-app-runtime-new/
+  SKIP_NPM_CI=1
+else
+  echo "no prev node_modules available, will run npm ci"
+fi
+
 cd iiqe-app-runtime-new
 
-echo "---[4/9] npm ci + prisma generate---"
-# --omit=dev 不装 devDeps;生产只需要 next + 运行时依赖
-npm ci --omit=dev --no-audit --no-fund 2>&1 | tail -20
+echo "---[4/9] deps + prisma generate---"
+if [ "$SKIP_NPM_CI" = "1" ]; then
+  echo "(skipped npm ci, using copied node_modules from $APP-prev)"
+else
+  # --omit=dev 不装 devDeps;生产只需要 next + 运行时依赖
+  npm ci --omit=dev --no-audit --no-fund 2>&1 | tail -20
+fi
 npx prisma generate 2>&1 | tail -10
 
 echo "---[5/9] prisma db push (non-destructive)---"
@@ -96,6 +112,22 @@ if [ -d "$APP" ]; then
 fi
 mv iiqe-app-runtime-new "$APP"
 echo "swap done; previous app preserved at $APP-prev"
+
+# 修复 Next 16 Turbopack 在 .next/node_modules 下生成的绝对路径 symlink
+# 这些 symlink 指向 build 机的本地路径(如 /d/Downloads/...),在 VPS 上全部失效。
+# 修法:删 symlink,重建为指向 $APP/node_modules 的相对路径 symlink。
+# 修完后,next start require('better-sqlite3-79580e436acd1aa8') 走 native binding。
+if [ -d "$APP/.next/node_modules" ]; then
+  for link in "$APP/.next/node_modules/"*; do
+    [ -L "$link" ] || continue
+    target_name=$(basename "$link")
+    # better-sqlite3-79580e436acd1aa8 → better-sqlite3(去掉 hash 后缀)
+    target_pkg="${target_name%-*}"
+    rm "$link"
+    ln -s "$APP/node_modules/$target_pkg" "$link"
+    echo "relinked: $link -> $APP/node_modules/$target_pkg"
+  done
+fi
 
 cd "$APP"
 

@@ -43,8 +43,12 @@ $tarList = $tarItems | Where-Object { Test-Path $_ }
 
 # PowerShell 5.1 没有原生 tar(Win10 1803+ 有 tar.exe),用 Compress-Archive 走 zip 改走 tar
 # 这里假设环境有 tar.exe(Git for Windows / Windows 10+ 自带)
+#
+# 排除 .next/node_modules/:Next 16 Turbopack 在 build 时把 native module 的
+# 绝对路径 symlink(如 /d/Downloads/...)写进这里,跨平台会失效。next start
+# 启动时如果找不到会自己从 $APP/node_modules/require,不依赖这层 symlink。
 $paths = ($tarList | ForEach-Object { '"' + $_ + '"' }) -join ' '
-$tarCmd = "tar -czf $tarball $paths"
+$tarCmd = "tar -czf $tarball --exclude=`.next/node_modules $paths"
 Write-Output "[1/4] packing: $tarCmd"
 cmd /c $tarCmd 2>&1 | Out-Null
 if (-not (Test-Path $tarball)) {
