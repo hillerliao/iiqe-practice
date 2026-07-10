@@ -1,0 +1,37 @@
+# ===== Build artifacts / caches (Vercel rebuilds these) =====
+.next/
+out/
+node_modules/
+
+# ===== Giant local archives — NOT needed on Vercel =====
+# These are local backup/transfer tarballs; uploading them blew the
+# deploy package to ~2.1GB and crashed the upload. Keep them locally only.
+*.tar
+*.tar.gz
+iiqe-app.tar
+iiqe-build.tar.gz
+iiqe-runtime-update.tar.gz
+
+# ===== Local SQLite databases (Vercel uses in-memory fallback) =====
+*.db
+*.db-journal
+orphan-dev.db
+prisma/dev.db
+prisma/*.db
+
+# ===== Self-host / Docker assets (irrelevant on Vercel) =====
+Dockerfile
+docker-compose.yml
+nginx/
+.vercel/
+
+# ===== Logs =====
+*.log
+
+# ===== Local secrets (env vars are set via Vercel dashboard/CLI) =====
+.env
+.env.local
+.env*.local
+# 临时从 Vercel 拉下来的解密密钥文件 / 测试脚本,绝不可上传
+ve-*.env
+smoke.mjs

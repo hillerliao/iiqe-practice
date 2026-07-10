@@ -41,7 +41,7 @@ export function HandbookNavLink({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap text-sm"
+        className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap text-sm"
         title="研習手冊"
       >
         <BookOpen className="w-4 h-4" />

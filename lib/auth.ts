@@ -140,11 +140,18 @@ export function establishUserSession(
   return sid;
 }
 
-// 管理員登錄：僅當 token 正確時簽發 admin:true
-export function establishAdminSession(res: NextResponse): string {
-  const adminId = process.env.ADMIN_ID || "admin";
-  setSessionCookie(res, makePayload(adminId, true));
-  return adminId;
+// 管理員登錄：僅當 token 正確時簽發 admin:true。
+// 關鍵：保留當前用戶的 sid,只翻轉 admin 標誌 —— 絕不把身份整個換成
+// 管理員 ID,否則會覆寫 iiqe_session Cookie 的 sid,導致用戶自己的
+// 作答/收藏/筆記在 KV 中「看不見」(數據仍在,只是用錯 sid 查詢)。
+// 管理員身份是疊加在當前會話上的權限,而非替換身份。
+export function establishAdminSession(
+  res: NextResponse,
+  currentSid?: string,
+): string {
+  const sid = currentSid || process.env.ADMIN_ID || "admin";
+  setSessionCookie(res, makePayload(sid, true));
+  return sid;
 }
 
 // 鑒權助手：返回 Session 或 401/403 的 NextResponse

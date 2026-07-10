@@ -103,9 +103,139 @@ function createInMemoryClient(): KVClient {
   };
 }
 
-// 非 sqlite 後端統一退回 in-memory(與 storage-backend 的 memory 兜底一致)。
-// 原 Vercel KV / Upstash 分支已移除(@vercel/kv 依賴已卸載,見 M4 清理)。
-export const kv: KVClient = createInMemoryClient();
+// 非 sqlite 後端:Vercel 上若配置了 KV/Upstash REST,走真正的远端 KV(持久化);
+// 否则退回 in-memory(與 storage-backend 的 memory 兜底一致)。
+// 用纯 fetch 调用 Upstash REST,Vercel KV 底层即 Upstash,同一套 API,无原生依赖,
+// serverless 友好。(@vercel/kv 依賴已於 M4 卸載,這裡直接打 REST,見 storage-backend.ts 的 hasKvConfig)
+
+function hasUpstashEnv(): boolean {
+  return !!(
+    (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) ||
+    (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
+  );
+}
+
+function createUpstashClient(): KVClient {
+  const url =
+    process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || "";
+  const token =
+    process.env.KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_TOKEN ||
+    "";
+  const base = url.replace(/\/+$/, "");
+  const headers = { Authorization: `Bearer ${token}` } as Record<string, string>;
+
+  // Upstash REST:GET 形式即可执行所有命令;每个参数需 encodeURIComponent。
+  async function exec<T>(...args: string[]): Promise<T> {
+    const path = args.map((a) => encodeURIComponent(a)).join("/");
+    const res = await fetch(`${base}/${path}`, { headers, cache: "no-store" });
+    if (!res.ok) {
+      throw new Error(`Upstash REST ${res.status} on ${args[0]}`);
+    }
+    const json = (await res.json()) as { result: T };
+    return json.result;
+  }
+
+  // 所有 key 的 value 统一以 JSON 字符串存储,与 createInMemoryClient 保持一致。
+  const readJSON = async <T>(key: string): Promise<T | null> => {
+    let raw: string | null;
+    try {
+      raw = await exec<string | null>("GET", key);
+    } catch (e) {
+      // 历史遗留:旧版 native 客户端(LPUSH/SADD/HSET)把部分 key 写成了
+      // list/set/hash 原生类型,而本客户端用 GET(期望 JSON 字符串)读取会
+      // 触发 Upstash "WRONGTYPE"。防御:直接视为空(null),后续写入会以
+      // JSON 字符串 SET 重建该 key。绝不 DEL —— DEL 会在读一次时直接销毁
+      // 用户数据(曾导致"打开页面数据消失")。存量错类型已由一次性
+      // 迁移路由 /api/kvmig 处理,正常运行不会走到这里。
+      if (e instanceof Error && /WRONGTYPE/i.test(e.message)) {
+        return null;
+      }
+      throw e;
+    }
+    if (raw === null || raw === undefined) return null;
+    return JSON.parse(raw) as T;
+  };
+  const writeJSON = async (key: string, value: unknown): Promise<void> => {
+    await exec("SET", key, JSON.stringify(value));
+  };
+
+  return {
+    async get<T>(key: string) {
+      return readJSON<T>(key);
+    },
+    async set(key: string, value: unknown) {
+      await writeJSON(key, value);
+    },
+    async del(key: string) {
+      await exec("DEL", key);
+    },
+    async keys(pattern: string) {
+      return (await exec<string[] | null>("KEYS", pattern)) ?? [];
+    },
+    async lpush(key: string, value: unknown) {
+      const arr = (await readJSON<unknown[]>(key)) ?? [];
+      arr.unshift(value);
+      await writeJSON(key, arr);
+    },
+    async lrange<T>(key: string, start: number, stop: number) {
+      const arr = (await readJSON<T[]>(key)) ?? [];
+      if (stop === -1) return arr.slice(start);
+      return arr.slice(start, stop + 1);
+    },
+    async lrem(key: string, _count: number, value: string) {
+      const arr = (await readJSON<unknown[]>(key)) ?? [];
+      await writeJSON(
+        key,
+        arr.filter((x) => JSON.stringify(x) !== value)
+      );
+    },
+    async sadd(key: string, member: string) {
+      const set = new Set(await this.smembers(key));
+      set.add(member);
+      await writeJSON(key, Array.from(set));
+    },
+    async smembers(key: string) {
+      return (await readJSON<string[]>(key)) ?? [];
+    },
+    async srem(key: string, member: string) {
+      const set = new Set(await this.smembers(key));
+      set.delete(member);
+      await writeJSON(key, Array.from(set));
+    },
+    async hset(key: string, field: string, value: unknown) {
+      const obj = (await readJSON<Record<string, unknown>>(key)) ?? {};
+      obj[field] = value;
+      await writeJSON(key, obj);
+    },
+    async hget<T>(key: string, field: string) {
+      const obj = await readJSON<Record<string, T>>(key);
+      return obj ? ((obj[field] as T) ?? null) : null;
+    },
+    async hgetall<T>(key: string) {
+      return (await readJSON<Record<string, T>>(key)) ?? {};
+    },
+    async hdel(key: string, field: string) {
+      const obj = (await readJSON<Record<string, unknown>>(key)) ?? {};
+      delete obj[field];
+      await writeJSON(key, obj);
+    },
+    async exists(key: string) {
+      const n = await exec<number>("EXISTS", key);
+      return n > 0;
+    },
+    async rename(key: string, newKey: string) {
+      await exec("RENAME", key, newKey);
+    },
+    async expire(key: string, seconds: number) {
+      await exec("EXPIRE", key, String(seconds));
+    },
+  };
+}
+
+export const kv: KVClient = hasUpstashEnv()
+  ? createUpstashClient()
+  : createInMemoryClient();
 
 import type { StorageBackend } from "@/lib/storage-backend";
 // 在顶层 import 一次 storage-backend,避免循环依赖问题(getPrisma -> lib/db -> 不会反向依赖 kv)

@@ -54,13 +54,14 @@ export default function SettingsPage() {
         return;
       }
 
-      // 先遷移資料,成功後才切換 ID
+      // 先遷移資料（from 由服務端依已驗證 Cookie 決定，客戶端僅傳目標），
+      // 成功後才切換 ID
       if (oldId) {
         setMigrating(true);
         const res = await authedFetch("/api/migrate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ fromSessionId: oldId, toSessionId: newId }),
+          body: JSON.stringify({ toSessionId: newId }),
         });
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
