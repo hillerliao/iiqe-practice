@@ -137,7 +137,22 @@ function PaperSetupInner() {
           questionIds,
         }),
       });
-      if (!aRes.ok) throw new Error("建立作答 session 失敗");
+      if (!aRes.ok) {
+        // 嘗試解析伺服器回傳的具體原因(503 AUTH_NOT_CONFIGURED、401 等),
+        // 讓使用者與管理員能區分「後端配置問題」與「業務錯誤」。
+        let detail = "";
+        try {
+          const errBody = await aRes.clone().json();
+          if (errBody && typeof errBody.error === "string") {
+            detail = errBody.error;
+          }
+        } catch {
+          // 忽略解析失敗,維持通用訊息
+        }
+        throw new Error(
+          detail ? `建立作答 session 失敗：${detail}` : "建立作答 session 失敗"
+        );
+      }
       const aData = await aRes.json();
 
       sessionStorage.setItem(

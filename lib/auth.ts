@@ -12,7 +12,32 @@ export const SESSION_COOKIE = "iiqe_session";
 // 30 天
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 30;
 
-const SECRET = process.env.AUTH_SECRET ?? "";
+const RAW_SECRET = process.env.AUTH_SECRET ?? "";
+// 部署期必修守衛:AUTH_SECRET 缺失時所有簽名 Cookie 都會被驗證失敗,
+// 導致 /api/attempts 等守衛端點一律回 401,客戶端只會看到泛化的
+// 「建立作答 session 失敗」。在這裡於啟動期一次性報錯,讓問題在日誌
+// 與 health check 中立刻可見,而不是在每個請求中靜默拒絕。
+// 本地開發若想暫時繞過,可顯式設 AUTH_SECRET_ALLOW_EMPTY=1。
+function resolveSecret(): string {
+  if (RAW_SECRET.length > 0) return RAW_SECRET;
+  const allowEmpty = process.env.AUTH_SECRET_ALLOW_EMPTY === "1";
+  const msg =
+    "[auth] AUTH_SECRET 未設定:所有簽名 Cookie 將驗證失敗," +
+    " /api/attempts 等守衛端點會一律 401。" +
+    " 請於 .env / .env.production 設定高熵隨機值" +
+    " (node -e \"console.log(require('crypto').randomBytes(32).toString('base64url'))\")。";
+  if (allowEmpty) {
+    // 只警告,不拋錯(本地除錯用;生產路徑不應走這條)
+    if (typeof console !== "undefined") console.warn(msg);
+    return "";
+  }
+  // 啟動期一次性 console.error,讓 docker logs / pm2 logs 立刻看到根因。
+  // 不主動 throw:避免把整個 Next 啟動擋掉,允許 /api/health 之類的
+  // 未守衛端點仍可服務(供監控抓取)。
+  if (typeof console !== "undefined") console.error(msg);
+  return "";
+}
+const SECRET = resolveSecret();
 
 type SessionPayload = {
   sid: string;
@@ -22,6 +47,12 @@ type SessionPayload = {
 };
 
 export type Session = { sessionId: string; isAdmin: boolean };
+
+// 供 health check / smoke test 判斷當前進程的會話簽章是否可信。
+// true 表示 SECRET 已設定、Cookie 簽章可被驗證。
+export function isAuthConfigured(): boolean {
+  return SECRET.length > 0;
+}
 
 function sign(data: string): string {
   return createHmac("sha256", SECRET).update(data).digest("base64url");

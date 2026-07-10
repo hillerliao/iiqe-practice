@@ -11,10 +11,25 @@ import {
   makePayload,
   setSessionCookie,
   clearSessionCookie,
+  isAuthConfigured,
 } from "@/lib/auth";
 import { normalizeSessionId } from "@/lib/session-id";
 
 export async function POST(req: NextRequest) {
+  // 啟動守衛：AUTH_SECRET 缺失時簽發的 Cookie 永遠驗證失敗,
+  // 會導致下游守衛端點（/api/attempts 等）一律 401,客戶端只會看到
+  // 泛化的「建立作答 session 失敗」。這裡提前回 503 + 明確錯誤,
+  // 讓前端能區分「後端配置問題」與「業務錯誤」。
+  if (!isAuthConfigured()) {
+    return NextResponse.json(
+      {
+        error: "AUTH_SECRET 未設定,伺服器無法簽發會話 Cookie",
+        code: "AUTH_NOT_CONFIGURED",
+      },
+      { status: 503 }
+    );
+  }
+
   // 冪等引導：已存在合法會話（含 admin）時直接沿用,
   // 避免 authedFetch 惰性 bootstrap 把 admin Cookie 覆寫成非 admin（R2 競態）。
   const existing = getSessionFromRequest(req);
