@@ -259,6 +259,16 @@ export function RedoPractice({
         s.current
       ) {
         e.preventDefault();
+        const text = formatQuestionText({
+          number: s.current.question.number,
+          question: s.current.question.question,
+          options: s.current.question.options,
+          ref: s.current.question.ref || undefined,
+        });
+        navigator.clipboard
+          ?.writeText(text)
+          .then(() => toast("已複製題目並開啟 Google"))
+          .catch(() => {});
         const q = buildSearchQuery({
           question: s.current.question.question,
           options: s.current.question.options,
@@ -592,7 +602,7 @@ export function RedoPractice({
           <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
             S
           </kbd>{" "}
-          Google 搜尋
+          複製題目 + Google 搜尋
         </span>
         <span>
           <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">

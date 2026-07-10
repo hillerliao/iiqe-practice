@@ -53,25 +53,20 @@ if (-not (Test-Path $tarball)) {
 }
 
 # 2) 上传 tarball + deploy-remote.sh 到 VPS
+# 注意: 用直接 & 调用而非 Start-Process —— 后者在构造环境块时会因
+# 父进程同时存在 'Path' 与 'PATH'(大小写重复)而抛
+# "Item has already been added" 崩溃,导致 scp 根本没发起。
 Write-Output "[2/4] uploading tarball + deploy-remote.sh"
-$scpTar = Start-Process -FilePath 'scp.exe' -ArgumentList @(
-  '-o','ConnectTimeout=10','-o','StrictHostKeyChecking=no',
-  $tarball,"${DeployAddr}:/home/${DeployUser}/"
-) -PassThru -WindowStyle Hidden -RedirectStandardOutput $scpOut -RedirectStandardError $scpErr
-$null = $scpTar.WaitForExit(120000)
-if (-not $scpTar.HasExited -or $scpTar.ExitCode -ne 0) {
-  Write-Output "ERROR: scp tarball failed (exit=$($scpTar.ExitCode))"
+& 'C:\Windows\System32\OpenSSH\scp.exe' -o ConnectTimeout=10 -o StrictHostKeyChecking=no $tarball "${DeployAddr}:/home/${DeployUser}/" > $scpOut 2> $scpErr
+if ($LASTEXITCODE -ne 0) {
+  Write-Output "ERROR: scp tarball failed (exit=$LASTEXITCODE)"
   Get-Content -LiteralPath $scpErr -Raw -ErrorAction SilentlyContinue
   exit 1
 }
 
-$scpSh = Start-Process -FilePath 'scp.exe' -ArgumentList @(
-  '-o','ConnectTimeout=10','-o','StrictHostKeyChecking=no',
-  'deploy-remote.sh',"${DeployAddr}:/home/${DeployUser}/deploy-remote.sh"
-) -PassThru -WindowStyle Hidden -RedirectStandardOutput $upOut -RedirectStandardError $upErr
-$null = $scpSh.WaitForExit(60000)
-if (-not $scpSh.HasExited -or $scpSh.ExitCode -ne 0) {
-  Write-Output "ERROR: scp deploy-remote.sh failed (exit=$($scpSh.ExitCode))"
+& 'C:\Windows\System32\OpenSSH\scp.exe' -o ConnectTimeout=10 -o StrictHostKeyChecking=no 'deploy-remote.sh' "${DeployAddr}:/home/${DeployUser}/deploy-remote.sh" > $upOut 2> $upErr
+if ($LASTEXITCODE -ne 0) {
+  Write-Output "ERROR: scp deploy-remote.sh failed (exit=$LASTEXITCODE)"
   Get-Content -LiteralPath $upErr -Raw -ErrorAction SilentlyContinue
   exit 1
 }
@@ -79,12 +74,8 @@ if (-not $scpSh.HasExited -or $scpSh.ExitCode -ne 0) {
 # 3) 远端执行 deploy-remote.sh
 Write-Output "[3/4] executing deploy-remote.sh on VPS"
 $remoteCmd = "chmod +x /home/${DeployUser}/deploy-remote.sh && /home/${DeployUser}/deploy-remote.sh"
-$p = Start-Process -FilePath 'C:\Windows\System32\OpenSSH\ssh.exe' -ArgumentList @(
-  '-o','ConnectTimeout=10','-o','StrictHostKeyChecking=no',
-  $DeployAddr, $remoteCmd
-) -PassThru -WindowStyle Hidden -RedirectStandardOutput $out -RedirectStandardError $err
-$null = $p.WaitForExit(600000)  # 10 分钟,给 db:push + seed + verify 留余量
-if ($p.HasExited) { Write-Output "ssh exitcode=$($p.ExitCode)" } else { Stop-Process -Id $p.Id -Force; Write-Output 'ssh timeout, killed' }
+& 'C:\Windows\System32\OpenSSH\ssh.exe' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -o ServerAliveCountMax=20 $DeployAddr $remoteCmd > $out 2> $err
+$sshExit = $LASTEXITCODE
 
 # 4) 输出日志
 Write-Output '---OUT---'
@@ -92,8 +83,8 @@ if (Test-Path $out) { Get-Content -LiteralPath $out -Raw }
 Write-Output '---ERR---'
 if (Test-Path $err) { Get-Content -LiteralPath $err -Raw }
 
-if ($p.HasExited -and $p.ExitCode -ne 0) {
-  Write-Output "deploy FAILED with exitcode=$($p.ExitCode). See logs above."
-  exit $p.ExitCode
+if ($sshExit -ne 0) {
+  Write-Output "deploy FAILED with exitcode=$sshExit. See logs above."
+  exit $sshExit
 }
 Write-Output "[4/4] deploy OK"
