@@ -42,7 +42,9 @@ echo "---[3/9] stage runtime-new---"
 rm -rf iiqe-app-runtime-new
 mkdir -p iiqe-app-runtime-new
 # 复制所有必需运行时文件;.next 是构建产物,public 是静态资源,prisma 是 schema 源
-for item in .next public scripts prisma data lib app components package.json package-lock.json next.config.ts tsconfig.json; do
+# 注意:Prisma 7 需要 prisma.config.ts(连接字符串配置,见该文件顶部注释),
+# 不 copy 会导致 db push 报 "datasource.url property is required"。
+for item in .next public scripts prisma data lib app components package.json package-lock.json next.config.ts tsconfig.json prisma.config.ts; do
   if [ -e "iiqe-update-new/$item" ]; then
     cp -a "iiqe-update-new/$item" "iiqe-app-runtime-new/"
   fi
@@ -88,7 +90,8 @@ echo "---[5/9] prisma db push (non-destructive)---"
 # 关键守门:db push 会先比对 schema 与 DB,如果检测到可能丢数据的破坏性变更,
 # 它会要求确认。我们传入 --accept-data-loss=false 让它在破坏性 diff 上失败,
 # 让人工介入而不是默认执行。
-DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npx prisma db push --accept-data-loss=false --skip-generate 2>&1 | tail -30
+# Prisma 7 已移除 --skip-generate(generate 已在 step 4 跑過,且 db push 會自動 reuse)。
+DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npx prisma db push --accept-data-loss=false 2>&1 | tail -30
 
 echo "---[6/9] prisma seed (idempotent)---"
 DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npx tsx prisma/seed.ts 2>&1 | tail -20
