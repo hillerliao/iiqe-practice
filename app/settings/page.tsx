@@ -18,6 +18,7 @@ import {
   resetSessionId,
   validateCustomId,
 } from "@/lib/session";
+import { authedFetch, reestablishSession } from "@/lib/session-client";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -56,7 +57,7 @@ export default function SettingsPage() {
       // 先遷移資料,成功後才切換 ID
       if (oldId) {
         setMigrating(true);
-        const res = await fetch("/api/migrate", {
+        const res = await authedFetch("/api/migrate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ fromSessionId: oldId, toSessionId: newId }),
@@ -76,8 +77,9 @@ export default function SettingsPage() {
         }
       }
 
-      // 遷移成功,寫入 localStorage 切換 ID
+      // 遷移成功,寫入 localStorage 切換 ID,並強制重建會話 Cookie 使 sid 同步
       setCustomSessionId(inputId);
+      await reestablishSession();
       setCurrentId(getSessionId());
       setSaved(true);
       setTimeout(() => {
@@ -92,8 +94,9 @@ export default function SettingsPage() {
     }
   }
 
-  function handleReset() {
+  async function handleReset() {
     resetSessionId();
+    await reestablishSession();
     setCurrentId(getSessionId());
     setInputId("");
     setConfirmReset(false);

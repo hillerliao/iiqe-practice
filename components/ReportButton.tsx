@@ -5,6 +5,7 @@ import { Flag, Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
+import { authedFetch } from "@/lib/session-client";
 
 const MAX_DESC_LEN = 500;
 
@@ -92,12 +93,11 @@ export const ReportButton = forwardRef<ReportButtonHandle, ReportButtonProps>(
       setSaving(true);
       setError(null);
       try {
-        const sessionId = localStorage.getItem("iiqe:sessionId") ?? "";
-        const res = await fetch("/api/feedback", {
+        // 會話 ID 由簽名 Cookie 在服務端推導,客戶端不再上送 sessionId
+        const res = await authedFetch("/api/feedback", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            sessionId,
             questionId,
             category,
             description: trimmed,

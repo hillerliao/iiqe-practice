@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listAttempts } from "@/lib/kv";
 import { getQuestionByIdAsync, getPapersAsync } from "@/lib/data";
+import { requireSession } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
-  const sessionId = url.searchParams.get("sessionId");
-  if (!sessionId) {
-    return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
-  }
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+  const sessionId = session.sessionId;
 
   // 排除錯題本重做練習(source=wrongbook-redo),避免復習刷題污染總正確率
   const attempts = (await listAttempts(sessionId)).filter(

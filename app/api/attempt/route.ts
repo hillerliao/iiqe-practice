@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAttempt, updateAttempt, getNote, listNotes, AnswerRecord } from "@/lib/kv";
 import { getQuestionById, getQuestions, getPapers } from "@/lib/data";
+import { requireSession } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+
   const url = new URL(req.url);
   const id = url.searchParams.get("id");
   if (!id) {
@@ -11,6 +15,10 @@ export async function GET(req: NextRequest) {
 
   const attempt = await getAttempt(id);
   if (!attempt) {
+    return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
+  }
+  // H2: 僅允許擁有者讀取自己的作答(含逐題筆記)
+  if (attempt.sessionId !== session.sessionId) {
     return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
   }
 
@@ -66,6 +74,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+
   const body = await req.json();
   const { action, id } = body;
   if (!id) {
@@ -86,6 +97,9 @@ export async function PATCH(req: NextRequest) {
 
       const attempt = await getAttempt(id);
       if (!attempt) {
+        return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
+      }
+      if (attempt.sessionId !== session.sessionId) {
         return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
       }
 
@@ -119,6 +133,9 @@ export async function PATCH(req: NextRequest) {
   if (action === "finish") {
     const attempt = await getAttempt(id);
     if (!attempt) {
+      return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
+    }
+    if (attempt.sessionId !== session.sessionId) {
       return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
     }
     const correct = attempt.answers.filter((a) => a.isCorrect).length;

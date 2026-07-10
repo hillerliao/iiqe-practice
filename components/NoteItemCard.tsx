@@ -6,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { NotebookPen, Trash2, Eye, EyeOff, ExternalLink } from "lucide-react";
-import { getSessionId } from "@/lib/session";
 import { NoteSection } from "@/components/NoteSection";
+import { authedFetch } from "@/lib/session-client";
 
 type NoteItem = {
   questionId: string;
@@ -48,9 +48,9 @@ export function NoteItemCard({ item, onDeleted }: NoteItemCardProps) {
     setDeleting(true);
     setError(null);
     try {
-      const sessionId = getSessionId();
-      const res = await fetch(
-        `/api/notes?sessionId=${encodeURIComponent(sessionId)}&questionId=${encodeURIComponent(item.questionId)}`,
+      // 會話 ID 由簽名 Cookie 在服務端推導,客戶端不再上送 sessionId
+      const res = await authedFetch(
+        `/api/notes?questionId=${encodeURIComponent(item.questionId)}`,
         { method: "DELETE" }
       );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

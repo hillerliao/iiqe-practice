@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ShieldAlert, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { isAdmin } from "@/lib/admin";
+import { authedFetch } from "@/lib/session-client";
 
 type AdminMeta = {
   backend: "sqlite" | "kv" | "memory";
@@ -23,14 +23,18 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const [meta, setMeta] = useState<AdminMeta | null>(null);
 
   useEffect(() => {
-    const sid = localStorage.getItem("iiqe:sessionId") ?? "";
-    if (!isAdmin(sid)) {
-      setGate({ status: "denied", reason: "not_admin", meta: null });
-      return;
-    }
-    fetch("/api/admin/meta")
+    // 通過服務端 whoami 接口判斷管理員身份(身份來自簽名 Cookie)
+    authedFetch(`/api/admin/whoami`)
       .then((r) => r.json())
-      .then((m: AdminMeta) => {
+      .then(({ isAdmin }: { isAdmin: boolean }) => {
+        if (!isAdmin) {
+          setGate({ status: "denied", reason: "not_admin", meta: null });
+          return null;
+        }
+        return fetch("/api/admin/meta").then((r) => r.json());
+      })
+      .then((m?: AdminMeta) => {
+        if (!m) return; // 已被 not_admin 處理或 meta 不存在
         setMeta(m);
         if (!m.writable) {
           setGate({ status: "denied", reason: "not_writable", meta: m });
@@ -77,7 +81,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </div>
             <p className="text-muted-foreground">
               {isAdminIssue
-                ? "此頁面僅供管理員使用。請在設定中將 sessionId 設為 user:iiqe2026。"
+                ? "此頁面僅供管理員使用,如需訪問請聯繫系統管理員。"
                 : gate.meta?.writableReason ?? "請確認伺服器 DATABASE_URL 已配置。"}
             </p>
             {gate.meta && (

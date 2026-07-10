@@ -63,3 +63,14 @@ next-env.d.ts
 build.log
 build_check.log
 dev_err*.log
+
+# agent / tool caches (never commit)
+.workbuddy/
+.zcode/
+
+# python cache
+__pycache__/
+*.pyc
+
+# prisma db backups (contain real user data, not schema)
+*.db.bak*

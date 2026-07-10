@@ -128,3 +128,9 @@
     @apply font-sans;
   }
 }
+
+/* 自定义网格列数(L4):Tailwind v4 默认无 grid-cols-15,
+   原 practice 頁导航器用 sm:grid-cols-15,补上此 utility 避免类被忽略。 */
+@utility grid-cols-15 {
+  grid-template-columns: repeat(15, minmax(0, 1fr));
+}

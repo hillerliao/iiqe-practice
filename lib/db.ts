@@ -8,7 +8,8 @@ import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 let _client: PrismaClient | null = null;
 
 function createPrismaClient(): PrismaClient {
-  const url = process.env.DATABASE_URL ?? "file:./prisma/prod.db";
+  // 預設與本地 .env 的 DATABASE_URL 一致(prisma/dev.db),避免路徑漂移
+  const url = process.env.DATABASE_URL ?? "file:./prisma/dev.db";
   const path = url.replace(/^file:/, "");
   const adapter = new PrismaBetterSqlite3({ url: path });
   return new PrismaClient({ adapter });

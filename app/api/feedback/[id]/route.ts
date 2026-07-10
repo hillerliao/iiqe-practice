@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { deleteFeedback, getFeedback } from "@/lib/kv";
-import { isAdmin } from "@/lib/admin";
+import { requireAdmin } from "@/lib/auth";
 
 export async function DELETE(
   req: NextRequest,
@@ -8,15 +8,9 @@ export async function DELETE(
 ) {
   const { id } = await ctx.params;
 
-  const sessionId = req.nextUrl.searchParams.get("sessionId");
-  if (!sessionId) {
-    return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
-  }
-
-  // 雙重校驗:僅管理員可刪除他人的反饋
-  if (!isAdmin(sessionId)) {
-    return NextResponse.json({ error: "僅管理員可刪除反饋" }, { status: 403 });
-  }
+  // 僅管理員可刪除反饋（身份來自簽名 Cookie，不可偽造）
+  const session = requireAdmin(req);
+  if (session instanceof NextResponse) return session;
 
   const existing = await getFeedback(id);
   if (!existing) {

@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { saveNote, deleteNote, getNote, listNotes } from "@/lib/kv";
 import { getQuestionById, getPapers } from "@/lib/data";
+import { requireSession } from "@/lib/auth";
 
 const MAX_LEN = 1000;
 
 export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
-  const sessionId = url.searchParams.get("sessionId");
-  if (!sessionId) {
-    return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
-  }
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+  const sessionId = session.sessionId;
 
+  const url = new URL(req.url);
   const questionIdsParam = url.searchParams.get("questionIds");
 
   if (questionIdsParam) {
@@ -62,17 +62,19 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  let body: any;
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+  const sessionId = session.sessionId;
+  let body: { questionId?: unknown; content?: unknown };
   try {
     body = await req.json();
   } catch {
-    const text = await req.text().catch(() => "");
-    return NextResponse.json({ error: "Invalid JSON body", raw: text }, { status: 400 });
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
-  const { sessionId, questionId, content } = body;
+  const { questionId, content } = body;
 
-  if (!sessionId || !questionId) {
-    return NextResponse.json({ error: "sessionId, questionId 必填" }, { status: 400 });
+  if (!questionId || typeof questionId !== "string") {
+    return NextResponse.json({ error: "questionId 必填" }, { status: 400 });
   }
   if (typeof content !== "string") {
     return NextResponse.json({ error: "content 必為字串" }, { status: 400 });
@@ -105,11 +107,13 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+  const sessionId = session.sessionId;
   const url = new URL(req.url);
-  const sessionId = url.searchParams.get("sessionId");
   const questionId = url.searchParams.get("questionId");
-  if (!sessionId || !questionId) {
-    return NextResponse.json({ error: "sessionId, questionId 必填" }, { status: 400 });
+  if (!questionId) {
+    return NextResponse.json({ error: "questionId 必填" }, { status: 400 });
   }
   await deleteNote(sessionId, questionId);
   return NextResponse.json({ ok: true });

@@ -4,175 +4,388 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>保險原理及實務 研習手冊 2024</title>
+<script>
+(function() {
+  try {
+    var stored = localStorage.getItem('iiqe:theme');
+    var mode = (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : 'system';
+    var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var resolved = (mode === 'system') ? (systemDark ? 'dark' : 'light') : mode;
+    document.documentElement.classList.toggle('dark', resolved === 'dark');
+    document.documentElement.classList.toggle('light', resolved === 'light');
+    document.documentElement.style.colorScheme = resolved;
+  } catch (e) {}
+})();
+</script>
 <style>
-/* 預設淺色主題 */
+/* =========================================================================
+   預設淺色 (與 globals.css :root 同步;獨立 HTML 用 hex 表達)
+   ========================================================================= */
 :root {
-  --bg: #ffffff;
-  --fg: #1a1a1a;
-  --muted: #6b7280;
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #1a1a1a;
+  --primary-foreground: #fafafa;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #1a1a1a;
+  --muted: #f5f5f5;
+  --muted-foreground: #6b7280;
+  --accent: #f5f5f5;
+  --accent-foreground: #1a1a1a;
   --border: #e5e7eb;
-  --accent: #2563eb;
-  --code-bg: #f5f5f5;
-  --sidebar-bg: #fafafa;
+  --ring: #9ca3af;
+  --sidebar: #fafafa;
+  --sidebar-foreground: #1a1a1a;
+  --code-bg: #f3f4f6;
 }
-/* 系統偏好深色時,自動切換 */
+/* 系統偏好深色 + 腳本 fallback */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0d0d0f;
-    --fg: #e5e7eb;
-    --muted: #9ca3af;
-    --border: #374151;
-    --accent: #60a5fa;
-    --code-bg: #1f2937;
-    --sidebar-bg: #111827;
+  :root:not(.light) {
+    --background: #1c1c1e;
+    --foreground: #e5e7eb;
+    --popover: #2a2a2c;
+    --popover-foreground: #e5e7eb;
+    --primary: #e5e7eb;
+    --primary-foreground: #1c1c1e;
+    --secondary: #2a2a2c;
+    --secondary-foreground: #e5e7eb;
+    --muted: #2a2a2c;
+    --muted-foreground: #9ca3af;
+    --accent: #2a2a2c;
+    --accent-foreground: #e5e7eb;
+    --border: #3a3a3c;
+    --ring: #6b7280;
+    --sidebar: #1f1f21;
+    --sidebar-foreground: #e5e7eb;
+    --code-bg: #2a2a2c;
   }
 }
-/* 使用者手動切換(checkbox checked):
-   策略:同時用 :has() 與 sibling selector 兩種方式,
-   任何一個支援都能運作(覆蓋舊瀏覽器) */
-:root:has(#theme-toggle:checked) {
-  --bg: #0d0d0f;
-  --fg: #e5e7eb;
-  --muted: #9ca3af;
-  --border: #374151;
-  --accent: #60a5fa;
-  --code-bg: #1f2937;
-  --sidebar-bg: #111827;
+/* 腳本加上 .dark 類別時強制深色 */
+:root.dark {
+  --background: #1c1c1e;
+  --foreground: #e5e7eb;
+  --popover: #2a2a2c;
+  --popover-foreground: #e5e7eb;
+  --primary: #e5e7eb;
+  --primary-foreground: #1c1c1e;
+  --secondary: #2a2a2c;
+  --secondary-foreground: #e5e7eb;
+  --muted: #2a2a2c;
+  --muted-foreground: #9ca3af;
+  --accent: #2a2a2c;
+  --accent-foreground: #e5e7eb;
+  --border: #3a3a3c;
+  --ring: #6b7280;
+  --sidebar: #1f1f21;
+  --sidebar-foreground: #e5e7eb;
+  --code-bg: #2a2a2c;
 }
-/* Fallback for 舊瀏覽器(不支援 :has()):在 body 上用 sibling selector
-   當 checkbox 與 body 同輩時,無法直接 sibling 改 body 樣式
-   故改用 :checked 影響後續所有兄弟元素,並用 :has() 雙保險 */
-#theme-toggle:checked ~ .layout {
-  --bg: #0d0d0f;
-  --fg: #e5e7eb;
-  --muted: #9ca3af;
-  --border: #374151;
-  --accent: #60a5fa;
-  --code-bg: #1f2937;
-  --sidebar-bg: #111827;
+/* 腳本加上 .light 類別時強制淺色 */
+:root.light {
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #1a1a1a;
+  --primary-foreground: #fafafa;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #1a1a1a;
+  --muted: #f5f5f5;
+  --muted-foreground: #6b7280;
+  --accent: #f5f5f5;
+  --accent-foreground: #1a1a1a;
+  --border: #e5e7eb;
+  --ring: #9ca3af;
+  --sidebar: #fafafa;
+  --sidebar-foreground: #1a1a1a;
+  --code-bg: #f3f4f6;
 }
+
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
   font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
-  /* body 不直接套用 var(--bg),改在 .layout 與 :root 兩處都設定 */
-  color: var(--fg);
+  background: var(--background);
+  color: var(--foreground);
   line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
 }
-/* 隱藏 checkbox,改用 label 觸發 */
-#theme-toggle { display: none; }
-.theme-toggle-label {
-  position: fixed; top: 14px; right: 16px; z-index: 100;
-  width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
-  border: 1px solid var(--border); border-radius: 999px; background: var(--bg);
-  color: var(--fg);
-  cursor: pointer; user-select: none; font-size: 18px;
-  transition: all 0.2s;
+
+/* =========================================================================
+   sticky header — 主站風格(border-b, backdrop-blur, h-14)
+   ========================================================================= */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklab, var(--background) 80%, transparent);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  padding: 0 20px;
 }
-@media (max-width: 900px) {
-  .theme-toggle-label { right: 16px; }
-  .back-to-top { right: 16px; bottom: 16px; }
+.app-header-inner {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
 }
-.theme-toggle-label:hover {
+.app-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--foreground);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.app-logo svg { width: 20px; height: 20px; }
+.app-title {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--muted-foreground);
+  flex: 1;
+  min-width: 0;
+}
+.app-title b {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.version-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+.app-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.icon-btn:hover {
   background: var(--accent);
-  color: white;
-  border-color: var(--accent);
+  color: var(--accent-foreground);
 }
-.theme-toggle-label::after { content: "🌙"; }
-:root:has(#theme-toggle:checked) .theme-toggle-label::after { content: "☀️"; }
-/* 不支援 :has() 的瀏覽器:用 sibling selector 切換 label 文字(失敗也無害) */
-#theme-toggle:checked ~ .theme-toggle-label::after { content: "☀️"; }
-.back-to-top {
-  position: fixed; bottom: 24px; right: 24px; z-index: 90;
-  width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;
-  border: 1px solid var(--border); border-radius: 999px; background: var(--bg);
-  color: var(--fg); text-decoration: none; font-size: 18px; box-shadow: 0 2px 8px rgba(0,0,0,.08);
+.icon-btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
-.back-to-top:hover {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
+.icon-btn svg { width: 16px; height: 16px; }
+
+/* 主題 dropdown(對齊主站 ThemeToggle 視覺)
+   - 預設關閉,按按鈕打開
+   - 三檔:淺色 / 深色 / 跟隨系統
+   - 鍵盤 Esc / 點外面 / 選了項自動關閉
+   - 視覺與主站 min-w-56,rounded-lg,ring-1 一致 */
+.theme-dropdown {
+  position: relative;
 }
-.layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; background: var(--bg); }
-/* Mobile:sidebar 預設隱藏,點漢堡按鈕展開;漢堡按鈕是 #menu-toggle 的 label */
-@media (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; }
-  .sidebar {
-    position: fixed; top: 0; left: 0;
-    width: 280px; height: 100vh;
-    z-index: 200;
-    transform: translateX(-100%);
-    transition: transform 0.25s ease;
-    padding-top: 70px;
-    box-shadow: 2px 0 12px rgba(0,0,0,0.15);
-  }
-  /* 當 #menu-toggle checked,sidebar 滑入 */
-  #menu-toggle:checked ~ .layout .sidebar { transform: translateX(0); }
-  /* 背景遮罩(用 .layout::before 充當) */
-  .layout::before {
-    content: ""; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.5);
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.25s ease;
-    z-index: 199;
-  }
-  #menu-toggle:checked ~ .layout::before { opacity: 1; pointer-events: auto; }
-  .menu-toggle-label { display: flex; }
-  .content { padding: 56px 16px 80px; }
-  .content h1 { font-size: 22px; }
-  .content h2 { font-size: 19px; }
-  .content h3 { font-size: 17px; }
-}
-/* 漢堡按鈕:在 desktop 完全隱藏 */
-.menu-toggle-label {
+.theme-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 224px;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.15), 0 4px 6px -2px rgb(0 0 0 / 0.05);
   display: none;
-  position: fixed; top: 14px; left: 16px; z-index: 250;
-  width: 38px; height: 38px;
-  align-items: center; justify-content: center;
-  border: 1px solid var(--border); border-radius: 8px;
-  background: var(--bg); color: var(--fg);
-  cursor: pointer; user-select: none; font-size: 20px;
-  line-height: 1;
+  z-index: 110;
 }
-.menu-toggle-label:hover { background: var(--accent); color: white; border-color: var(--accent); }
-#menu-toggle { display: none; }
+.theme-menu.open { display: block; }
+.theme-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--popover-foreground);
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+}
+.theme-option:hover,
+.theme-option:focus-visible {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  outline: none;
+}
+.theme-option[data-active="true"] {
+  background: var(--muted);
+  color: var(--foreground);
+}
+.theme-option svg {
+  width: 16px; height: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+}
+.theme-option[data-active="true"] svg { color: var(--primary); }
+.theme-option-text { flex: 1; min-width: 0; }
+.theme-option-label {
+  display: block;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.theme-option-desc {
+  display: block;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.3;
+  margin-top: 2px;
+}
+.theme-option-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+
+/* =========================================================================
+   Layout: sidebar + content
+   ========================================================================= */
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: calc(100vh - 56px);
+}
 .sidebar {
-  position: sticky; top: 0; align-self: start;
-  height: 100vh; overflow-y: auto;
-  background: var(--sidebar-bg); border-right: 1px solid var(--border);
-  padding: 64px 14px 24px 18px; font-size: 14px;
+  background: var(--sidebar);
+  color: var(--sidebar-foreground);
+  border-right: 1px solid var(--border);
+  padding: 24px 14px 24px 18px;
+  font-size: 14px;
+  position: sticky;
+  top: 56px;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
 }
-.sidebar h2 { margin: 0 0 12px; font-size: 16px; }
+.sidebar h2 {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+}
 .sidebar ul { list-style: none; padding: 0; margin: 0; }
 .sidebar li { margin: 4px 0; }
-.sidebar li.lvl-1 { font-weight: 600; margin-top: 10px; }
-.sidebar li.lvl-2 { padding-left: 14px; }
-.sidebar li.lvl-3 { padding-left: 28px; color: var(--muted); font-size: 13px; }
-.sidebar a { color: var(--fg); text-decoration: none; }
-.sidebar a:hover { color: var(--accent); }
-.content { padding: 64px 32px 80px; max-width: 880px; margin: 0 auto; }
+.sidebar li.lvl-1 { font-weight: 600; margin-top: 12px; }
+.sidebar li.lvl-2 { padding-left: 14px; font-weight: 500; }
+.sidebar li.lvl-3 { padding-left: 28px; color: var(--muted-foreground); font-size: 13px; }
+.sidebar a {
+  color: var(--foreground);
+  text-decoration: none;
+  display: block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.sidebar a:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+.content {
+  padding: 32px 40px 96px;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
 .content h1, .content h2, .content h3, .content h4 {
-  scroll-margin-top: 70px;
+  scroll-margin-top: 80px;
 }
-.content h1 { font-size: 28px; border-bottom: 2px solid var(--border); padding-bottom: 6px; margin-top: 32px; }
-.content h2 { font-size: 22px; margin-top: 28px; }
-.content h3 { font-size: 18px; margin-top: 22px; }
-.content h4.sub7 { font-size: 16px; margin-top: 18px; color: var(--muted); }
+.content h1 {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #1e3a8a;
+  margin: 48px 0 24px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid #93c5fd;
+}
+:root.dark .content h1 { color: #93c5fd; border-bottom-color: #1e40af; }
+.content h2 {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #1e40af;
+  margin: 36px 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #dbeafe;
+}
+:root.dark .content h2 { color: #93c5fd; border-bottom-color: #1e3a8a; }
+.content h3 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1e3a8a;
+  margin: 28px 0 12px;
+}
+:root.dark .content h3 { color: #bfdbfe; }
+.content h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+  margin: 22px 0 10px;
+}
+:root.dark .content h4 { color: #d1d5db; }
+.content p { margin: 0 0 14px; font-size: 16px; }
+.content ul, .content ol { margin: 12px 0 14px; padding-left: 28px; }
+.content li { margin-bottom: 6px; }
 .page-badge {
-  display: inline-block; font-size: 11px; padding: 2px 6px; margin-left: 6px;
-  border-radius: 4px; background: var(--code-bg); color: var(--muted);
-  text-decoration: none; vertical-align: middle;
+  display: inline-block;
+  font-size: 12px;
+  padding: 3px 8px;
+  margin-left: 10px;
+  border-radius: 6px;
+  background: var(--code-bg);
+  color: var(--muted-foreground);
+  text-decoration: none;
+  vertical-align: middle;
+  font-weight: 500;
 }
-.content p { margin: 10px 0; }
-.content ul { padding-left: 24px; }
 .content hr.handbook-divider {
   border: none;
   border-top: 1px dashed var(--border);
   margin: 22px auto;
   width: 60%;
 }
-/* 辭彙表區塊:PDF 兩欄(英文/中文),用 CSS columns 還原 */
 .vocab-block {
   column-count: 2;
   column-gap: 32px;
@@ -181,13 +394,15 @@ body {
   line-height: 1.6;
   margin: 12px 0;
 }
-.vocab-block strong { color: var(--accent); }
+.vocab-block p { margin: 6px 0; font-size: 14px; line-height: 1.6; }
+.vocab-block strong { color: #2563eb; }
+:root.dark .vocab-block strong { color: #60a5fa; }
 .vocab-block .vocab-section {
   display: inline-block;
   font-weight: 600;
   font-size: 15px;
-  color: var(--fg);
-  background: var(--code-bg);
+  background: var(--muted);
+  color: var(--foreground);
   border-radius: 4px;
   padding: 1px 6px;
   margin-top: 6px;
@@ -195,20 +410,144 @@ body {
 .vocab-block .vocab-subsection {
   display: inline-block;
   font-weight: 500;
-  color: var(--muted);
+  color: var(--muted-foreground);
   font-size: 13px;
   margin-top: 4px;
 }
-@media (max-width: 900px) {
+
+/* =========================================================================
+   返回頂部按鈕(rounded-full, 右下角固定,捲動後出現)
+   ========================================================================= */
+.back-to-top {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 90;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: all 0.2s;
+}
+.back-to-top[data-visible="true"] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.back-to-top:hover {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+}
+.back-to-top svg { width: 18px; height: 18px; }
+
+/* =========================================================================
+   移動端 (< 768px)
+   ========================================================================= */
+@media (max-width: 768px) {
+  .app-header { padding: 0 12px; }
+  .app-header-inner { gap: 12px; }
+  .app-title { display: none; }
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    width: 280px;
+    height: calc(100vh - 56px);
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+  }
+  .layout.menu-open .sidebar { transform: translateX(0); }
+  .layout::before {
+    content: "";
+    position: fixed;
+    top: 56px;
+    left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 199;
+  }
+  .layout.menu-open::before {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .content { padding: 24px 16px 80px; }
+  .content h1 { font-size: 24px; }
+  .content h2 { font-size: 20px; }
+  .content h3 { font-size: 18px; }
   .vocab-block { column-count: 1; }
+  .back-to-top { right: 16px; bottom: 16px; }
 }
 </style>
 </head>
 <body>
-<input type="checkbox" id="menu-toggle">
-<input type="checkbox" id="theme-toggle">
-<label for="menu-toggle" class="menu-toggle-label" title="開啟目錄" aria-label="開啟目錄">☰</label>
-<label for="theme-toggle" class="theme-toggle-label" title="切換深色模式"></label>
+<header class="app-header">
+  <div class="app-header-inner">
+    <a href="/" class="app-logo" title="返回首頁">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      <span>IIQE 做题家</span>
+    </a>
+    <span class="app-title">
+      研習手冊：<b>保險原理及實務 研習手冊 2024</b> <span class="version-badge">第八版 2024 年 11 月</span>
+    </span>
+    <div class="app-actions">
+      <button type="button" id="menu-toggle" class="icon-btn" aria-label="開啟目錄" title="目錄">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      </button>
+      <div class="theme-dropdown">
+        <button type="button" id="theme-btn" class="icon-btn" aria-haspopup="menu" aria-label="切換主題" title="主題">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        </button>
+        <div class="theme-menu" id="theme-menu">
+          <button type="button" class="theme-option" data-value="light" role="menuitemradio">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            <span class="theme-option-text">
+              <span class="theme-option-label">淺色</span>
+              <span class="theme-option-desc">固定使用淺色模式</span>
+            </span>
+            <span class="theme-option-dot" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="theme-option" data-value="dark" role="menuitemradio">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            <span class="theme-option-text">
+              <span class="theme-option-label">深色</span>
+              <span class="theme-option-desc">固定使用深色模式</span>
+            </span>
+            <span class="theme-option-dot" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="theme-option" data-value="system" role="menuitemradio">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+            <span class="theme-option-text">
+              <span class="theme-option-label">跟隨系統</span>
+              <span class="theme-option-desc">依作業系統設定自動切換</span>
+            </span>
+            <span class="theme-option-dot" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+      <a href="/" class="icon-btn" aria-label="返回首頁" title="返回首頁">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
 <div class="layout" id="top">
   <aside class="sidebar">
     <h2>目錄</h2>
@@ -2285,6 +2624,112 @@ body {
 <p>本研習資料手冊的編撰工作，得到了以下機構的代表參與，謹在此表示感謝：1． 保險業監管局2． 香港保險業聯會3． 英國特許保險學院香港有限公司4． 職業訓練局5． 保險業訓練委員會6． 香港保險顧問聯會7． 香港專業保險經紀協會8． 香港一般保險代理協會有限公司9． 香港人壽保險從業員協會有限公司10． 香港人壽保險經理協會有限公司11． 香港壽險管理學會此外，亦謹向職業訓練局高峰進修學院為其撰寫本研習資料手冊致謝。</p>
   </main>
 </div>
-<a href="#top" class="back-to-top" title="返回頂部">↑</a>
+<button type="button" id="back-to-top" class="back-to-top" aria-label="返回頂部" title="返回頂部">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+</button>
+<script>
+(function() {
+  var THEME_KEY = 'iiqe:theme';
+  var VALID = ['light', 'dark', 'system'];
+
+  function resolve(mode) {
+    if (mode === 'system') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return mode;
+  }
+
+  function applyTheme(mode) {
+    var r = resolve(mode);
+    document.documentElement.classList.toggle('dark', r === 'dark');
+    document.documentElement.classList.toggle('light', r === 'light');
+    document.documentElement.style.colorScheme = r;
+  }
+
+  // 主題 dropdown
+  var themeBtn = document.getElementById('theme-btn');
+  var themeMenu = document.getElementById('theme-menu');
+  if (themeBtn && themeMenu) {
+    var stored = localStorage.getItem(THEME_KEY);
+    var currentMode = VALID.indexOf(stored) >= 0 ? stored : 'system';
+    var options = themeMenu.querySelectorAll('.theme-option');
+    options.forEach(function(opt) {
+      opt.setAttribute('data-active', String(opt.getAttribute('data-value') === currentMode));
+    });
+    themeBtn.setAttribute('aria-expanded', 'false');
+    themeMenu.setAttribute('role', 'menu');
+
+    themeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var isOpen = themeMenu.classList.toggle('open');
+      themeBtn.setAttribute('aria-expanded', String(isOpen));
+    });
+    themeMenu.addEventListener('click', function(e) {
+      var opt = e.target.closest('.theme-option');
+      if (!opt) return;
+      var value = opt.getAttribute('data-value');
+      if (VALID.indexOf(value) < 0) return;
+      try { localStorage.setItem(THEME_KEY, value); } catch (_) {}
+      applyTheme(value);
+      options.forEach(function(o) {
+        o.setAttribute('data-active', String(o.getAttribute('data-value') === value));
+      });
+      themeMenu.classList.remove('open');
+      themeBtn.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('click', function(e) {
+      if (!themeMenu.classList.contains('open')) return;
+      if (themeMenu.contains(e.target) || themeBtn.contains(e.target)) return;
+      themeMenu.classList.remove('open');
+      themeBtn.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && themeMenu.classList.contains('open')) {
+        themeMenu.classList.remove('open');
+        themeBtn.setAttribute('aria-expanded', 'false');
+        themeBtn.focus();
+      }
+    });
+    // 跟隨系統時,即時響應 prefers-color-scheme 變化
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+      var m = localStorage.getItem(THEME_KEY);
+      if (m === 'system' || !m || VALID.indexOf(m) < 0) applyTheme('system');
+    });
+  }
+
+  // 目錄切換(移動端)
+  var menuToggle = document.getElementById('menu-toggle');
+  var layout = document.querySelector('.layout');
+  if (menuToggle && layout) {
+    menuToggle.addEventListener('click', function() {
+      layout.classList.toggle('menu-open');
+    });
+    layout.addEventListener('click', function(e) {
+      if (window.innerWidth > 768) return;
+      if (e.target === layout || (e.target.classList && e.target.classList.contains('content'))) {
+        layout.classList.remove('menu-open');
+      }
+    });
+  }
+
+  // 返回頂部(顯示/隱藏 + 平滑捲動)
+  var backBtn = document.getElementById('back-to-top');
+  if (backBtn) {
+    function update() {
+      if (window.scrollY > 300) {
+        backBtn.setAttribute('data-visible', 'true');
+      } else {
+        backBtn.setAttribute('data-visible', 'false');
+      }
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+    backBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+})();
+</script>
 </body>
 </html>

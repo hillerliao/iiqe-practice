@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, Play } from "lucide-react";
 import { QuestionActions } from "@/components/QuestionActions";
 import { NoteSection } from "@/components/NoteSection";
+import { authedFetch } from "@/lib/session-client";
 
 type AnswerData = {
   id: string;
@@ -53,7 +54,7 @@ function ResultInner() {
 
   useEffect(() => {
     if (!attemptId) return;
-    fetch(`/api/attempt?id=${attemptId}`)
+    authedFetch(`/api/attempt?id=${attemptId}`)
       .then((r) => {
         if (!r.ok) throw new Error("載入結果失敗");
         return r.json();

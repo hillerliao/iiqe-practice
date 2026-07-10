@@ -7,7 +7,7 @@ import {
   type FeedbackRecord,
 } from "@/lib/kv";
 import { getQuestionById } from "@/lib/data";
-import { isAdmin } from "@/lib/admin";
+import { requireSession } from "@/lib/auth";
 
 const VALID_CATEGORIES: FeedbackCategory[] = [
   "question_error",
@@ -22,26 +22,34 @@ function isCategory(v: unknown): v is FeedbackCategory {
   return typeof v === "string" && (VALID_CATEGORIES as string[]).includes(v);
 }
 
-export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
-  const sessionId = url.searchParams.get("sessionId");
-  if (!sessionId) {
-    return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
-  }
+// 不可逆短哈希，管理員列表用來區分不同用戶，但不洩露 email/帳號(PII)
+function maskSessionId(sid: string): string {
+  let h = 0;
+  for (let i = 0; i < sid.length; i++) h = (h * 31 + sid.charCodeAt(i)) >>> 0;
+  return `u_${h.toString(36)}`;
+}
 
+export async function GET(req: NextRequest) {
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+  const sessionId = session.sessionId;
+
+  const url = new URL(req.url);
   const limit = Math.min(500, parseInt(url.searchParams.get("limit") ?? "100", 10) || 100);
 
-  const admin = isAdmin(sessionId);
+  const admin = session.isAdmin;
 
-  const items: FeedbackRecord[] = admin
+  const rawItems: FeedbackRecord[] = admin
     ? await listAllFeedback(limit)
     : await listFeedback(sessionId, limit);
 
   // 附加題目摘要供查看頁直接渲染
-  const enriched = items.map((it) => {
+  const items = rawItems.map((it) => {
     const q = getQuestionById(it.questionId);
     return {
       ...it,
+      // H3: 管理員視圖下脫敏 sessionId，避免洩露他人 email/帳號
+      sessionId: admin ? maskSessionId(it.sessionId) : it.sessionId,
       question: q
         ? {
             id: q.id,
@@ -59,21 +67,25 @@ export async function GET(req: NextRequest) {
     };
   });
 
-  return NextResponse.json({ count: enriched.length, isAdmin: admin, items: enriched });
+  return NextResponse.json({ count: items.length, isAdmin: admin, items });
 }
 
 export async function POST(req: NextRequest) {
-  let body: any;
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+  const sessionId = session.sessionId;
+
+  let body: { questionId?: unknown; category?: unknown; description?: unknown; userAnswer?: unknown };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { sessionId, questionId, category, description, userAnswer } = body ?? {};
+  const { questionId, category, description, userAnswer } = body ?? {};
 
-  if (!sessionId || typeof sessionId !== "string") {
-    return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
+  if (!questionId || typeof questionId !== "string") {
+    return NextResponse.json({ error: "questionId 必填" }, { status: 400 });
   }
   if (!questionId || typeof questionId !== "string") {
     return NextResponse.json({ error: "questionId 必填" }, { status: 400 });

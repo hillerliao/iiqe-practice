@@ -20,7 +20,7 @@ import {
   Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getSessionId } from "@/lib/session";
+import { authedFetch } from "@/lib/session-client";
 import { NoteButton, type NoteButtonHandle } from "@/components/NoteButton";
 import { ReportButton } from "@/components/ReportButton";
 import { QuestionActions } from "@/components/QuestionActions";
@@ -28,7 +28,7 @@ import { buildSearchQuery } from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
 import { useToast, ToastContainer } from "@/components/useToast";
 import { getChapterInfo } from "@/lib/chapters";
-import { getHandbookHref } from "@/lib/handbook-refs";
+import { getHandbookHref, getHandbookSlugByPaper } from "@/lib/handbook-refs";
 
 type Question = {
   id: string;
@@ -106,7 +106,7 @@ function PracticeInner() {
         sessionStorage.setItem(`attempt:${attemptId}:questions`, stored);
       }
     }
-    fetch(`/api/attempt?id=${attemptId}`)
+    authedFetch(`/api/attempt?id=${attemptId}`)
       .then((r) => {
         if (!r.ok) throw new Error("載入作答資料失敗");
         return r.json();
@@ -149,8 +149,7 @@ function PracticeInner() {
           setShowFeedback(false);
         }
         // 同步收藏狀態
-        const sessionId = getSessionId();
-        fetch(`/api/favorites?sessionId=${sessionId}`)
+        authedFetch(`/api/favorites`)
           .then((r) => r.json())
           .then((d) => {
             const favSet = new Set<string>();
@@ -160,7 +159,7 @@ function PracticeInner() {
         // 批量載入此 attempt 所有題目的筆記(避免 N+1)
         const questionIds = qs.map((q) => q.id).join(",");
         if (questionIds) {
-          fetch(`/api/notes?sessionId=${sessionId}&questionIds=${encodeURIComponent(questionIds)}`)
+          authedFetch(`/api/notes?questionIds=${encodeURIComponent(questionIds)}`)
             .then((r) => (r.ok ? r.json() : { items: [] }))
             .then((d: { items: { questionId: string; content: string }[] }) => {
               const map: Record<string, string> = {};
@@ -214,7 +213,7 @@ function PracticeInner() {
     const timeSpentMs = Date.now() - questionStartRef.current;
     setAnswers((prev) => ({ ...prev, [qId]: ans }));
     setShowFeedback(true);
-    const res = await fetch("/api/attempt", {
+    const res = await authedFetch("/api/attempt", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -231,8 +230,11 @@ function PracticeInner() {
       setLoadError(`答案儲存失敗: ${err.error ?? res.status}`);
     }
     // 答對且非最後一題 → 延遲自動跳下一題
-    const correct = ans === currentQ.answer;
-    if (correct && currentIdx < questions.length - 1) {
+    // 用傳入的 qId 查表,避免依賴渲染期 currentQ 閉包(currentQ 在 await 期間可能過期, L6)
+    const q = questions.find((x) => x.id === qId);
+    const correct = q ? ans === q.answer : false;
+    const qIdx = q ? questions.indexOf(q) : -1;
+    if (correct && qIdx >= 0 && qIdx < questions.length - 1) {
       setAutoNextCountdown(Math.ceil(AUTO_NEXT_DELAY / 1000));
       autoNextTimerRef.current = setTimeout(() => {
         autoNextTimerRef.current = null;
@@ -248,16 +250,15 @@ function PracticeInner() {
     if (next) newFav.add(qId);
     else newFav.delete(qId);
     setFavorites(newFav);
-    const sessionId = getSessionId();
-    await fetch("/api/favorites", {
+    await authedFetch("/api/favorites", {
       method: next ? "POST" : "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId, questionId: qId }),
+      body: JSON.stringify({ questionId: qId }),
     });
   }
 
   async function handleFinish() {
-    await fetch("/api/attempt", {
+    await authedFetch("/api/attempt", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "finish", id: attemptId }),
@@ -310,7 +311,10 @@ function PracticeInner() {
   }
 
   // 保持 finishRef 指向最新 handleFinish,供 timer 到期呼叫
-  finishRef.current = handleFinish;
+  // 放在 effect 內(而非 render 期賦值),避免 render 副作用(L2)
+  useEffect(() => {
+    finishRef.current = handleFinish;
+  }, [handleFinish]);
 
   // 倒計時顯示 + 卸載清理
   useEffect(() => {
@@ -467,7 +471,10 @@ function PracticeInner() {
               第 {currentIdx + 1} / {questions.length} 題
             </span>
             {currentQ.ref && (() => {
-              const handbookHref = getHandbookHref("exam1-2024", currentQ.ref);
+              const handbookSlug = getHandbookSlugByPaper(attempt?.paperCode);
+              const handbookHref = handbookSlug
+                ? getHandbookHref(handbookSlug, currentQ.ref)
+                : null;
               if (!handbookHref) {
                 return (
                   <Badge
@@ -809,15 +816,14 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
 
   // 載入收藏與筆記
   useEffect(() => {
-    const sessionId = getSessionId();
-    fetch(`/api/favorites?sessionId=${sessionId}`)
+    authedFetch(`/api/favorites`)
       .then((r) => (r.ok ? r.json() : { items: [] }))
       .then((d: { items: { questionId: string }[] }) => {
         setIsFavorite(d.items.some((it) => it.questionId === questionId));
       })
       .catch(() => {});
-    fetch(
-      `/api/notes?sessionId=${sessionId}&questionIds=${encodeURIComponent(questionId)}`
+    authedFetch(
+      `/api/notes?questionIds=${encodeURIComponent(questionId)}`
     )
       .then((r) => (r.ok ? r.json() : { items: [] }))
       .then((d: { items: { questionId: string; content: string }[] }) => {
@@ -831,11 +837,10 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
     if (!question) return;
     const next = !isFavorite;
     setIsFavorite(next);
-    const sessionId = getSessionId();
-    const res = await fetch("/api/favorites", {
+    const res = await authedFetch("/api/favorites", {
       method: next ? "POST" : "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId, questionId: question.id }),
+      body: JSON.stringify({ questionId: question.id }),
     });
     if (!res.ok) {
       setIsFavorite(!next);

@@ -12,7 +12,7 @@ import {
   Play,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getSessionId } from "@/lib/session";
+import { authedFetch } from "@/lib/session-client";
 import { QuestionActions } from "@/components/QuestionActions";
 import { NoteSection } from "@/components/NoteSection";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
@@ -177,8 +177,7 @@ export default function FavoritesPage() {
   const [practiceMode, setPracticeMode] = useState(false);
 
   const load = () => {
-    const sessionId = getSessionId();
-    fetch(`/api/favorites?sessionId=${sessionId}`)
+    authedFetch(`/api/favorites`)
       .then((r) => {
         if (!r.ok) throw new Error("載入收藏失敗");
         return r.json();
@@ -198,11 +197,7 @@ export default function FavoritesPage() {
   }, []);
 
   async function remove(qId: string) {
-    const sessionId = getSessionId();
-    await fetch(
-      `/api/favorites?sessionId=${sessionId}&questionId=${qId}`,
-      { method: "DELETE" }
-    );
+    await authedFetch(`/api/favorites?questionId=${qId}`, { method: "DELETE" });
     load();
   }
 

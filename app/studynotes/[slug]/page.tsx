@@ -69,26 +69,108 @@ export default async function HandbookPage({
       <style
         dangerouslySetInnerHTML={{
           __html: `
-            .handbook-content { color: var(--foreground); }
+            .handbook-content { color: var(--foreground); line-height: 1.7; }
             .dark .handbook-content { color: #e5e7eb; }
-            .handbook-content h1, .handbook-content h2,
-            .handbook-content h3, .handbook-content h4 {
-              color: var(--foreground);
-              border-color: var(--border);
+
+            /* === 章節標題層級 === *
+               Tailwind preflight 預設 reset 了 h1-h6 樣式,這裡重新建立層級。
+               使用 !important 確保不被 Tailwind utility class 覆蓋。
+               字級與間距遵循「字號 ≈ 1.25^n」幾何級數(major third) */
+            .handbook-content h1 {
+              font-size: 1.875rem !important;       /* 30px (章) */
+              font-weight: 700 !important;          /* Bold */
+              line-height: 1.3 !important;
+              color: #1e3a8a !important;            /* 深藍 — 章 */
+              margin-top: 48px !important;
+              margin-bottom: 24px !important;
+              padding-bottom: 12px !important;
+              border-bottom: 3px solid #93c5fd !important;  /* 強調分隔 */
+              letter-spacing: -0.01em !important;
             }
-            .dark .handbook-content h1,
-            .dark .handbook-content h2,
-            .dark .handbook-content h3,
-            .dark .handbook-content h4 { color: #f3f4f6; border-color: #374151; }
-            .handbook-content a { color: var(--primary, #2563eb); }
-            .dark .handbook-content a { color: #60a5fa; }
+            .dark .handbook-content h1 {
+              color: #93c5fd !important;
+              border-bottom-color: #1e40af !important;
+            }
+
+            .handbook-content h2 {
+              font-size: 1.5rem !important;         /* 24px (節) */
+              font-weight: 600 !important;          /* Semi-bold */
+              line-height: 1.35 !important;
+              color: #1e40af !important;            /* 稍深藍 — 節 */
+              margin-top: 36px !important;
+              margin-bottom: 16px !important;
+              padding-bottom: 8px !important;
+              border-bottom: 1px solid #dbeafe !important;
+            }
+            .dark .handbook-content h2 {
+              color: #93c5fd !important;
+              border-bottom-color: #1e3a8a !important;
+            }
+
+            .handbook-content h3 {
+              font-size: 1.25rem !important;        /* 20px (子節) */
+              font-weight: 600 !important;
+              line-height: 1.4 !important;
+              color: #1e3a8a !important;            /* 深藍 — 子節 */
+              margin-top: 28px !important;
+              margin-bottom: 12px !important;
+            }
+            .dark .handbook-content h3 { color: #bfdbfe !important; }
+
+            .handbook-content h4 {
+              font-size: 1.125rem !important;       /* 18px (亞節) */
+              font-weight: 600 !important;
+              line-height: 1.45 !important;
+              color: #374151 !important;            /* 中性灰 */
+              margin-top: 22px !important;
+              margin-bottom: 10px !important;
+            }
+            .dark .handbook-content h4 { color: #d1d5db !important; }
+
+            /* === 內文段 === */
+            .handbook-content p {
+              font-size: 1rem !important;           /* 16px */
+              line-height: 1.75 !important;
+              margin-top: 0 !important;
+              margin-bottom: 14px !important;
+            }
+            .handbook-content ul,
+            .handbook-content ol {
+              font-size: 1rem !important;
+              line-height: 1.75 !important;
+              margin-top: 12px !important;
+              margin-bottom: 14px !important;
+              padding-left: 28px !important;
+            }
+            .handbook-content li {
+              margin-bottom: 6px !important;
+            }
+
+            /* === 標題旁的 PDF 頁碼徽章 === */
             .handbook-content .page-badge {
-              background: var(--muted, #f3f4f6);
-              color: var(--muted-foreground, #6b7280);
+              display: inline-block !important;
+              font-size: 12px !important;          /* 比內文略小,不會喧賓奪主 */
+              font-weight: 500 !important;
+              padding: 3px 8px !important;
+              margin-left: 10px !important;
+              border-radius: 6px !important;
+              background: #f3f4f6 !important;
+              color: #4b5563 !important;
+              text-decoration: none !important;
+              vertical-align: middle !important;
+            }
+            .handbook-content .page-badge:hover {
+              background: #dbeafe !important;
+              color: #1e40af !important;
             }
             .dark .handbook-content .page-badge {
-              background: #1f2937; color: #9ca3af;
+              background: #1f2937 !important;
+              color: #9ca3af !important;
             }
+
+            .handbook-content a { color: var(--primary, #2563eb); }
+            .dark .handbook-content a { color: #60a5fa; }
+
             .handbook-content hr.handbook-divider {
               border: none;
               border-top: 1px dashed var(--border, #e5e7eb);
@@ -96,6 +178,7 @@ export default async function HandbookPage({
               width: 60%;
             }
             .dark .handbook-content hr.handbook-divider { border-top-color: #374151; }
+
             /* 辭彙表兩欄排版(還原 PDF 兩欄版面) */
             .handbook-content .vocab-block {
               column-count: 2;
@@ -131,19 +214,24 @@ export default async function HandbookPage({
             @media (max-width: 768px) {
               .handbook-content .vocab-block { column-count: 1; }
             }
-            /* Mobile 字級與行高優化 */
-            @media (max-width: 640px) {
-              .handbook-content h1 { font-size: 1.5rem; padding-bottom: 4px; }
-              .handbook-content h2 { font-size: 1.25rem; }
-              .handbook-content h3 { font-size: 1.1rem; }
-              .handbook-content h4 { font-size: 1rem; }
-              .handbook-content p,
-              .handbook-content li { font-size: 0.95rem; line-height: 1.65; }
-              .handbook-content .page-badge { font-size: 10px; }
-            }
-            /* 內文內所有錨點加上 scroll-margin,避免被頂部 header 擋住 */
+
+            /* 內文內所有錨點加上 scroll-margin,避免被頂部兩層 sticky header 擋住
+               全域 header: h-14 (=3.5rem=56px),子 header: py-3 lg:py-4 + 一行 h1+文字 ≈ 76px
+               為確保章節標題完整露出,scroll-margin-top 設為 144px (兩層 header + 安全緩衝) */
             .handbook-content h1, .handbook-content h2,
-            .handbook-content h3, .handbook-content h4 { scroll-margin-top: 70px; }
+            .handbook-content h3, .handbook-content h4 { scroll-margin-top: 144px; }
+            /* 純錨點(內文單獨的 page-badge <a id="pdf-page-N">)也需避開 header */
+            .handbook-content a[id^="pdf-page-"] { scroll-margin-top: 144px; }
+
+            /* 行動裝置:略小字級以避免水平溢出,scroll-margin 也略小 */
+            @media (max-width: 640px) {
+              .handbook-content h1 { font-size: 1.5rem !important; margin-top: 32px !important; margin-bottom: 16px !important; }
+              .handbook-content h2 { font-size: 1.25rem !important; margin-top: 24px !important; }
+              .handbook-content h3 { font-size: 1.125rem !important; }
+              .handbook-content h1, .handbook-content h2,
+              .handbook-content h3, .handbook-content h4 { scroll-margin-top: 120px; }
+              .handbook-content a[id^="pdf-page-"] { scroll-margin-top: 120px; }
+            }
           `,
         }}
       />

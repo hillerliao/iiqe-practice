@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, Copy, Check, Trash2, ChevronDown, ChevronUp, ExternalLink, Database, Pencil } from "lucide-react";
+import { ArrowLeft, Copy, Check, Trash2, ChevronDown, ChevronUp, Database, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { isAdmin } from "@/lib/admin";
+import { authedFetch } from "@/lib/session-client";
 import type { QuestionData } from "@/lib/data";
 
 type FeedbackItem = {
@@ -97,11 +98,7 @@ function FeedbackCard({
     if (!window.confirm("確定刪除這條反饋?此操作無法復原。")) return;
     setDeleting(true);
     try {
-      const sessionId = localStorage.getItem("iiqe:sessionId") ?? "";
-      const res = await fetch(
-        `/api/feedback/${item.id}?sessionId=${encodeURIComponent(sessionId)}`,
-        { method: "DELETE" }
-      );
+      const res = await authedFetch(`/api/feedback/${item.id}`, { method: "DELETE" });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error ?? `HTTP ${res.status}`);
@@ -243,22 +240,15 @@ export default function FeedbackPage() {
   const [items, setItems] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sessionId, setSessionId] = useState<string>("");
-
-  useEffect(() => {
-    setSessionId(localStorage.getItem("iiqe:sessionId") ?? "");
-  }, []);
-
-  const admin = isAdmin(sessionId);
+  const [admin, setAdmin] = useState<boolean>(false);
+  const [adminToken, setAdminToken] = useState<string>("");
+  const [loginErr, setLoginErr] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
-    if (!sessionId) return;
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(
-        `/api/feedback?sessionId=${encodeURIComponent(sessionId)}&limit=500`
-      );
+      const res = await authedFetch(`/api/feedback?limit=500`);
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error ?? `HTTP ${res.status}`);
@@ -270,11 +260,43 @@ export default function FeedbackPage() {
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, []);
+
+  const refreshAdmin = useCallback(() => {
+    authedFetch(`/api/admin/whoami`)
+      .then((r) => r.json())
+      .then(({ isAdmin }: { isAdmin: boolean }) => setAdmin(!!isAdmin))
+      .catch(() => setAdmin(false));
+  }, []);
+
+  useEffect(() => {
+    refreshAdmin();
+  }, [refreshAdmin]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  async function adminLogin() {
+    setLoginErr(null);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ token: adminToken }),
+      });
+      if (!res.ok) {
+        setLoginErr("令牌無效");
+        return;
+      }
+      setAdminToken("");
+      setAdmin(true);
+      fetchData();
+    } catch {
+      setLoginErr("登入失敗");
+    }
+  }
 
   async function copyAllJson() {
     try {
@@ -353,6 +375,19 @@ export default function FeedbackPage() {
               <span>我的反饋</span>
             )}
           </CardTitle>
+          {!admin && (
+            <div className="pt-2 flex items-center gap-2 flex-wrap">
+              <Input
+                type="password"
+                placeholder="管理員令牌"
+                value={adminToken}
+                onChange={(e) => setAdminToken(e.target.value)}
+                className="max-w-[200px] text-xs"
+              />
+              <Button size="sm" onClick={adminLogin}>管理員登入</Button>
+              {loginErr && <span className="text-xs text-red-600">{loginErr}</span>}
+            </div>
+          )}
           {admin && (
             <div className="pt-2">
               <Button asChild variant="outline" size="sm">
@@ -405,13 +440,6 @@ export default function FeedbackPage() {
               />
             ))}
           </div>
-
-          {admin && (
-            <p className="text-xs text-muted-foreground pt-2 border-t">
-              <ExternalLink className="inline w-3 h-3 mr-0.5" />
-              所有管理員操作需以 <code className="bg-muted px-1 rounded">user:iiqe2026</code> 身份操作才會生效。
-            </p>
-          )}
         </CardContent>
       </Card>
     </div>

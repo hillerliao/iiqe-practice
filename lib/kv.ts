@@ -103,77 +103,9 @@ function createInMemoryClient(): KVClient {
   };
 }
 
-function createUpstashClient(): KVClient {
-  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || "";
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || "";
-  const { createClient } = require("@vercel/kv") as typeof import("@vercel/kv");
-  const client = createClient({ url, token });
-  return {
-    async get<T>(key: string): Promise<T | null> {
-      return client.get<T>(key);
-    },
-    async set(key: string, value: unknown): Promise<void> {
-      await client.set(key, value);
-    },
-    async del(key: string): Promise<void> {
-      await client.del(key);
-    },
-    async keys(pattern: string): Promise<string[]> {
-      let cursor = 0;
-      const all: string[] = [];
-      do {
-        const [next, keys] = await client.scan(cursor, { match: pattern, count: 100 });
-        cursor = Number(next);
-        all.push(...keys);
-      } while (cursor !== 0);
-      return all;
-    },
-    async lpush(key: string, value: unknown): Promise<void> {
-      await client.lpush(key, value);
-    },
-    async lrange<T>(key: string, start: number, stop: number): Promise<T[]> {
-      return client.lrange<T>(key, start, stop);
-    },
-    async lrem(key: string, count: number, value: string): Promise<void> {
-      await client.lrem(key, count, value);
-    },
-    async sadd(key: string, member: string): Promise<void> {
-      await client.sadd(key, member);
-    },
-    async smembers(key: string): Promise<string[]> {
-      return client.smembers(key);
-    },
-    async srem(key: string, member: string): Promise<void> {
-      await client.srem(key, member);
-    },
-    async hset(key: string, field: string, value: unknown): Promise<void> {
-      await client.hset(key, { [field]: value });
-    },
-    async hget<T>(key: string, field: string): Promise<T | null> {
-      return client.hget<T>(key, field);
-    },
-    async hgetall<T>(key: string): Promise<Record<string, T>> {
-      const result = await client.hgetall(key);
-      return (result ?? {}) as unknown as Record<string, T>;
-    },
-    async hdel(key: string, field: string): Promise<void> {
-      await client.hdel(key, field);
-    },
-    async exists(key: string): Promise<boolean> {
-      const r = await client.exists(key);
-      return r === 1;
-    },
-    async rename(key: string, newKey: string): Promise<void> {
-      await client.rename(key, newKey);
-    },
-    async expire(key: string, seconds: number): Promise<void> {
-      await client.expire(key, seconds);
-    },
-  };
-}
-
-const hasUpstash = !!(process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL);
-export const kv: KVClient = hasUpstash ? createUpstashClient() : createInMemoryClient();
+// 非 sqlite 後端統一退回 in-memory(與 storage-backend 的 memory 兜底一致)。
+// 原 Vercel KV / Upstash 分支已移除(@vercel/kv 依賴已卸載,見 M4 清理)。
+export const kv: KVClient = createInMemoryClient();
 
 import type { StorageBackend } from "@/lib/storage-backend";
 // 在顶层 import 一次 storage-backend,避免循环依赖问题(getPrisma -> lib/db -> 不会反向依赖 kv)

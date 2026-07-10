@@ -11,7 +11,7 @@ import {
   Play,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getSessionId } from "@/lib/session";
+import { authedFetch } from "@/lib/session-client";
 import { QuestionActions } from "@/components/QuestionActions";
 import { NoteSection } from "@/components/NoteSection";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
@@ -183,8 +183,7 @@ export default function WrongbookPage() {
   const [practiceMode, setPracticeMode] = useState(false);
 
   useEffect(() => {
-    const sessionId = getSessionId();
-    fetch(`/api/wrongbook?sessionId=${sessionId}`)
+    authedFetch(`/api/wrongbook`)
       .then((r) => {
         if (!r.ok) throw new Error("載入錯題本失敗");
         return r.json();
@@ -204,15 +203,14 @@ export default function WrongbookPage() {
   // 注意:失敗時要拋出(而非吞掉),persistAnswers 的 .catch 才會重置 recordedRef 以便重試
   const recordRedo = useCallback(
     async (answers: Record<string, string>) => {
-      const sessionId = getSessionId();
       const payload = items
         .map((it) => ({ questionId: it.questionId, userAnswer: answers[it.questionId] }))
         .filter((a) => a.userAnswer != null && a.userAnswer !== "");
       if (payload.length === 0) return;
-      const r = await fetch("/api/wrongbook/record", {
+      const r = await authedFetch("/api/wrongbook/record", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, answers: payload }),
+        body: JSON.stringify({ answers: payload }),
       });
       if (!r.ok) {
         throw new Error(`記錄重做結果失敗: ${r.status}`);
@@ -223,9 +221,8 @@ export default function WrongbookPage() {
 
   // 退出重做模式:重新整理錯題本,使更新後的 wrongCount / 反覆錯標籤立即反映
   const handleExit = useCallback(async () => {
-    const sessionId = getSessionId();
     try {
-      const r = await fetch(`/api/wrongbook?sessionId=${sessionId}`);
+      const r = await authedFetch(`/api/wrongbook`);
       if (r.ok) {
         const data = await r.json();
         setItems(data.items);
@@ -256,11 +253,10 @@ export default function WrongbookPage() {
 
     async function recordRedo(answers: Record<string, string>) {
       try {
-        const sid = getSessionId();
-        await fetch("/api/wrongbook/record", {
+        await authedFetch("/api/wrongbook/record", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId: sid, answers }),
+          body: JSON.stringify({ answers }),
         });
       } catch (e) {
         console.error("記錄重做結果失敗:", e);
@@ -271,7 +267,7 @@ export default function WrongbookPage() {
       setPracticeMode(false);
       // 重新載入錯題本列表以反映記錄結果
       try {
-        const r = await fetch(`/api/wrongbook?sessionId=${getSessionId()}`);
+        const r = await authedFetch(`/api/wrongbook`);
         if (r.ok) {
           const data = await r.json();
           setItems(data.items);

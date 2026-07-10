@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAttempt, type AttemptRecord, type AnswerRecord } from "@/lib/kv";
 import { getQuestionById } from "@/lib/data";
+import { requireSession } from "@/lib/auth";
 
 const REDO_SOURCE = "wrongbook-redo";
 
@@ -17,12 +18,13 @@ function genId(): string {
 type RecordedAnswer = { questionId: string; userAnswer?: string };
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json()) as { sessionId?: string; answers?: RecordedAnswer[] };
-  const { sessionId, answers } = body;
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+  const sessionId = session.sessionId;
 
-  if (!sessionId) {
-    return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
-  }
+  const body = (await req.json()) as { answers?: RecordedAnswer[] };
+  const { answers } = body;
+
   if (!Array.isArray(answers) || answers.length === 0) {
     return NextResponse.json({ ok: true, recorded: 0 });
   }

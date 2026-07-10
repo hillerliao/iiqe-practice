@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Play, FileText, RotateCcw } from "lucide-react";
-import { getSessionId } from "@/lib/session";
+import { authedFetch } from "@/lib/session-client";
 import { getChapterInfo } from "@/lib/chapters";
 
 // 把題目序號陣列壓縮成區段字串,例如 [110,111,118,119,120,126] → "110~111, 118~120, 126"
@@ -60,8 +60,7 @@ export default function StatsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const sessionId = getSessionId();
-    fetch(`/api/stats?sessionId=${encodeURIComponent(sessionId)}`)
+    authedFetch(`/api/stats`)
       .then((r) => {
         if (!r.ok) throw new Error("載入統計失敗");
         return r.json();
@@ -92,11 +91,10 @@ export default function StatsPage() {
     setRedoingId(attemptId);
     setError(null);
     try {
-      const sessionId = getSessionId();
-      const res = await fetch("/api/attempts", {
+      const res = await authedFetch("/api/attempts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, fromAttemptId: attemptId }),
+        body: JSON.stringify({ fromAttemptId: attemptId }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "未知錯誤" }));

@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { addFavorite, removeFavorite, listFavorites, getFavoriteMeta } from "@/lib/kv";
 import { getQuestionById, getPapers } from "@/lib/data";
+import { requireSession } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
-  const sessionId = url.searchParams.get("sessionId");
-  if (!sessionId) {
-    return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
-  }
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+  const sessionId = session.sessionId;
 
   const favIds = await listFavorites(sessionId);
   const papers = getPapers();
@@ -49,21 +48,26 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+  const sessionId = session.sessionId;
   const body = await req.json();
-  const { sessionId, questionId } = body;
-  if (!sessionId || !questionId) {
-    return NextResponse.json({ error: "sessionId, questionId 必填" }, { status: 400 });
+  const { questionId } = body;
+  if (!questionId) {
+    return NextResponse.json({ error: "questionId 必填" }, { status: 400 });
   }
   await addFavorite(sessionId, questionId);
   return NextResponse.json({ favorite: { sessionId, questionId } });
 }
 
 export async function DELETE(req: NextRequest) {
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+  const sessionId = session.sessionId;
   const url = new URL(req.url);
-  const sessionId = url.searchParams.get("sessionId");
   const questionId = url.searchParams.get("questionId");
-  if (!sessionId || !questionId) {
-    return NextResponse.json({ error: "sessionId, questionId 必填" }, { status: 400 });
+  if (!questionId) {
+    return NextResponse.json({ error: "questionId 必填" }, { status: 400 });
   }
   await removeFavorite(sessionId, questionId);
   return NextResponse.json({ ok: true });

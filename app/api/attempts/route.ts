@@ -4,6 +4,7 @@ import {
   attemptKey, AnswerRecord, AttemptRecord,
 } from "@/lib/kv";
 import { getQuestions, getQuestionById } from "@/lib/data";
+import { requireSession } from "@/lib/auth";
 
 let idCounter = Date.now();
 function genId(): string {
@@ -11,19 +12,20 @@ function genId(): string {
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { sessionId, paperId, mode, source, durationSec, questionIds, fromAttemptId } = body;
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+  const sessionId = session.sessionId;
 
-  let finalQuestionIds: string[] = questionIds;
+  const body = await req.json().catch(() => ({}));
+  const { paperId, mode, source, durationSec, questionIds, fromAttemptId } = body as Record<string, unknown>;
+
+  let finalQuestionIds: string[] = Array.isArray(questionIds) ? (questionIds as string[]) : [];
   let finalPaperId = paperId;
   let finalMode = mode;
   let finalSource = source;
   let finalDurationSec = durationSec;
 
-  if (fromAttemptId) {
-    if (!sessionId) {
-      return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
-    }
+  if (fromAttemptId && typeof fromAttemptId === "string") {
     const src = await getAttempt(fromAttemptId);
     if (!src) {
       return NextResponse.json({ error: "來源 attempt 找不到" }, { status: 404 });
@@ -35,9 +37,9 @@ export async function POST(req: NextRequest) {
     finalDurationSec = src.durationSec;
   }
 
-  if (!sessionId || !finalPaperId || !Array.isArray(finalQuestionIds) || finalQuestionIds.length === 0) {
+  if (!finalPaperId || !Array.isArray(finalQuestionIds) || finalQuestionIds.length === 0) {
     return NextResponse.json(
-      { error: "sessionId, paperId, questionIds[] 必填(fromAttemptId 模式需有作答記錄)" },
+      { error: "paperId, questionIds[] 必填(fromAttemptId 模式需有作答記錄)" },
       { status: 400 }
     );
   }
@@ -48,10 +50,10 @@ export async function POST(req: NextRequest) {
   const record: AttemptRecord = {
     id,
     sessionId,
-    paperId: finalPaperId,
-    mode: finalMode ?? "exam",
-    source: finalSource ?? "exam",
-    durationSec: finalDurationSec ?? null,
+    paperId: finalPaperId as string,
+    mode: (finalMode as string) ?? "exam",
+    source: (finalSource as string) ?? "exam",
+    durationSec: (finalDurationSec as number) ?? null,
     totalQ: finalQuestionIds.length,
     startedAt: now,
     finishedAt: null,
@@ -82,12 +84,11 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
-  const sessionId = url.searchParams.get("sessionId");
-  if (!sessionId) {
-    return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
-  }
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+  const sessionId = session.sessionId;
 
+  const url = new URL(req.url);
   const unfinished = url.searchParams.get("unfinished") === "1";
   const paperId = url.searchParams.get("paperId");
   const source = url.searchParams.get("source");

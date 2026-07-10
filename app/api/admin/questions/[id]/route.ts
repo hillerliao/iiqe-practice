@@ -3,7 +3,7 @@
 // - PATCH: 修改題目(雙寫 SQLite + JSON);id / number / paperCode / source 不可改
 
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin } from "@/lib/admin";
+import { requireAdmin } from "@/lib/auth";
 import { pickStorageBackend } from "@/lib/storage-backend";
 import { saveQuestion, readQuestionLatest } from "@/lib/question-write";
 import type { QuestionData } from "@/lib/data";
@@ -30,13 +30,8 @@ export async function GET(
   ctx: RouteContext<"/api/admin/questions/[id]">
 ) {
   const { id } = await ctx.params;
-  const sessionId = req.nextUrl.searchParams.get("sessionId");
-  if (!sessionId) {
-    return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
-  }
-  if (!isAdmin(sessionId)) {
-    return NextResponse.json({ error: "僅管理員可訪問" }, { status: 403 });
-  }
+  const session = requireAdmin(req);
+  if (session instanceof NextResponse) return session;
 
   const writableBlock = ensureWritable();
   if (writableBlock) return writableBlock;
@@ -53,13 +48,8 @@ export async function PATCH(
   ctx: RouteContext<"/api/admin/questions/[id]">
 ) {
   const { id } = await ctx.params;
-  const sessionId = req.nextUrl.searchParams.get("sessionId");
-  if (!sessionId) {
-    return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
-  }
-  if (!isAdmin(sessionId)) {
-    return NextResponse.json({ error: "僅管理員可修改題目" }, { status: 403 });
-  }
+  const session = requireAdmin(req);
+  if (session instanceof NextResponse) return session;
 
   const writableBlock = ensureWritable();
   if (writableBlock) return writableBlock;

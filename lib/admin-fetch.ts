@@ -1,7 +1,8 @@
 // 管理員 API 客戶端 helper:
-// - 自動從 localStorage 讀 sessionId 並追加為 query param
+// - 統一走 authedFetch（會先 ensureSession 並帶上簽名 Cookie,絕不再上送可偽造的 sessionId）
 // - 統一錯誤處理(解析後端返回的 { error } 結構)
 // - 返回解析後的 JSON
+import { authedFetch } from "@/lib/session-client";
 
 export class AdminApiError extends Error {
   status: number;
@@ -12,22 +13,11 @@ export class AdminApiError extends Error {
   }
 }
 
-function getSessionId(): string {
-  if (typeof window === "undefined") return "";
-  return localStorage.getItem("iiqe:sessionId") ?? "";
-}
-
 export async function adminFetch<T = unknown>(
   path: string,
-  init?: RequestInit
+  init?: RequestInit,
 ): Promise<T> {
-  const sid = getSessionId();
-  const sep = path.includes("?") ? "&" : "?";
-  const url = sid
-    ? `${path}${sep}sessionId=${encodeURIComponent(sid)}`
-    : path;
-
-  const res = await fetch(url, {
+  const res = await authedFetch(path, {
     ...init,
     headers: {
       ...(init?.body && !(init.body instanceof FormData)

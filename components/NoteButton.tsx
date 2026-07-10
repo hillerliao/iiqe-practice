@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "re
 import { NotebookPen, Save, X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { authedFetch } from "@/lib/session-client";
 
 const MAX_LEN = 1000;
 
@@ -104,12 +105,11 @@ export const NoteButton = forwardRef<NoteButtonHandle, NoteButtonProps>(function
     setSaving(true);
     setError(null);
     try {
-      const sessionId = localStorage.getItem("iiqe:sessionId") ?? "";
-      const res = await fetch("/api/notes", {
+      // 會話 ID 由簽名 Cookie 在服務端推導,客戶端不再上送 sessionId
+      const res = await authedFetch("/api/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          sessionId,
           questionId,
           content: trimmed,
         }),
@@ -136,9 +136,9 @@ export const NoteButton = forwardRef<NoteButtonHandle, NoteButtonProps>(function
     setSaving(true);
     setError(null);
     try {
-      const sessionId = localStorage.getItem("iiqe:sessionId") ?? "";
-      const res = await fetch(
-        `/api/notes?sessionId=${encodeURIComponent(sessionId)}&questionId=${encodeURIComponent(questionId)}`,
+      // 會話 ID 由簽名 Cookie 在服務端推導,客戶端不再上送 sessionId
+      const res = await authedFetch(
+        `/api/notes?questionId=${encodeURIComponent(questionId)}`,
         { method: "DELETE" }
       );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

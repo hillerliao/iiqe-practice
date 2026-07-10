@@ -6,7 +6,7 @@
 // 環境:必須 backend === "sqlite"
 
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin } from "@/lib/admin";
+import { requireAdmin } from "@/lib/auth";
 import { pickStorageBackend } from "@/lib/storage-backend";
 import {
   listQuestionsSqlite,
@@ -47,13 +47,8 @@ function ensureWritable(): NextResponse | null {
 }
 
 export async function GET(req: NextRequest) {
-  const sessionId = req.nextUrl.searchParams.get("sessionId");
-  if (!sessionId) {
-    return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
-  }
-  if (!isAdmin(sessionId)) {
-    return NextResponse.json({ error: "僅管理員可訪問" }, { status: 403 });
-  }
+  const session = requireAdmin(req);
+  if (session instanceof NextResponse) return session;
 
   const writableBlock = ensureWritable();
   if (writableBlock) return writableBlock;
@@ -84,13 +79,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const sessionId = req.nextUrl.searchParams.get("sessionId");
-  if (!sessionId) {
-    return NextResponse.json({ error: "sessionId 必填" }, { status: 400 });
-  }
-  if (!isAdmin(sessionId)) {
-    return NextResponse.json({ error: "僅管理員可新增題目" }, { status: 403 });
-  }
+  const session = requireAdmin(req);
+  if (session instanceof NextResponse) return session;
 
   const writableBlock = ensureWritable();
   if (writableBlock) return writableBlock;

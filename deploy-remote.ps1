@@ -11,6 +11,13 @@
 
 Set-Location d:\Downloads\IIQE\iiqe-app
 
+# 部署目标:从环境变量读取,避免在仓库里写死 VPS 地址
+#   $env:DEPLOY_HOST = 'user@your-vps-ip'   (SSH user@host 完整形式)
+#   $env:DEPLOY_USER = 'your-user'          (可选,默认从 DEPLOY_HOST 推导)
+$DeployHost = if ($env:DEPLOY_HOST) { $env:DEPLOY_HOST } else { 'user@your-vps-ip' }
+$DeployUser = if ($env:DEPLOY_USER) { $env:DEPLOY_USER } else { ($DeployHost -split '@')[0] }
+$DeployAddr = $DeployHost
+
 $out = 'ssh.out.log'; $err = 'ssh.err.log'
 $scpOut = 'scp.out.log'; $scpErr = 'scp.err.log'
 $upOut = 'upload.out.log'; $upErr = 'upload.err.log'
@@ -49,7 +56,7 @@ if (-not (Test-Path $tarball)) {
 Write-Output "[2/4] uploading tarball + deploy-remote.sh"
 $scpTar = Start-Process -FilePath 'scp.exe' -ArgumentList @(
   '-o','ConnectTimeout=10','-o','StrictHostKeyChecking=no',
-  $tarball,'ecs-user@39.103.59.145:/home/ecs-user/'
+  $tarball,"${DeployAddr}:/home/${DeployUser}/"
 ) -PassThru -WindowStyle Hidden -RedirectStandardOutput $scpOut -RedirectStandardError $scpErr
 $null = $scpTar.WaitForExit(120000)
 if (-not $scpTar.HasExited -or $scpTar.ExitCode -ne 0) {
@@ -60,7 +67,7 @@ if (-not $scpTar.HasExited -or $scpTar.ExitCode -ne 0) {
 
 $scpSh = Start-Process -FilePath 'scp.exe' -ArgumentList @(
   '-o','ConnectTimeout=10','-o','StrictHostKeyChecking=no',
-  'deploy-remote.sh','ecs-user@39.103.59.145:/home/ecs-user/deploy-remote.sh'
+  'deploy-remote.sh',"${DeployAddr}:/home/${DeployUser}/deploy-remote.sh"
 ) -PassThru -WindowStyle Hidden -RedirectStandardOutput $upOut -RedirectStandardError $upErr
 $null = $scpSh.WaitForExit(60000)
 if (-not $scpSh.HasExited -or $scpSh.ExitCode -ne 0) {
@@ -71,10 +78,10 @@ if (-not $scpSh.HasExited -or $scpSh.ExitCode -ne 0) {
 
 # 3) 远端执行 deploy-remote.sh
 Write-Output "[3/4] executing deploy-remote.sh on VPS"
-$remoteCmd = "chmod +x /home/ecs-user/deploy-remote.sh && /home/ecs-user/deploy-remote.sh"
+$remoteCmd = "chmod +x /home/${DeployUser}/deploy-remote.sh && /home/${DeployUser}/deploy-remote.sh"
 $p = Start-Process -FilePath 'C:\Windows\System32\OpenSSH\ssh.exe' -ArgumentList @(
   '-o','ConnectTimeout=10','-o','StrictHostKeyChecking=no',
-  'ecs-user@39.103.59.145', $remoteCmd
+  $DeployAddr, $remoteCmd
 ) -PassThru -WindowStyle Hidden -RedirectStandardOutput $out -RedirectStandardError $err
 $null = $p.WaitForExit(600000)  # 10 分钟,给 db:push + seed + verify 留余量
 if ($p.HasExited) { Write-Output "ssh exitcode=$($p.ExitCode)" } else { Stop-Process -Id $p.Id -Force; Write-Output 'ssh timeout, killed' }
