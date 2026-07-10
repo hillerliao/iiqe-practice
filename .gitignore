@@ -74,3 +74,17 @@ __pycache__/
 
 # prisma db backups (contain real user data, not schema)
 *.db.bak*
+
+# local scratch artifacts (never commit)
+page_code.txt
+page_local.html
+rec_out.json
+/-w
+_p3_clean.json
+cleanup-test.mjs
+scripts/cache_paper1.json
+scripts/mock_p1.json
+scripts/mock_p3.json
+scripts/p3_clean.json
+scripts/_mock_*.txt
+GIT_PUSH_REVIEW_*.md
