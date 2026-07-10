@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, Copy, Check, Trash2, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import { ArrowLeft, Copy, Check, Trash2, ChevronDown, ChevronUp, ExternalLink, Database, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -201,6 +201,12 @@ function FeedbackCard({
 
         {isAdmin && (
           <div className="flex items-center justify-end gap-1 pt-1 border-t border-border/50">
+            <Button asChild variant="ghost" size="xs">
+              <Link href={`/admin/questions/${item.questionId}`}>
+                <Pencil className="w-3 h-3" />
+                去編輯此題
+              </Link>
+            </Button>
             <Button
               type="button"
               variant="ghost"
@@ -347,6 +353,16 @@ export default function FeedbackPage() {
               <span>我的反饋</span>
             )}
           </CardTitle>
+          {admin && (
+            <div className="pt-2">
+              <Button asChild variant="outline" size="sm">
+                <Link href="/admin/questions">
+                  <Database className="w-3.5 h-3.5 mr-1" />
+                  進入題目管理
+                </Link>
+              </Button>
+            </div>
+          )}
         </CardHeader>
         <CardContent className="space-y-3">
           {admin && (

@@ -6,6 +6,7 @@
 
 import { getPrisma } from "@/lib/db";
 import type { AttemptRecord, AnswerRecord, FavoriteRecord, NoteRecord, FeedbackRecord } from "@/lib/kv";
+import type { QuestionData } from "@/lib/data";
 import type { Prisma } from "@/lib/generated/prisma";
 
 type TransactionClient = Prisma.TransactionClient;
@@ -74,6 +75,149 @@ function toAttemptRecord(a: {
     correct: a.correct,
     answers: a.answers.map(toAnswerRecord),
   };
+}
+
+// ---------- Question CRUD (管理员编辑题目) ----------
+
+type QuestionRow = {
+  id: string;
+  paperId: string;
+  number: number;
+  ref: string | null;
+  question: string;
+  options: string;
+  answer: string;
+  explanation: string | null;
+  page: number | null;
+  source: string;
+  sourceLabel: string | null;
+};
+
+function toQuestionData(r: QuestionRow): QuestionData {
+  let options: Record<string, string> = {};
+  try {
+    const parsed = JSON.parse(r.options);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      options = parsed as Record<string, string>;
+    }
+  } catch {
+    // 容错:JSON 损坏时回退为空对象,避免上层崩溃
+  }
+  return {
+    id: r.id,
+    number: r.number,
+    ref: r.ref ?? "",
+    question: r.question,
+    options,
+    answer: r.answer,
+    explanation: r.explanation,
+    page: r.page,
+    source: r.source,
+    sourceLabel: r.sourceLabel,
+  };
+}
+
+export async function getQuestionSqlite(id: string): Promise<QuestionData | null> {
+  const prisma = getPrisma();
+  const row = await prisma.question.findUnique({ where: { id } });
+  return row ? toQuestionData(row) : null;
+}
+
+export async function listQuestionsSqlite(opts: {
+  paperCode?: string;
+  source?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<{ items: QuestionData[]; total: number }> {
+  const prisma = getPrisma();
+  const limit = Math.max(1, Math.min(opts.limit ?? 50, 200));
+  const offset = Math.max(0, opts.offset ?? 0);
+
+  // 根据 paperCode 先查 paperId;不指定时查所有 Paper。
+  let paperIds: string[] | undefined;
+  if (opts.paperCode) {
+    const paper = await prisma.paper.findUnique({
+      where: { code: opts.paperCode },
+      select: { id: true },
+    });
+    if (!paper) return { items: [], total: 0 };
+    paperIds = [paper.id];
+  } else {
+    const papers = await prisma.paper.findMany({ select: { id: true } });
+    paperIds = papers.map((p) => p.id);
+    if (paperIds.length === 0) return { items: [], total: 0 };
+  }
+
+  const where: Prisma.QuestionWhereInput = {
+    paperId: { in: paperIds },
+    ...(opts.source ? { source: opts.source } : {}),
+    ...(opts.search
+      ? {
+          OR: [
+            { question: { contains: opts.search } },
+            { options: { contains: opts.search } },
+            { ref: { contains: opts.search } },
+          ],
+        }
+      : {}),
+  };
+
+  const [total, rows] = await Promise.all([
+    prisma.question.count({ where }),
+    prisma.question.findMany({
+      where,
+      orderBy: [{ paperId: "asc" }, { source: "asc" }, { number: "asc" }],
+      skip: offset,
+      take: limit,
+    }),
+  ]);
+
+  return {
+    items: rows.map((r) => toQuestionData(r as QuestionRow)),
+    total,
+  };
+}
+
+export async function upsertQuestionSqlite(q: QuestionData): Promise<void> {
+  const prisma = getPrisma();
+  const paperCode = q.id.split("-")[0] || "UNKNOWN";
+  const paper = await prisma.paper.findUnique({
+    where: { code: paperCode },
+    select: { id: true },
+  });
+  if (!paper) {
+    throw new Error(`Paper 不存在: code=${paperCode}。請先在 papers.json 中定義此試卷。`);
+  }
+  const optionsJson = JSON.stringify(q.options ?? {});
+  await prisma.question.upsert({
+    where: { id: q.id },
+    create: {
+      id: q.id,
+      paperId: paper.id,
+      number: q.number,
+      ref: q.ref ?? "",
+      question: q.question,
+      options: optionsJson,
+      answer: q.answer,
+      explanation: q.explanation ?? null,
+      page: q.page,
+      source: q.source,
+      sourceLabel: q.sourceLabel ?? null,
+    },
+    update: {
+      paperId: paper.id,
+      number: q.number,
+      ref: q.ref ?? "",
+      question: q.question,
+      options: optionsJson,
+      answer: q.answer,
+      explanation: q.explanation ?? null,
+      page: q.page,
+      source: q.source,
+      sourceLabel: q.sourceLabel ?? null,
+    },
+  });
 }
 
 function toFeedbackRecord(r: FeedbackRow): FeedbackRecord {
