@@ -96,6 +96,17 @@ DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npx prisma db push --accep
 echo "---[6/9] prisma seed (idempotent)---"
 DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npx tsx prisma/seed.ts 2>&1 | tail -20
 
+echo "---[6.5/9] self-heal: drop legacy duplicate question rows---"
+# 历史双写残留(df8a225 重構後遺症):同一 (paperId,source,number) 可能同时存在
+# 旧式 ID(P1-exam-1,来自 JSON seed)与 cuid(cm...,旧版管理员新增默认生成)两行,
+# 导致 /admin/questions 每题显示两次。seed 按 id 幂等 upsert,不会删 cuid 行,
+# 故这里显式去重:保留旧式 ID、删 cuid,并迁移 Answer/Favorite/Note/Feedback 引用。
+# 幂等:无重复时脚本 exit 0(打印"没有重复项");遇到无法自动判定的组会 exit 2 并
+# 终止删除(安全,不误删)。本步设为非致命——即便去重异常也继续部署(避免阻塞发布),
+# 但会打印警告,运维需人工介入排查。
+DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npx tsx scripts/dedupe-questions.ts 2>&1 | tail -30 || \
+  echo "!!! [warn] dedupe-questions 返回非 0(可能无可自动判定的重复组)。prod.db 可能仍有重复,请人工核查。"
+
 echo "---[7/9] health check: verify-storage---"
 DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npx tsx scripts/verify-storage.ts 2>&1 | tail -40
 VERIFY_EXIT=$?

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { NotebookPen, Trash2, Eye, EyeOff, ExternalLink } from "lucide-react";
 import { NoteSection } from "@/components/NoteSection";
+import { QuestionStem } from "@/components/QuestionStem";
 import { authedFetch } from "@/lib/session-client";
 
 type NoteItem = {
@@ -121,7 +122,7 @@ export function NoteItemCard({ item, onDeleted }: NoteItemCardProps) {
           </div>
         </div>
         <CardTitle className="text-base leading-relaxed mt-2">
-          {q.question}
+          <QuestionStem text={q.question} />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">

@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { authedFetch } from "@/lib/session-client";
 import { QuestionActions } from "@/components/QuestionActions";
+import { QuestionStem } from "@/components/QuestionStem";
 import { NoteSection } from "@/components/NoteSection";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
 import { RedoPractice, type RedoItem } from "@/components/RedoPractice";
@@ -110,7 +111,7 @@ function FavItemCard({
           </div>
         </div>
         <CardTitle className="text-base leading-relaxed mt-2">
-          {q.question}
+          <QuestionStem text={q.question} />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">

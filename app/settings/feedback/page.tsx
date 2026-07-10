@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { authedFetch } from "@/lib/session-client";
 import type { QuestionData } from "@/lib/data";
+import { QuestionStem } from "@/components/QuestionStem";
 
 type FeedbackItem = {
   id: string;
@@ -172,7 +173,9 @@ function FeedbackCard({
               題幹 / 答案
             </summary>
             <div className="mt-2 p-2 bg-muted/30 rounded space-y-1.5">
-              <p className="font-medium text-foreground">{q.question}</p>
+              <p className="font-medium text-foreground">
+                <QuestionStem text={q.question} />
+              </p>
               <ul className="space-y-0.5 text-muted-foreground">
                 {Object.entries(q.options).map(([k, v]) => (
                   <li

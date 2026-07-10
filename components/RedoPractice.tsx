@@ -17,6 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { getChapterInfo } from "@/lib/chapters";
 import { QuestionActions } from "@/components/QuestionActions";
+import { QuestionStem } from "@/components/QuestionStem";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
 import { buildSearchQuery } from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
@@ -476,7 +477,7 @@ export function RedoPractice({
             </div>
           </div>
           <CardTitle className="text-base leading-relaxed mt-2">
-            {current.question.question}
+            <QuestionStem text={current.question.question} />
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">

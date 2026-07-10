@@ -24,6 +24,7 @@ import { authedFetch } from "@/lib/session-client";
 import { NoteButton, type NoteButtonHandle } from "@/components/NoteButton";
 import { ReportButton } from "@/components/ReportButton";
 import { QuestionActions } from "@/components/QuestionActions";
+import { QuestionStem } from "@/components/QuestionStem";
 import { buildSearchQuery } from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
 import { useToast, ToastContainer } from "@/components/useToast";
@@ -572,7 +573,7 @@ function PracticeInner() {
           <div className="min-w-0 flex-1">
             <CardTitle className="text-base leading-relaxed">
               <span className="text-muted-foreground mr-2">#{currentQ.number}</span>
-              {currentQ.question}
+              <QuestionStem text={currentQ.question} />
             </CardTitle>
           </div>
           </div>
@@ -952,7 +953,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
         <CardHeader>
           <div className="flex items-start justify-between gap-2">
             <CardTitle className="text-base leading-relaxed flex-1 min-w-0">
-              {question.question}
+              <QuestionStem text={question.question} />
             </CardTitle>
             <QuestionActions
               number={question.number}
