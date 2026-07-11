@@ -1,15 +1,14 @@
 // app/studynotes/[slug]/page.tsx
 // 研習手冊動態路由 — /studynotes/<slug>
+// 頁面只剩一層 sticky header (HandbookSubHeader),
+// 全域 header 由 GlobalHeader 在該路徑下隱藏。
 
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import { getHandbook, listHandbookSlugs } from "@/lib/handbook";
+
+import { getHandbook, listHandbookEntries, listHandbookSlugs } from "@/lib/handbook";
 import { HandbookTOC } from "./HandbookTOC";
+import { HandbookSubHeader } from "./HandbookSubHeader";
 import { BackToTop } from "./BackToTop";
-import {
-  HandbookArrowLeft,
-  HandbookBookOpen,
-} from "@/components/HandbookPageIcons";
 
 type Params = { slug: string };
 
@@ -37,23 +36,21 @@ export default async function HandbookPage({
   const data = await getHandbook(slug);
   if (!data) notFound();
 
+  // 與 app/layout.tsx 共用同一份 { slug, title, version } 清單
+  const handbookEntries = await listHandbookEntries();
+  const defaultSlug =
+    handbookEntries.find((h) => h.slug === "exam1-2024")?.slug ??
+    handbookEntries[0]?.slug ??
+    "";
+
   return (
     <div className="max-w-7xl mx-auto">
-      {/* Header bar */}
-      <div className="px-4 lg:px-6 py-3 lg:py-4 border-b flex items-center gap-2 lg:gap-3 sticky top-14 bg-background/95 backdrop-blur z-10">
-        <Link
-          href="/"
-          className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1 shrink-0"
-        >
-          <HandbookArrowLeft className="w-4 h-4" />
-          <span className="hidden sm:inline">返回首頁</span>
-        </Link>
-        <HandbookBookOpen className="w-4 h-4 text-muted-foreground shrink-0" />
-        <div className="flex-1 min-w-0">
-          <h1 className="text-base lg:text-lg font-semibold truncate">{data.title}</h1>
-          <p className="text-xs text-muted-foreground truncate">{data.version}</p>
-        </div>
-      </div>
+      <HandbookSubHeader
+        title={data.title}
+        version={data.version}
+        defaultSlug={defaultSlug}
+        handbookEntries={handbookEntries}
+      />
 
       <div className="flex">
         {/* TOC sidebar (client) */}
@@ -218,13 +215,13 @@ export default async function HandbookPage({
               .handbook-content .vocab-block { column-count: 1; }
             }
 
-            /* 內文內所有錨點加上 scroll-margin,避免被頂部兩層 sticky header 擋住
-               全域 header: h-14 (=3.5rem=56px),子 header: py-3 lg:py-4 + 一行 h1+文字 ≈ 76px
-               為確保章節標題完整露出,scroll-margin-top 設為 144px (兩層 header + 安全緩衝) */
+            /* 內文內所有錨點加上 scroll-margin,避免被頂部單層 sticky header 擋住
+               新的 sub-header: h-14 (=3.5rem=56px) + 內容區 padding-bottom
+               為確保章節標題完整露出,scroll-margin-top 設為 76px */
             .handbook-content h1, .handbook-content h2,
-            .handbook-content h3, .handbook-content h4 { scroll-margin-top: 144px; }
+            .handbook-content h3, .handbook-content h4 { scroll-margin-top: 76px; }
             /* 純錨點(內文單獨的 page-badge <a id="pdf-page-N">)也需避開 header */
-            .handbook-content a[id^="pdf-page-"] { scroll-margin-top: 144px; }
+            .handbook-content a[id^="pdf-page-"] { scroll-margin-top: 76px; }
 
             /* 行動裝置:略小字級以避免水平溢出,scroll-margin 也略小 */
             @media (max-width: 640px) {
@@ -232,8 +229,8 @@ export default async function HandbookPage({
               .handbook-content h2 { font-size: 1.25rem !important; margin-top: 24px !important; }
               .handbook-content h3 { font-size: 1.125rem !important; }
               .handbook-content h1, .handbook-content h2,
-              .handbook-content h3, .handbook-content h4 { scroll-margin-top: 120px; }
-              .handbook-content a[id^="pdf-page-"] { scroll-margin-top: 120px; }
+              .handbook-content h3, .handbook-content h4 { scroll-margin-top: 68px; }
+              .handbook-content a[id^="pdf-page-"] { scroll-margin-top: 68px; }
             }
           `,
         }}

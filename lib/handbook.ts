@@ -39,6 +39,22 @@ export async function listHandbookSlugs(): Promise<string[]> {
     .map((f) => f.replace(/\.json$/, ""));
 }
 
+/** 對 layout / sub-header 共用的手冊清單({ slug, title, version }) */
+export async function listHandbookEntries(): Promise<
+  { slug: string; title: string; version: string }[]
+> {
+  const slugs = await listHandbookSlugs();
+  const entries = await Promise.all(
+    slugs.map(async (slug) => {
+      const h = await getHandbook(slug);
+      return h ? { slug, title: h.title, version: h.version } : null;
+    }),
+  );
+  return entries.filter(
+    (e): e is { slug: string; title: string; version: string } => e !== null,
+  );
+}
+
 /** 載入指定 slug 的研習手冊;找不到回傳 null */
 export async function getHandbook(slug: string): Promise<HandbookData | null> {
   // 防止 path traversal

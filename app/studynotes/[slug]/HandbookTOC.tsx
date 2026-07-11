@@ -165,8 +165,8 @@ export function HandbookTOC({ chapters }: Props) {
         className={cn(
           // 基礎 layout
           "bg-muted/30 text-sm border-r",
-          // Desktop:sticky sidebar
-          "hidden lg:block lg:sticky lg:top-14 lg:self-start lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto lg:py-4 lg:px-3",
+          // Desktop:sticky sidebar。寬度縮窄到 14rem(224px),不靠內容撐開
+          "hidden lg:block lg:sticky lg:top-14 lg:self-start lg:w-56 lg:shrink-0 lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto lg:py-4 lg:px-3",
           // Mobile:抽屜式 drawer(transform 控制顯隱)
           "lg:transform-none",
         )}
