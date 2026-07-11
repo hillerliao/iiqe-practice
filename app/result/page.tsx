@@ -171,6 +171,7 @@ function ResultInner() {
                       question={a.question.question}
                       options={a.question.options}
                       ref={a.question.ref || undefined}
+                      paper={attempt?.paper?.code || undefined}
                       size="xs"
                     />
                   </div>

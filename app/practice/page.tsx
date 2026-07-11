@@ -294,6 +294,7 @@ function PracticeInner() {
       question: currentQ.question,
       options: currentQ.options,
       ref: currentQ.ref || undefined,
+      paper: attempt?.paperCode || undefined,
     });
     try {
       await navigator.clipboard.writeText(text);
@@ -406,6 +407,7 @@ function PracticeInner() {
           question: currentQ.question,
           options: currentQ.options,
           ref: currentQ.ref || undefined,
+          paper: attempt?.paperCode || undefined,
         });
         navigator.clipboard
           ?.writeText(text)
@@ -960,6 +962,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
               question={question.question}
               options={question.options}
               ref={question.ref || undefined}
+              paper={paperCode || undefined}
               size="xs"
             />
           </div>

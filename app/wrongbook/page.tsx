@@ -74,6 +74,7 @@ function WrongItemCard({ item }: { item: WrongItem }) {
               question={q.question}
               options={q.options}
               ref={q.ref || undefined}
+              paper={item.paperCode || undefined}
               size="xs"
             />
             {picked != null && (

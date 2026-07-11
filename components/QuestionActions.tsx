@@ -18,6 +18,7 @@ type QuestionActionsProps = {
   question: string;
   options: Record<string, string>;
   ref?: string;
+  paper?: string;
   className?: string;
   size?: "xs" | "sm" | "default";
 };
@@ -27,6 +28,7 @@ export function QuestionActions({
   question,
   options,
   ref,
+  paper,
   className,
   size = "xs",
 }: QuestionActionsProps) {
@@ -56,7 +58,7 @@ export function QuestionActions({
   }, [open]);
 
   async function handleCopy() {
-    const text = formatQuestionText({ number, question, options, ref });
+    const text = formatQuestionText({ number, question, options, ref, paper });
     try {
       await navigator.clipboard.writeText(text);
     } catch {

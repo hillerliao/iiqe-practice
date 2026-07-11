@@ -265,6 +265,7 @@ export function RedoPractice({
           question: s.current.question.question,
           options: s.current.question.options,
           ref: s.current.question.ref || undefined,
+          paper: s.current.paperCode || undefined,
         });
         navigator.clipboard
           ?.writeText(text)
@@ -293,6 +294,7 @@ export function RedoPractice({
           question: s.current.question.question,
           options: s.current.question.options,
           ref: s.current.question.ref || undefined,
+          paper: s.current.paperCode || undefined,
         });
         navigator.clipboard
           ?.writeText(text)
@@ -472,6 +474,7 @@ export function RedoPractice({
                 question={current.question.question}
                 options={current.question.options}
                 ref={current.question.ref || undefined}
+                paper={current.paperCode || undefined}
                 size="xs"
               />
             </div>
