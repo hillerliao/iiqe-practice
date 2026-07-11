@@ -1,0 +1,8963 @@
+{
+  "parser": "scripts\\rebuild_mock_pdfs.py",
+  "method": "pdfplumber word coordinates",
+  "papers": [
+    {
+      "paper": "P1",
+      "sourcePdf": "D:\\Downloads\\IIQE\\試卷㇐：保險原理及實務 — 模擬試題2025年版(適用於2025年2月17日或以後的考試).pdf",
+      "sourcePdfSha256": "cb2cb20764f24bca862010d1abec2e89e869975828ab5e31a84eeca05bf019d1",
+      "target": "D:\\Downloads\\IIQE\\iiqe-app\\data\\questions-p1-mock.json",
+      "expectedCount": 919,
+      "currentCount": 919,
+      "extractedCount": 919,
+      "sourceAnswerAvailability": {
+        "available": 892,
+        "unavailable": 27
+      },
+      "answerConflicts": [],
+      "validationErrors": [],
+      "valid": true,
+      "anchorPages": [
+        {
+          "number": 1,
+          "page": 2,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 2,
+          "page": 2,
+          "ref": "1.3"
+        },
+        {
+          "number": 3,
+          "page": 2,
+          "ref": "1.1.2b"
+        },
+        {
+          "number": 4,
+          "page": 2,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 5,
+          "page": 2,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 6,
+          "page": 2,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 7,
+          "page": 3,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 8,
+          "page": 3,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 9,
+          "page": 3,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 10,
+          "page": 3,
+          "ref": "1.2"
+        },
+        {
+          "number": 11,
+          "page": 3,
+          "ref": "1.2"
+        },
+        {
+          "number": 12,
+          "page": 4,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 13,
+          "page": 4,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 14,
+          "page": 4,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 15,
+          "page": 4,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 16,
+          "page": 4,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 17,
+          "page": 5,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 18,
+          "page": 5,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 19,
+          "page": 5,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 20,
+          "page": 5,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 21,
+          "page": 5,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 22,
+          "page": 6,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 23,
+          "page": 6,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 24,
+          "page": 6,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 25,
+          "page": 6,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 26,
+          "page": 6,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 27,
+          "page": 6,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 28,
+          "page": 7,
+          "ref": "1.1.1註"
+        },
+        {
+          "number": 29,
+          "page": 7,
+          "ref": "1.1.1註"
+        },
+        {
+          "number": 30,
+          "page": 7,
+          "ref": "1.1.1註"
+        },
+        {
+          "number": 31,
+          "page": 7,
+          "ref": "1.1.1註"
+        },
+        {
+          "number": 32,
+          "page": 7,
+          "ref": "1.1.2"
+        },
+        {
+          "number": 33,
+          "page": 7,
+          "ref": "1.1.2"
+        },
+        {
+          "number": 34,
+          "page": 8,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 35,
+          "page": 8,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 36,
+          "page": 8,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 37,
+          "page": 8,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 38,
+          "page": 8,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 39,
+          "page": 8,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 40,
+          "page": 9,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 41,
+          "page": 9,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 42,
+          "page": 9,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 43,
+          "page": 9,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 44,
+          "page": 9,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 45,
+          "page": 10,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 46,
+          "page": 10,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 47,
+          "page": 10,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 48,
+          "page": 10,
+          "ref": "1.1.2a"
+        },
+        {
+          "number": 49,
+          "page": 10,
+          "ref": "1.1.2b"
+        },
+        {
+          "number": 50,
+          "page": 11,
+          "ref": "1.1.2b"
+        },
+        {
+          "number": 51,
+          "page": 11,
+          "ref": "1.1.2b"
+        },
+        {
+          "number": 52,
+          "page": 11,
+          "ref": "1.1.2b"
+        },
+        {
+          "number": 53,
+          "page": 11,
+          "ref": "1.1.2b"
+        },
+        {
+          "number": 54,
+          "page": 11,
+          "ref": "1.1.2b"
+        },
+        {
+          "number": 55,
+          "page": 11,
+          "ref": "1.1.2b"
+        },
+        {
+          "number": 56,
+          "page": 11,
+          "ref": "1.1.2b"
+        },
+        {
+          "number": 57,
+          "page": 12,
+          "ref": "1.1.2b"
+        },
+        {
+          "number": 58,
+          "page": 12,
+          "ref": "1.1.2b"
+        },
+        {
+          "number": 59,
+          "page": 12,
+          "ref": "1.1.2b"
+        },
+        {
+          "number": 60,
+          "page": 12,
+          "ref": "1.1.2b"
+        },
+        {
+          "number": 61,
+          "page": 12,
+          "ref": "1.1"
+        },
+        {
+          "number": 62,
+          "page": 12,
+          "ref": "1.1"
+        },
+        {
+          "number": 63,
+          "page": 13,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 64,
+          "page": 13,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 65,
+          "page": 13,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 66,
+          "page": 13,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 67,
+          "page": 13,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 68,
+          "page": 13,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 69,
+          "page": 14,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 70,
+          "page": 14,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 71,
+          "page": 14,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 72,
+          "page": 14,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 73,
+          "page": 14,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 74,
+          "page": 14,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 75,
+          "page": 15,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 76,
+          "page": 15,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 77,
+          "page": 15,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 78,
+          "page": 15,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 79,
+          "page": 15,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 80,
+          "page": 15,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 81,
+          "page": 16,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 82,
+          "page": 16,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 83,
+          "page": 16,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 84,
+          "page": 16,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 85,
+          "page": 16,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 86,
+          "page": 16,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 87,
+          "page": 17,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 88,
+          "page": 17,
+          "ref": "1.1.3"
+        },
+        {
+          "number": 89,
+          "page": 17,
+          "ref": "1.2"
+        },
+        {
+          "number": 90,
+          "page": 17,
+          "ref": "1.2"
+        },
+        {
+          "number": 91,
+          "page": 17,
+          "ref": "1.2"
+        },
+        {
+          "number": 92,
+          "page": 17,
+          "ref": "1.2"
+        },
+        {
+          "number": 93,
+          "page": 18,
+          "ref": "1.2"
+        },
+        {
+          "number": 94,
+          "page": 18,
+          "ref": "1.2"
+        },
+        {
+          "number": 95,
+          "page": 18,
+          "ref": "1.2"
+        },
+        {
+          "number": 96,
+          "page": 18,
+          "ref": "1.2"
+        },
+        {
+          "number": 97,
+          "page": 18,
+          "ref": "1.2"
+        },
+        {
+          "number": 98,
+          "page": 18,
+          "ref": "1.2"
+        },
+        {
+          "number": 99,
+          "page": 19,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 100,
+          "page": 19,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 101,
+          "page": 19,
+          "ref": "2.2.1"
+        },
+        {
+          "number": 102,
+          "page": 19,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 103,
+          "page": 19,
+          "ref": "2.1.3(a)"
+        },
+        {
+          "number": 104,
+          "page": 19,
+          "ref": "2.1.3(d)"
+        },
+        {
+          "number": 105,
+          "page": 20,
+          "ref": "2.1.3(f)"
+        },
+        {
+          "number": 106,
+          "page": 20,
+          "ref": "2.1.4"
+        },
+        {
+          "number": 107,
+          "page": 20,
+          "ref": "2.2"
+        },
+        {
+          "number": 108,
+          "page": 20,
+          "ref": "2.2"
+        },
+        {
+          "number": 109,
+          "page": 20,
+          "ref": "2.2.3(d)"
+        },
+        {
+          "number": 110,
+          "page": 21,
+          "ref": "2.1.2(a)"
+        },
+        {
+          "number": 111,
+          "page": 21,
+          "ref": "2.1"
+        },
+        {
+          "number": 112,
+          "page": 21,
+          "ref": "2.1"
+        },
+        {
+          "number": 113,
+          "page": 21,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 114,
+          "page": 21,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 115,
+          "page": 21,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 116,
+          "page": 22,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 117,
+          "page": 22,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 118,
+          "page": 22,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 119,
+          "page": 22,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 120,
+          "page": 22,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 121,
+          "page": 23,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 122,
+          "page": 23,
+          "ref": "2.1.2(a)"
+        },
+        {
+          "number": 123,
+          "page": 23,
+          "ref": "2.1.2(a)"
+        },
+        {
+          "number": 124,
+          "page": 23,
+          "ref": "2.1.2(a)"
+        },
+        {
+          "number": 125,
+          "page": 23,
+          "ref": "2.1.2(a)"
+        },
+        {
+          "number": 126,
+          "page": 23,
+          "ref": "2.1.2(a)"
+        },
+        {
+          "number": 127,
+          "page": 24,
+          "ref": "2.1.2(a)"
+        },
+        {
+          "number": 128,
+          "page": 24,
+          "ref": "2.1.2(a)"
+        },
+        {
+          "number": 129,
+          "page": 24,
+          "ref": "2.1.2(b)"
+        },
+        {
+          "number": 130,
+          "page": 24,
+          "ref": "2.1.2(b)"
+        },
+        {
+          "number": 131,
+          "page": 24,
+          "ref": "2.1.2(b)"
+        },
+        {
+          "number": 132,
+          "page": 24,
+          "ref": "2.1.2(b)"
+        },
+        {
+          "number": 133,
+          "page": 25,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 134,
+          "page": 25,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 135,
+          "page": 25,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 136,
+          "page": 25,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 137,
+          "page": 25,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 138,
+          "page": 25,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 139,
+          "page": 26,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 140,
+          "page": 26,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 141,
+          "page": 26,
+          "ref": "2.1.3(a)"
+        },
+        {
+          "number": 142,
+          "page": 26,
+          "ref": "2.1.3(a)"
+        },
+        {
+          "number": 143,
+          "page": 26,
+          "ref": "2.1.3(b)"
+        },
+        {
+          "number": 144,
+          "page": 26,
+          "ref": "2.1.3(b)"
+        },
+        {
+          "number": 145,
+          "page": 27,
+          "ref": "2.1.3(b)"
+        },
+        {
+          "number": 146,
+          "page": 27,
+          "ref": "2.1.3(b)"
+        },
+        {
+          "number": 147,
+          "page": 27,
+          "ref": "2.1.3(b)"
+        },
+        {
+          "number": 148,
+          "page": 27,
+          "ref": "2.1.3(b)"
+        },
+        {
+          "number": 149,
+          "page": 27,
+          "ref": "2.1.3(b)"
+        },
+        {
+          "number": 150,
+          "page": 28,
+          "ref": "2.1.3(c)"
+        },
+        {
+          "number": 151,
+          "page": 28,
+          "ref": "2.1.3(c)"
+        },
+        {
+          "number": 152,
+          "page": 28,
+          "ref": "2.1.3(c)"
+        },
+        {
+          "number": 153,
+          "page": 28,
+          "ref": "2.1.3(c)"
+        },
+        {
+          "number": 154,
+          "page": 28,
+          "ref": "2.1.3(c)"
+        },
+        {
+          "number": 155,
+          "page": 28,
+          "ref": "2.1.3(c)"
+        },
+        {
+          "number": 156,
+          "page": 29,
+          "ref": "2.1.3(c)"
+        },
+        {
+          "number": 157,
+          "page": 29,
+          "ref": "2.1.3(c)"
+        },
+        {
+          "number": 158,
+          "page": 29,
+          "ref": "2.1.3(c)"
+        },
+        {
+          "number": 159,
+          "page": 29,
+          "ref": "2.1.3(d)"
+        },
+        {
+          "number": 160,
+          "page": 29,
+          "ref": "2.1.3(d)"
+        },
+        {
+          "number": 161,
+          "page": 30,
+          "ref": "2.1.3(d)"
+        },
+        {
+          "number": 162,
+          "page": 30,
+          "ref": "2.1.3(e)"
+        },
+        {
+          "number": 163,
+          "page": 30,
+          "ref": "2.1.3(f)"
+        },
+        {
+          "number": 164,
+          "page": 30,
+          "ref": "2.1.3(f)"
+        },
+        {
+          "number": 165,
+          "page": 30,
+          "ref": "2.1.3(f)"
+        },
+        {
+          "number": 166,
+          "page": 30,
+          "ref": "2.2"
+        },
+        {
+          "number": 167,
+          "page": 31,
+          "ref": "2.2"
+        },
+        {
+          "number": 168,
+          "page": 31,
+          "ref": "2.2"
+        },
+        {
+          "number": 169,
+          "page": 31,
+          "ref": "2.2"
+        },
+        {
+          "number": 170,
+          "page": 31,
+          "ref": "2.2"
+        },
+        {
+          "number": 171,
+          "page": 31,
+          "ref": "2.2"
+        },
+        {
+          "number": 172,
+          "page": 31,
+          "ref": "2.2"
+        },
+        {
+          "number": 173,
+          "page": 32,
+          "ref": "2.2"
+        },
+        {
+          "number": 174,
+          "page": 32,
+          "ref": "2.2"
+        },
+        {
+          "number": 175,
+          "page": 32,
+          "ref": "2.2"
+        },
+        {
+          "number": 176,
+          "page": 32,
+          "ref": "2.2"
+        },
+        {
+          "number": 177,
+          "page": 32,
+          "ref": "2.2.1"
+        },
+        {
+          "number": 178,
+          "page": 32,
+          "ref": "2.2.1"
+        },
+        {
+          "number": 179,
+          "page": 33,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 180,
+          "page": 33,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 181,
+          "page": 33,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 182,
+          "page": 33,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 183,
+          "page": 33,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 184,
+          "page": 34,
+          "ref": "2.2.3"
+        },
+        {
+          "number": 185,
+          "page": 34,
+          "ref": "2.2.3"
+        },
+        {
+          "number": 186,
+          "page": 34,
+          "ref": "2.2.3"
+        },
+        {
+          "number": 187,
+          "page": 34,
+          "ref": "2.2.3"
+        },
+        {
+          "number": 188,
+          "page": 34,
+          "ref": "2.2.3"
+        },
+        {
+          "number": 189,
+          "page": 35,
+          "ref": "2.2.3(a)"
+        },
+        {
+          "number": 190,
+          "page": 35,
+          "ref": "2.2.3(a)"
+        },
+        {
+          "number": 191,
+          "page": 35,
+          "ref": "2.2.3(a)"
+        },
+        {
+          "number": 192,
+          "page": 35,
+          "ref": "2.2.3(a)"
+        },
+        {
+          "number": 193,
+          "page": 35,
+          "ref": "2.2.3(a)"
+        },
+        {
+          "number": 194,
+          "page": 35,
+          "ref": "2.2.3(b)"
+        },
+        {
+          "number": 195,
+          "page": 36,
+          "ref": "2.2.3(b)"
+        },
+        {
+          "number": 196,
+          "page": 36,
+          "ref": "2.2.3(b)"
+        },
+        {
+          "number": 197,
+          "page": 36,
+          "ref": "2.2.3(c)"
+        },
+        {
+          "number": 198,
+          "page": 36,
+          "ref": "2.2.3(c)"
+        },
+        {
+          "number": 199,
+          "page": 36,
+          "ref": "2.2.3(c)"
+        },
+        {
+          "number": 200,
+          "page": 36,
+          "ref": "2.2.3(c)"
+        },
+        {
+          "number": 201,
+          "page": 37,
+          "ref": "2.2.3(c)"
+        },
+        {
+          "number": 202,
+          "page": 37,
+          "ref": "2.2.3(c)"
+        },
+        {
+          "number": 203,
+          "page": 37,
+          "ref": "2.2.3(c)"
+        },
+        {
+          "number": 204,
+          "page": 37,
+          "ref": "2.2.3(c)"
+        },
+        {
+          "number": 205,
+          "page": 37,
+          "ref": "2.2.3(d)"
+        },
+        {
+          "number": 206,
+          "page": 37,
+          "ref": "2.2.3(d)"
+        },
+        {
+          "number": 207,
+          "page": 38,
+          "ref": "2.2.4"
+        },
+        {
+          "number": 208,
+          "page": 38,
+          "ref": "2.2.4"
+        },
+        {
+          "number": 209,
+          "page": 38,
+          "ref": "2.2.4"
+        },
+        {
+          "number": 210,
+          "page": 38,
+          "ref": "2.2.4"
+        },
+        {
+          "number": 211,
+          "page": 38,
+          "ref": "2.2.4"
+        },
+        {
+          "number": 212,
+          "page": 38,
+          "ref": "2.2.5"
+        },
+        {
+          "number": 213,
+          "page": 39,
+          "ref": "2.2.5"
+        },
+        {
+          "number": 214,
+          "page": 39,
+          "ref": "2.2.5"
+        },
+        {
+          "number": 215,
+          "page": 39,
+          "ref": "2.2.5"
+        },
+        {
+          "number": 216,
+          "page": 39,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 217,
+          "page": 39,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 218,
+          "page": 39,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 219,
+          "page": 40,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 220,
+          "page": 40,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 221,
+          "page": 40,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 222,
+          "page": 40,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 223,
+          "page": 40,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 224,
+          "page": 40,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 225,
+          "page": 41,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 226,
+          "page": 41,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 227,
+          "page": 41,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 228,
+          "page": 41,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 229,
+          "page": 41,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 230,
+          "page": 41,
+          "ref": "2.2.6"
+        },
+        {
+          "number": 231,
+          "page": 42,
+          "ref": "3.1.4"
+        },
+        {
+          "number": 232,
+          "page": 42,
+          "ref": "3.3.2(c)"
+        },
+        {
+          "number": 233,
+          "page": 42,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 234,
+          "page": 42,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 235,
+          "page": 42,
+          "ref": "3.3.2(c)"
+        },
+        {
+          "number": 236,
+          "page": 42,
+          "ref": "3.1.6"
+        },
+        {
+          "number": 237,
+          "page": 43,
+          "ref": "3.4.3"
+        },
+        {
+          "number": 238,
+          "page": 43,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 239,
+          "page": 43,
+          "ref": "3.2.3(b)"
+        },
+        {
+          "number": 240,
+          "page": 43,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 241,
+          "page": 43,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 242,
+          "page": 43,
+          "ref": "3.1.4"
+        },
+        {
+          "number": 243,
+          "page": 44,
+          "ref": "3.4.7(b)"
+        },
+        {
+          "number": 244,
+          "page": 44,
+          "ref": "3.1.3"
+        },
+        {
+          "number": 245,
+          "page": 44,
+          "ref": "3.1.3"
+        },
+        {
+          "number": 246,
+          "page": 44,
+          "ref": "3.4.7(b)"
+        },
+        {
+          "number": 247,
+          "page": 44,
+          "ref": "3.1.4"
+        },
+        {
+          "number": 248,
+          "page": 45,
+          "ref": "3.1.4"
+        },
+        {
+          "number": 249,
+          "page": 45,
+          "ref": "3.1.4(b)"
+        },
+        {
+          "number": 250,
+          "page": 45,
+          "ref": "3.1.6"
+        },
+        {
+          "number": 251,
+          "page": 45,
+          "ref": "3.1.6"
+        },
+        {
+          "number": 252,
+          "page": 45,
+          "ref": "3.1.6(b)"
+        },
+        {
+          "number": 253,
+          "page": 46,
+          "ref": "3.1.6"
+        },
+        {
+          "number": 254,
+          "page": 46,
+          "ref": "3.1.6(b)"
+        },
+        {
+          "number": 255,
+          "page": 46,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 256,
+          "page": 46,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 257,
+          "page": 46,
+          "ref": "3.2.4"
+        },
+        {
+          "number": 258,
+          "page": 46,
+          "ref": "3.2.4"
+        },
+        {
+          "number": 259,
+          "page": 47,
+          "ref": "3.2.4"
+        },
+        {
+          "number": 260,
+          "page": 47,
+          "ref": "3.2.4"
+        },
+        {
+          "number": 261,
+          "page": 47,
+          "ref": "3.2.6"
+        },
+        {
+          "number": 262,
+          "page": 47,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 263,
+          "page": 47,
+          "ref": "3.3.4"
+        },
+        {
+          "number": 264,
+          "page": 48,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 265,
+          "page": 48,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 266,
+          "page": 48,
+          "ref": "3.4.3"
+        },
+        {
+          "number": 267,
+          "page": 48,
+          "ref": "3.4.3"
+        },
+        {
+          "number": 268,
+          "page": 48,
+          "ref": "3.4.5"
+        },
+        {
+          "number": 269,
+          "page": 48,
+          "ref": "3.4.7"
+        },
+        {
+          "number": 270,
+          "page": 49,
+          "ref": "3.4.7(a)"
+        },
+        {
+          "number": 271,
+          "page": 49,
+          "ref": "3.4.7(b)"
+        },
+        {
+          "number": 272,
+          "page": 49,
+          "ref": "3.4.8"
+        },
+        {
+          "number": 273,
+          "page": 49,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 274,
+          "page": 49,
+          "ref": "3.1"
+        },
+        {
+          "number": 275,
+          "page": 49,
+          "ref": "3.1"
+        },
+        {
+          "number": 276,
+          "page": 50,
+          "ref": "3.1"
+        },
+        {
+          "number": 277,
+          "page": 50,
+          "ref": "3.1"
+        },
+        {
+          "number": 278,
+          "page": 50,
+          "ref": "3.1.1"
+        },
+        {
+          "number": 279,
+          "page": 50,
+          "ref": "3.1.1"
+        },
+        {
+          "number": 280,
+          "page": 50,
+          "ref": "3.1.1"
+        },
+        {
+          "number": 281,
+          "page": 50,
+          "ref": "3.1.2"
+        },
+        {
+          "number": 282,
+          "page": 51,
+          "ref": "3.1.2"
+        },
+        {
+          "number": 283,
+          "page": 51,
+          "ref": "3.1.2"
+        },
+        {
+          "number": 284,
+          "page": 51,
+          "ref": "3.1.3"
+        },
+        {
+          "number": 285,
+          "page": 51,
+          "ref": "3.1.3"
+        },
+        {
+          "number": 286,
+          "page": 51,
+          "ref": "3.1.3"
+        },
+        {
+          "number": 287,
+          "page": 51,
+          "ref": "3.1.3"
+        },
+        {
+          "number": 288,
+          "page": 52,
+          "ref": "3.1.3"
+        },
+        {
+          "number": 289,
+          "page": 52,
+          "ref": "3.1.3"
+        },
+        {
+          "number": 290,
+          "page": 52,
+          "ref": "3.1.3"
+        },
+        {
+          "number": 291,
+          "page": 52,
+          "ref": "3.1.3"
+        },
+        {
+          "number": 292,
+          "page": 52,
+          "ref": "3.1.3"
+        },
+        {
+          "number": 293,
+          "page": 52,
+          "ref": "3.1.3"
+        },
+        {
+          "number": 294,
+          "page": 53,
+          "ref": "3.1.4"
+        },
+        {
+          "number": 295,
+          "page": 53,
+          "ref": "3.1.4"
+        },
+        {
+          "number": 296,
+          "page": 53,
+          "ref": "3.1.4"
+        },
+        {
+          "number": 297,
+          "page": 53,
+          "ref": "3.1.4(a)"
+        },
+        {
+          "number": 298,
+          "page": 53,
+          "ref": "3.1.4"
+        },
+        {
+          "number": 299,
+          "page": 53,
+          "ref": "3.1.4"
+        },
+        {
+          "number": 300,
+          "page": 54,
+          "ref": "3.1.4"
+        },
+        {
+          "number": 301,
+          "page": 54,
+          "ref": "3.1.4"
+        },
+        {
+          "number": 302,
+          "page": 54,
+          "ref": "3.1.4(a)"
+        },
+        {
+          "number": 303,
+          "page": 54,
+          "ref": "3.1.4(a)"
+        },
+        {
+          "number": 304,
+          "page": 54,
+          "ref": "3.1.4(b)"
+        },
+        {
+          "number": 305,
+          "page": 54,
+          "ref": "3.1.4(b)"
+        },
+        {
+          "number": 306,
+          "page": 55,
+          "ref": "3.1.4(b)"
+        },
+        {
+          "number": 307,
+          "page": 55,
+          "ref": "3.1.4(b)"
+        },
+        {
+          "number": 308,
+          "page": 55,
+          "ref": "3.1.5"
+        },
+        {
+          "number": 309,
+          "page": 55,
+          "ref": "3.1.4(b)"
+        },
+        {
+          "number": 310,
+          "page": 55,
+          "ref": "3.1.4(b)"
+        },
+        {
+          "number": 311,
+          "page": 56,
+          "ref": "3.1.4(c)"
+        },
+        {
+          "number": 312,
+          "page": 56,
+          "ref": "3.1.4(c)"
+        },
+        {
+          "number": 313,
+          "page": 56,
+          "ref": "3.1.4(c)"
+        },
+        {
+          "number": 314,
+          "page": 56,
+          "ref": "3.1.4(c)"
+        },
+        {
+          "number": 315,
+          "page": 56,
+          "ref": "3.1.4(c)"
+        },
+        {
+          "number": 316,
+          "page": 57,
+          "ref": "3.1.4(c)"
+        },
+        {
+          "number": 317,
+          "page": 57,
+          "ref": "3.1.4(d)"
+        },
+        {
+          "number": 318,
+          "page": 57,
+          "ref": "3.1.4(d)"
+        },
+        {
+          "number": 319,
+          "page": 57,
+          "ref": "3.1.4(d)"
+        },
+        {
+          "number": 320,
+          "page": 57,
+          "ref": "3.1.5"
+        },
+        {
+          "number": 321,
+          "page": 58,
+          "ref": "3.1.5"
+        },
+        {
+          "number": 322,
+          "page": 59,
+          "ref": "3.1.5"
+        },
+        {
+          "number": 323,
+          "page": 59,
+          "ref": "3.1.5"
+        },
+        {
+          "number": 324,
+          "page": 59,
+          "ref": "3.1.6"
+        },
+        {
+          "number": 325,
+          "page": 59,
+          "ref": "3.1.6"
+        },
+        {
+          "number": 326,
+          "page": 59,
+          "ref": "3.1.6"
+        },
+        {
+          "number": 327,
+          "page": 60,
+          "ref": "3.1.6"
+        },
+        {
+          "number": 328,
+          "page": 60,
+          "ref": "3.1.6"
+        },
+        {
+          "number": 329,
+          "page": 60,
+          "ref": "3.1.6"
+        },
+        {
+          "number": 330,
+          "page": 60,
+          "ref": "3.1.6"
+        },
+        {
+          "number": 331,
+          "page": 60,
+          "ref": "3.1.6"
+        },
+        {
+          "number": 332,
+          "page": 61,
+          "ref": "3.1.6"
+        },
+        {
+          "number": 333,
+          "page": 61,
+          "ref": "3.2"
+        },
+        {
+          "number": 334,
+          "page": 61,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 335,
+          "page": 61,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 336,
+          "page": 61,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 337,
+          "page": 61,
+          "ref": "3.2.4"
+        },
+        {
+          "number": 338,
+          "page": 62,
+          "ref": "3.2.2"
+        },
+        {
+          "number": 339,
+          "page": 62,
+          "ref": "3.2.2"
+        },
+        {
+          "number": 340,
+          "page": 62,
+          "ref": "3.2.2"
+        },
+        {
+          "number": 341,
+          "page": 62,
+          "ref": "3.2.2"
+        },
+        {
+          "number": 342,
+          "page": 62,
+          "ref": "3.2.2"
+        },
+        {
+          "number": 343,
+          "page": 62,
+          "ref": "3.2.2"
+        },
+        {
+          "number": 344,
+          "page": 63,
+          "ref": "3.2.2"
+        },
+        {
+          "number": 345,
+          "page": 63,
+          "ref": "3.2.3"
+        },
+        {
+          "number": 346,
+          "page": 63,
+          "ref": "3.2.3"
+        },
+        {
+          "number": 347,
+          "page": 63,
+          "ref": "3.2.3"
+        },
+        {
+          "number": 348,
+          "page": 63,
+          "ref": "3.2.3(a)"
+        },
+        {
+          "number": 349,
+          "page": 63,
+          "ref": "3.2.3(b)"
+        },
+        {
+          "number": 350,
+          "page": 64,
+          "ref": "3.2.3(b)"
+        },
+        {
+          "number": 351,
+          "page": 64,
+          "ref": "3.2.3(b)"
+        },
+        {
+          "number": 352,
+          "page": 64,
+          "ref": "3.2.3(b)"
+        },
+        {
+          "number": 353,
+          "page": 64,
+          "ref": "3.2.4"
+        },
+        {
+          "number": 354,
+          "page": 64,
+          "ref": "3.2.4"
+        },
+        {
+          "number": 355,
+          "page": 64,
+          "ref": "3.2.4"
+        },
+        {
+          "number": 356,
+          "page": 65,
+          "ref": "3.2.4"
+        },
+        {
+          "number": 357,
+          "page": 65,
+          "ref": "3.2.4"
+        },
+        {
+          "number": 358,
+          "page": 65,
+          "ref": "3.2.4"
+        },
+        {
+          "number": 359,
+          "page": 65,
+          "ref": "3.2.4"
+        },
+        {
+          "number": 360,
+          "page": 65,
+          "ref": "3.2.4"
+        },
+        {
+          "number": 361,
+          "page": 65,
+          "ref": "3.2.5"
+        },
+        {
+          "number": 362,
+          "page": 66,
+          "ref": "3.2.5"
+        },
+        {
+          "number": 363,
+          "page": 66,
+          "ref": "3.2.5"
+        },
+        {
+          "number": 364,
+          "page": 66,
+          "ref": "3.2.5"
+        },
+        {
+          "number": 365,
+          "page": 66,
+          "ref": "3.2.5"
+        },
+        {
+          "number": 366,
+          "page": 66,
+          "ref": "3.2.5"
+        },
+        {
+          "number": 367,
+          "page": 66,
+          "ref": "3.2.6"
+        },
+        {
+          "number": 368,
+          "page": 67,
+          "ref": "3.2.6"
+        },
+        {
+          "number": 369,
+          "page": 67,
+          "ref": "3.2.6"
+        },
+        {
+          "number": 370,
+          "page": 67,
+          "ref": "3.2.6"
+        },
+        {
+          "number": 371,
+          "page": 67,
+          "ref": "3.2.6"
+        },
+        {
+          "number": 372,
+          "page": 67,
+          "ref": "3.2.6"
+        },
+        {
+          "number": 373,
+          "page": 67,
+          "ref": "3.2.6"
+        },
+        {
+          "number": 374,
+          "page": 68,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 375,
+          "page": 68,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 376,
+          "page": 68,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 377,
+          "page": 68,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 378,
+          "page": 68,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 379,
+          "page": 68,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 380,
+          "page": 69,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 381,
+          "page": 69,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 382,
+          "page": 69,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 383,
+          "page": 69,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 384,
+          "page": 69,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 385,
+          "page": 69,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 386,
+          "page": 70,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 387,
+          "page": 70,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 388,
+          "page": 70,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 389,
+          "page": 70,
+          "ref": "3.3.3"
+        },
+        {
+          "number": 390,
+          "page": 70,
+          "ref": "3.3.3"
+        },
+        {
+          "number": 391,
+          "page": 70,
+          "ref": "3.3.3"
+        },
+        {
+          "number": 392,
+          "page": 71,
+          "ref": "3.3.3"
+        },
+        {
+          "number": 393,
+          "page": 71,
+          "ref": "3.3.3"
+        },
+        {
+          "number": 394,
+          "page": 71,
+          "ref": "3.3.3"
+        },
+        {
+          "number": 395,
+          "page": 71,
+          "ref": "3.3.3"
+        },
+        {
+          "number": 396,
+          "page": 71,
+          "ref": "3.3.3"
+        },
+        {
+          "number": 397,
+          "page": 72,
+          "ref": "3.3.3"
+        },
+        {
+          "number": 398,
+          "page": 72,
+          "ref": "3.3.3"
+        },
+        {
+          "number": 399,
+          "page": 72,
+          "ref": "3.3.3"
+        },
+        {
+          "number": 400,
+          "page": 72,
+          "ref": "3.3.4"
+        },
+        {
+          "number": 401,
+          "page": 72,
+          "ref": "3.3.4"
+        },
+        {
+          "number": 402,
+          "page": 73,
+          "ref": "3.3.4"
+        },
+        {
+          "number": 403,
+          "page": 73,
+          "ref": "3.3.4"
+        },
+        {
+          "number": 404,
+          "page": 73,
+          "ref": "3.4"
+        },
+        {
+          "number": 405,
+          "page": 73,
+          "ref": "3.4"
+        },
+        {
+          "number": 406,
+          "page": 73,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 407,
+          "page": 74,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 408,
+          "page": 74,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 409,
+          "page": 74,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 410,
+          "page": 74,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 411,
+          "page": 74,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 412,
+          "page": 74,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 413,
+          "page": 75,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 414,
+          "page": 75,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 415,
+          "page": 75,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 416,
+          "page": 75,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 417,
+          "page": 75,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 418,
+          "page": 75,
+          "ref": "3.4.3"
+        },
+        {
+          "number": 419,
+          "page": 76,
+          "ref": "3.4.3"
+        },
+        {
+          "number": 420,
+          "page": 76,
+          "ref": "3.4.3"
+        },
+        {
+          "number": 421,
+          "page": 76,
+          "ref": "3.4.3"
+        },
+        {
+          "number": 422,
+          "page": 76,
+          "ref": "3.4.3"
+        },
+        {
+          "number": 423,
+          "page": 76,
+          "ref": "3.4.4"
+        },
+        {
+          "number": 424,
+          "page": 76,
+          "ref": "3.4.4"
+        },
+        {
+          "number": 425,
+          "page": 77,
+          "ref": "3.4.4"
+        },
+        {
+          "number": 426,
+          "page": 77,
+          "ref": "3.4.4"
+        },
+        {
+          "number": 427,
+          "page": 77,
+          "ref": "3.4.4"
+        },
+        {
+          "number": 428,
+          "page": 77,
+          "ref": "3.4.5"
+        },
+        {
+          "number": 429,
+          "page": 77,
+          "ref": "3.4.5"
+        },
+        {
+          "number": 430,
+          "page": 77,
+          "ref": "3.4.5"
+        },
+        {
+          "number": 431,
+          "page": 78,
+          "ref": "3.4.5"
+        },
+        {
+          "number": 432,
+          "page": 78,
+          "ref": "3.4.6"
+        },
+        {
+          "number": 433,
+          "page": 78,
+          "ref": "3.4.6"
+        },
+        {
+          "number": 434,
+          "page": 79,
+          "ref": "3.4.6"
+        },
+        {
+          "number": 435,
+          "page": 79,
+          "ref": "3.4.6"
+        },
+        {
+          "number": 436,
+          "page": 79,
+          "ref": "3.4.6"
+        },
+        {
+          "number": 437,
+          "page": 79,
+          "ref": "3.4.6"
+        },
+        {
+          "number": 438,
+          "page": 79,
+          "ref": "3.4.7"
+        },
+        {
+          "number": 439,
+          "page": 79,
+          "ref": "3.4.7"
+        },
+        {
+          "number": 440,
+          "page": 80,
+          "ref": "3.4.7"
+        },
+        {
+          "number": 441,
+          "page": 80,
+          "ref": "3.4.7"
+        },
+        {
+          "number": 442,
+          "page": 80,
+          "ref": "3.4.7(a)"
+        },
+        {
+          "number": 443,
+          "page": 80,
+          "ref": "3.4.7(a)"
+        },
+        {
+          "number": 444,
+          "page": 81,
+          "ref": "3.4.7(a)"
+        },
+        {
+          "number": 445,
+          "page": 81,
+          "ref": "3.4.7(a)"
+        },
+        {
+          "number": 446,
+          "page": 81,
+          "ref": "3.4.7(a)"
+        },
+        {
+          "number": 447,
+          "page": 81,
+          "ref": "3.4.7(a)"
+        },
+        {
+          "number": 448,
+          "page": 81,
+          "ref": "3.4.7(a)"
+        },
+        {
+          "number": 449,
+          "page": 82,
+          "ref": "3.4.7(a)"
+        },
+        {
+          "number": 450,
+          "page": 82,
+          "ref": "3.4.7(b)"
+        },
+        {
+          "number": 451,
+          "page": 82,
+          "ref": "3.4.7(b)"
+        },
+        {
+          "number": 452,
+          "page": 82,
+          "ref": "3.4.7(b)"
+        },
+        {
+          "number": 453,
+          "page": 82,
+          "ref": "3.4.7(b)"
+        },
+        {
+          "number": 454,
+          "page": 83,
+          "ref": "3.4.7(c)"
+        },
+        {
+          "number": 455,
+          "page": 83,
+          "ref": "3.4.8"
+        },
+        {
+          "number": 456,
+          "page": 83,
+          "ref": "3.4.8"
+        },
+        {
+          "number": 457,
+          "page": 83,
+          "ref": "3.4.8"
+        },
+        {
+          "number": 458,
+          "page": 83,
+          "ref": "3.4.8"
+        },
+        {
+          "number": 459,
+          "page": 83,
+          "ref": "3.4.8"
+        },
+        {
+          "number": 460,
+          "page": 84,
+          "ref": "3.4.8"
+        },
+        {
+          "number": 461,
+          "page": 84,
+          "ref": "3.4.8"
+        },
+        {
+          "number": 462,
+          "page": 84,
+          "ref": "3.4.8"
+        },
+        {
+          "number": 463,
+          "page": 84,
+          "ref": "3.4.8"
+        },
+        {
+          "number": 464,
+          "page": 84,
+          "ref": "3.5"
+        },
+        {
+          "number": 465,
+          "page": 84,
+          "ref": "3.5"
+        },
+        {
+          "number": 466,
+          "page": 85,
+          "ref": "3.5"
+        },
+        {
+          "number": 467,
+          "page": 85,
+          "ref": "3.5"
+        },
+        {
+          "number": 468,
+          "page": 85,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 469,
+          "page": 85,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 470,
+          "page": 85,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 471,
+          "page": 85,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 472,
+          "page": 86,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 473,
+          "page": 86,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 474,
+          "page": 86,
+          "ref": "3.5.3"
+        },
+        {
+          "number": 475,
+          "page": 86,
+          "ref": "3.5.3"
+        },
+        {
+          "number": 476,
+          "page": 86,
+          "ref": "3.5.3"
+        },
+        {
+          "number": 477,
+          "page": 86,
+          "ref": "3.5.4"
+        },
+        {
+          "number": 478,
+          "page": 87,
+          "ref": "3.5.4"
+        },
+        {
+          "number": 479,
+          "page": 87,
+          "ref": "3.5.4"
+        },
+        {
+          "number": 480,
+          "page": 87,
+          "ref": "3.5.5"
+        },
+        {
+          "number": 481,
+          "page": 87,
+          "ref": "3.5.5"
+        },
+        {
+          "number": 482,
+          "page": 87,
+          "ref": "3.5.5"
+        },
+        {
+          "number": 483,
+          "page": 87,
+          "ref": "3.5.5"
+        },
+        {
+          "number": 484,
+          "page": 88,
+          "ref": "3.5.5"
+        },
+        {
+          "number": 485,
+          "page": 88,
+          "ref": "3.5.5"
+        },
+        {
+          "number": 486,
+          "page": 88,
+          "ref": "3.5.5"
+        },
+        {
+          "number": 487,
+          "page": 88,
+          "ref": "3.5.5"
+        },
+        {
+          "number": 488,
+          "page": 88,
+          "ref": "3.6"
+        },
+        {
+          "number": 489,
+          "page": 88,
+          "ref": "3.6"
+        },
+        {
+          "number": 490,
+          "page": 89,
+          "ref": "3.6.1"
+        },
+        {
+          "number": 491,
+          "page": 89,
+          "ref": "3.6.2"
+        },
+        {
+          "number": 492,
+          "page": 89,
+          "ref": "3.6.2"
+        },
+        {
+          "number": 493,
+          "page": 89,
+          "ref": "3.6.2"
+        },
+        {
+          "number": 494,
+          "page": 89,
+          "ref": "3.6.2"
+        },
+        {
+          "number": 495,
+          "page": 89,
+          "ref": "3.6.2"
+        },
+        {
+          "number": 496,
+          "page": 90,
+          "ref": "3.6.2"
+        },
+        {
+          "number": 497,
+          "page": 90,
+          "ref": "3.6.4"
+        },
+        {
+          "number": 498,
+          "page": 90,
+          "ref": "3.6.4"
+        },
+        {
+          "number": 499,
+          "page": 90,
+          "ref": "3.6.4"
+        },
+        {
+          "number": 500,
+          "page": 90,
+          "ref": "3.6.4"
+        },
+        {
+          "number": 501,
+          "page": 91,
+          "ref": "3.6.4"
+        },
+        {
+          "number": 502,
+          "page": 91,
+          "ref": "3.6.4"
+        },
+        {
+          "number": 503,
+          "page": 91,
+          "ref": "3.6.4"
+        },
+        {
+          "number": 504,
+          "page": 91,
+          "ref": "3.6.4"
+        },
+        {
+          "number": 505,
+          "page": 91,
+          "ref": "4.11"
+        },
+        {
+          "number": 506,
+          "page": 92,
+          "ref": "4.1"
+        },
+        {
+          "number": 507,
+          "page": 92,
+          "ref": "4.2"
+        },
+        {
+          "number": 508,
+          "page": 92,
+          "ref": "4.1"
+        },
+        {
+          "number": 509,
+          "page": 92,
+          "ref": "4.1"
+        },
+        {
+          "number": 510,
+          "page": 92,
+          "ref": "4.9"
+        },
+        {
+          "number": 511,
+          "page": 92,
+          "ref": "4.10"
+        },
+        {
+          "number": 512,
+          "page": 93,
+          "ref": "4.11"
+        },
+        {
+          "number": 513,
+          "page": 93,
+          "ref": "4.12"
+        },
+        {
+          "number": 514,
+          "page": 93,
+          "ref": "4.12"
+        },
+        {
+          "number": 515,
+          "page": 93,
+          "ref": "4.12"
+        },
+        {
+          "number": 516,
+          "page": 93,
+          "ref": "4.1"
+        },
+        {
+          "number": 517,
+          "page": 94,
+          "ref": "4.1"
+        },
+        {
+          "number": 518,
+          "page": 94,
+          "ref": "4.1"
+        },
+        {
+          "number": 519,
+          "page": 94,
+          "ref": "4.1"
+        },
+        {
+          "number": 520,
+          "page": 94,
+          "ref": "4.1"
+        },
+        {
+          "number": 521,
+          "page": 94,
+          "ref": "4.1"
+        },
+        {
+          "number": 522,
+          "page": 94,
+          "ref": "4.1"
+        },
+        {
+          "number": 523,
+          "page": 95,
+          "ref": "4.1"
+        },
+        {
+          "number": 524,
+          "page": 95,
+          "ref": "4.2"
+        },
+        {
+          "number": 525,
+          "page": 95,
+          "ref": "4.2"
+        },
+        {
+          "number": 526,
+          "page": 95,
+          "ref": "4.2"
+        },
+        {
+          "number": 527,
+          "page": 95,
+          "ref": "4.2"
+        },
+        {
+          "number": 528,
+          "page": 95,
+          "ref": "4.2"
+        },
+        {
+          "number": 529,
+          "page": 96,
+          "ref": "4.3"
+        },
+        {
+          "number": 530,
+          "page": 96,
+          "ref": "4.3"
+        },
+        {
+          "number": 531,
+          "page": 96,
+          "ref": "4.3"
+        },
+        {
+          "number": 532,
+          "page": 96,
+          "ref": "4.4"
+        },
+        {
+          "number": 533,
+          "page": 96,
+          "ref": "4.4"
+        },
+        {
+          "number": 534,
+          "page": 96,
+          "ref": "4.4"
+        },
+        {
+          "number": 535,
+          "page": 97,
+          "ref": "4.4"
+        },
+        {
+          "number": 536,
+          "page": 97,
+          "ref": "4.5"
+        },
+        {
+          "number": 537,
+          "page": 97,
+          "ref": "4.5"
+        },
+        {
+          "number": 538,
+          "page": 97,
+          "ref": "4.5"
+        },
+        {
+          "number": 539,
+          "page": 97,
+          "ref": "4.5"
+        },
+        {
+          "number": 540,
+          "page": 97,
+          "ref": "4.5"
+        },
+        {
+          "number": 541,
+          "page": 98,
+          "ref": "4.5"
+        },
+        {
+          "number": 542,
+          "page": 98,
+          "ref": "4.5"
+        },
+        {
+          "number": 543,
+          "page": 98,
+          "ref": "4.5"
+        },
+        {
+          "number": 544,
+          "page": 98,
+          "ref": "4.5"
+        },
+        {
+          "number": 545,
+          "page": 98,
+          "ref": "4.5"
+        },
+        {
+          "number": 546,
+          "page": 98,
+          "ref": "4.5"
+        },
+        {
+          "number": 547,
+          "page": 99,
+          "ref": "4.5"
+        },
+        {
+          "number": 548,
+          "page": 99,
+          "ref": "4.5"
+        },
+        {
+          "number": 549,
+          "page": 99,
+          "ref": "4.5"
+        },
+        {
+          "number": 550,
+          "page": 99,
+          "ref": "4.5"
+        },
+        {
+          "number": 551,
+          "page": 99,
+          "ref": "4.5"
+        },
+        {
+          "number": 552,
+          "page": 99,
+          "ref": "4.5"
+        },
+        {
+          "number": 553,
+          "page": 100,
+          "ref": "4.5"
+        },
+        {
+          "number": 554,
+          "page": 100,
+          "ref": "4.5"
+        },
+        {
+          "number": 555,
+          "page": 100,
+          "ref": "4.5"
+        },
+        {
+          "number": 556,
+          "page": 100,
+          "ref": "4.6"
+        },
+        {
+          "number": 557,
+          "page": 100,
+          "ref": "4.6"
+        },
+        {
+          "number": 558,
+          "page": 100,
+          "ref": "4.6"
+        },
+        {
+          "number": 559,
+          "page": 101,
+          "ref": "4.6"
+        },
+        {
+          "number": 560,
+          "page": 101,
+          "ref": "4.7"
+        },
+        {
+          "number": 561,
+          "page": 101,
+          "ref": "4.7"
+        },
+        {
+          "number": 562,
+          "page": 101,
+          "ref": "4.7"
+        },
+        {
+          "number": 563,
+          "page": 101,
+          "ref": "4.7"
+        },
+        {
+          "number": 564,
+          "page": 101,
+          "ref": "4.7"
+        },
+        {
+          "number": 565,
+          "page": 102,
+          "ref": "4.7"
+        },
+        {
+          "number": 566,
+          "page": 102,
+          "ref": "4.7"
+        },
+        {
+          "number": 567,
+          "page": 102,
+          "ref": "4.7"
+        },
+        {
+          "number": 568,
+          "page": 102,
+          "ref": "4.7"
+        },
+        {
+          "number": 569,
+          "page": 102,
+          "ref": "4.7"
+        },
+        {
+          "number": 570,
+          "page": 102,
+          "ref": "4.7"
+        },
+        {
+          "number": 571,
+          "page": 103,
+          "ref": "4.7"
+        },
+        {
+          "number": 572,
+          "page": 103,
+          "ref": "4.7"
+        },
+        {
+          "number": 573,
+          "page": 103,
+          "ref": "4.8"
+        },
+        {
+          "number": 574,
+          "page": 103,
+          "ref": "4.8"
+        },
+        {
+          "number": 575,
+          "page": 103,
+          "ref": "4.8"
+        },
+        {
+          "number": 576,
+          "page": 103,
+          "ref": "4.8"
+        },
+        {
+          "number": 577,
+          "page": 104,
+          "ref": "4.8"
+        },
+        {
+          "number": 578,
+          "page": 104,
+          "ref": "4.8"
+        },
+        {
+          "number": 579,
+          "page": 104,
+          "ref": "4.9"
+        },
+        {
+          "number": 580,
+          "page": 104,
+          "ref": "4.9"
+        },
+        {
+          "number": 581,
+          "page": 104,
+          "ref": "4.9"
+        },
+        {
+          "number": 582,
+          "page": 104,
+          "ref": "4.9"
+        },
+        {
+          "number": 583,
+          "page": 105,
+          "ref": "4.9"
+        },
+        {
+          "number": 584,
+          "page": 105,
+          "ref": "4.10"
+        },
+        {
+          "number": 585,
+          "page": 105,
+          "ref": "4.10"
+        },
+        {
+          "number": 586,
+          "page": 105,
+          "ref": "4.10"
+        },
+        {
+          "number": 587,
+          "page": 105,
+          "ref": "4.10"
+        },
+        {
+          "number": 588,
+          "page": 105,
+          "ref": "4.11"
+        },
+        {
+          "number": 589,
+          "page": 106,
+          "ref": "4.11"
+        },
+        {
+          "number": 590,
+          "page": 106,
+          "ref": "4.11"
+        },
+        {
+          "number": 591,
+          "page": 106,
+          "ref": "5.11"
+        },
+        {
+          "number": 592,
+          "page": 106,
+          "ref": "5.5.1"
+        },
+        {
+          "number": 593,
+          "page": 106,
+          "ref": "5.5"
+        },
+        {
+          "number": 594,
+          "page": 106,
+          "ref": "5.5,3(b)"
+        },
+        {
+          "number": 595,
+          "page": 106,
+          "ref": "5.5"
+        },
+        {
+          "number": 596,
+          "page": 107,
+          "ref": "5.1.4"
+        },
+        {
+          "number": 597,
+          "page": 107,
+          "ref": "5.5"
+        },
+        {
+          "number": 598,
+          "page": 107,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 599,
+          "page": 107,
+          "ref": "5.1.4"
+        },
+        {
+          "number": 600,
+          "page": 107,
+          "ref": "5.5.1&5.5.3"
+        },
+        {
+          "number": 601,
+          "page": 107,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 602,
+          "page": 108,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 603,
+          "page": 108,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 604,
+          "page": 108,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 605,
+          "page": 108,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 606,
+          "page": 108,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 607,
+          "page": 109,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 608,
+          "page": 109,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 609,
+          "page": 109,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 610,
+          "page": 109,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 611,
+          "page": 109,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 612,
+          "page": 109,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 613,
+          "page": 110,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 614,
+          "page": 110,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 615,
+          "page": 110,
+          "ref": "5.1.2"
+        },
+        {
+          "number": 616,
+          "page": 110,
+          "ref": "5.1.2"
+        },
+        {
+          "number": 617,
+          "page": 110,
+          "ref": "5.1.2"
+        },
+        {
+          "number": 618,
+          "page": 110,
+          "ref": "5.1.2"
+        },
+        {
+          "number": 619,
+          "page": 111,
+          "ref": "5.1.3"
+        },
+        {
+          "number": 620,
+          "page": 111,
+          "ref": "5.1.3"
+        },
+        {
+          "number": 621,
+          "page": 111,
+          "ref": "5.1.3"
+        },
+        {
+          "number": 622,
+          "page": 111,
+          "ref": "5.1.4"
+        },
+        {
+          "number": 623,
+          "page": 111,
+          "ref": "5.1.4"
+        },
+        {
+          "number": 624,
+          "page": 111,
+          "ref": "5.1.4"
+        },
+        {
+          "number": 625,
+          "page": 111,
+          "ref": "5.1.4"
+        },
+        {
+          "number": 626,
+          "page": 112,
+          "ref": "5.1.4"
+        },
+        {
+          "number": 627,
+          "page": 112,
+          "ref": "5.2.1"
+        },
+        {
+          "number": 628,
+          "page": 112,
+          "ref": "5.2.1"
+        },
+        {
+          "number": 629,
+          "page": 112,
+          "ref": "5.2.1"
+        },
+        {
+          "number": 630,
+          "page": 112,
+          "ref": "5.4"
+        },
+        {
+          "number": 631,
+          "page": 112,
+          "ref": "5.5.1"
+        },
+        {
+          "number": 632,
+          "page": 113,
+          "ref": "5.5.1"
+        },
+        {
+          "number": 633,
+          "page": 113,
+          "ref": "5.5.1"
+        },
+        {
+          "number": 634,
+          "page": 113,
+          "ref": "5.5.1"
+        },
+        {
+          "number": 635,
+          "page": 113,
+          "ref": "5.5.3"
+        },
+        {
+          "number": 636,
+          "page": 113,
+          "ref": "5.5.3"
+        },
+        {
+          "number": 637,
+          "page": 113,
+          "ref": "5.5.3"
+        },
+        {
+          "number": 638,
+          "page": 113,
+          "ref": "5.5.3"
+        },
+        {
+          "number": 639,
+          "page": 114,
+          "ref": "6.1.3"
+        },
+        {
+          "number": 640,
+          "page": 114,
+          "ref": "6.1"
+        },
+        {
+          "number": 641,
+          "page": 114,
+          "ref": "6.1.1b"
+        },
+        {
+          "number": 642,
+          "page": 114,
+          "ref": "6.1.3"
+        },
+        {
+          "number": 643,
+          "page": 114,
+          "ref": "6.1.2b"
+        },
+        {
+          "number": 644,
+          "page": 115,
+          "ref": "6.1.1a"
+        },
+        {
+          "number": 645,
+          "page": 115,
+          "ref": "6.2.1"
+        },
+        {
+          "number": 646,
+          "page": 115,
+          "ref": "6.1"
+        },
+        {
+          "number": 647,
+          "page": 115,
+          "ref": "6.2.4(c )"
+        },
+        {
+          "number": 648,
+          "page": 115,
+          "ref": "6.1.3c"
+        },
+        {
+          "number": 649,
+          "page": 116,
+          "ref": "6..1.1e"
+        },
+        {
+          "number": 650,
+          "page": 116,
+          "ref": "6.2.5(f)(ii)"
+        },
+        {
+          "number": 651,
+          "page": 116,
+          "ref": "6.2.5(f)(ii)"
+        },
+        {
+          "number": 652,
+          "page": 116,
+          "ref": "6.1.1e"
+        },
+        {
+          "number": 653,
+          "page": 116,
+          "ref": "6.1.1e"
+        },
+        {
+          "number": 654,
+          "page": 117,
+          "ref": "6.1.1d"
+        },
+        {
+          "number": 655,
+          "page": 117,
+          "ref": "6.1.1d"
+        },
+        {
+          "number": 656,
+          "page": 117,
+          "ref": "6.1.1f (e)"
+        },
+        {
+          "number": 657,
+          "page": 117,
+          "ref": "6.2.4"
+        },
+        {
+          "number": 658,
+          "page": 117,
+          "ref": "6.2.5"
+        },
+        {
+          "number": 659,
+          "page": 117,
+          "ref": "6.1.3c"
+        },
+        {
+          "number": 660,
+          "page": 118,
+          "ref": "6.1.3b"
+        },
+        {
+          "number": 661,
+          "page": 118,
+          "ref": "6.1.3c"
+        },
+        {
+          "number": 662,
+          "page": 118,
+          "ref": "6.1.3b"
+        },
+        {
+          "number": 663,
+          "page": 118,
+          "ref": "6.1.1g"
+        },
+        {
+          "number": 664,
+          "page": 118,
+          "ref": "6.1"
+        },
+        {
+          "number": 665,
+          "page": 119,
+          "ref": "6.2.4"
+        },
+        {
+          "number": 666,
+          "page": 119,
+          "ref": "6.2.4"
+        },
+        {
+          "number": 667,
+          "page": 119,
+          "ref": "6.1"
+        },
+        {
+          "number": 668,
+          "page": 119,
+          "ref": "6.2.4"
+        },
+        {
+          "number": 669,
+          "page": 119,
+          "ref": "6.1.2(d)"
+        },
+        {
+          "number": 670,
+          "page": 120,
+          "ref": "6.1.3a"
+        },
+        {
+          "number": 671,
+          "page": 120,
+          "ref": "6.1.2"
+        },
+        {
+          "number": 672,
+          "page": 120,
+          "ref": "6.1.2"
+        },
+        {
+          "number": 673,
+          "page": 120,
+          "ref": "6.1.2"
+        },
+        {
+          "number": 674,
+          "page": 120,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 675,
+          "page": 120,
+          "ref": "6.1.1(d)"
+        },
+        {
+          "number": 676,
+          "page": 121,
+          "ref": "6.2.4"
+        },
+        {
+          "number": 677,
+          "page": 121,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 678,
+          "page": 121,
+          "ref": "6.1.3"
+        },
+        {
+          "number": 679,
+          "page": 121,
+          "ref": "6.1.1"
+        },
+        {
+          "number": 680,
+          "page": 121,
+          "ref": "6.1"
+        },
+        {
+          "number": 681,
+          "page": 121,
+          "ref": "6.1"
+        },
+        {
+          "number": 682,
+          "page": 122,
+          "ref": "6.1"
+        },
+        {
+          "number": 683,
+          "page": 122,
+          "ref": "6.1"
+        },
+        {
+          "number": 684,
+          "page": 122,
+          "ref": "6.1"
+        },
+        {
+          "number": 685,
+          "page": 122,
+          "ref": "6.1.1"
+        },
+        {
+          "number": 686,
+          "page": 122,
+          "ref": "6.1.1b"
+        },
+        {
+          "number": 687,
+          "page": 122,
+          "ref": "6.1.1f (iii)"
+        },
+        {
+          "number": 688,
+          "page": 123,
+          "ref": "6.1.1c"
+        },
+        {
+          "number": 689,
+          "page": 123,
+          "ref": "6.1.1c"
+        },
+        {
+          "number": 690,
+          "page": 123,
+          "ref": "6.1.1d"
+        },
+        {
+          "number": 691,
+          "page": 123,
+          "ref": "6.1.1d"
+        },
+        {
+          "number": 692,
+          "page": 123,
+          "ref": "6.1.1d"
+        },
+        {
+          "number": 693,
+          "page": 124,
+          "ref": "6.1.1d"
+        },
+        {
+          "number": 694,
+          "page": 124,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 695,
+          "page": 124,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 696,
+          "page": 124,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 697,
+          "page": 124,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 698,
+          "page": 125,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 699,
+          "page": 125,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 700,
+          "page": 125,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 701,
+          "page": 125,
+          "ref": "6.1.2"
+        },
+        {
+          "number": 702,
+          "page": 125,
+          "ref": "6.1.2a"
+        },
+        {
+          "number": 703,
+          "page": 126,
+          "ref": "6.1.2c"
+        },
+        {
+          "number": 704,
+          "page": 126,
+          "ref": "6.1.3"
+        },
+        {
+          "number": 705,
+          "page": 126,
+          "ref": "6.1.3"
+        },
+        {
+          "number": 706,
+          "page": 126,
+          "ref": "6.1.3"
+        },
+        {
+          "number": 707,
+          "page": 127,
+          "ref": "6.1.3a"
+        },
+        {
+          "number": 708,
+          "page": 127,
+          "ref": "6.1.3b"
+        },
+        {
+          "number": 709,
+          "page": 127,
+          "ref": "6.1.3b"
+        },
+        {
+          "number": 710,
+          "page": 128,
+          "ref": "6.1.3c"
+        },
+        {
+          "number": 711,
+          "page": 128,
+          "ref": "6.1.3c"
+        },
+        {
+          "number": 712,
+          "page": 128,
+          "ref": "6.1.3c"
+        },
+        {
+          "number": 713,
+          "page": 128,
+          "ref": "6.1.3c"
+        },
+        {
+          "number": 714,
+          "page": 129,
+          "ref": "6.1.3c"
+        },
+        {
+          "number": 715,
+          "page": 129,
+          "ref": "6.1.3c"
+        },
+        {
+          "number": 716,
+          "page": 129,
+          "ref": "6.1.3c"
+        },
+        {
+          "number": 717,
+          "page": 129,
+          "ref": "5.2 & 6.2"
+        },
+        {
+          "number": 718,
+          "page": 129,
+          "ref": "6.2"
+        },
+        {
+          "number": 719,
+          "page": 130,
+          "ref": "6.2"
+        },
+        {
+          "number": 720,
+          "page": 130,
+          "ref": "6.2.1"
+        },
+        {
+          "number": 721,
+          "page": 130,
+          "ref": "6.2.1"
+        },
+        {
+          "number": 722,
+          "page": 130,
+          "ref": "6.2.1"
+        },
+        {
+          "number": 723,
+          "page": 130,
+          "ref": "6.2.1"
+        },
+        {
+          "number": 724,
+          "page": 131,
+          "ref": "6.2.1"
+        },
+        {
+          "number": 725,
+          "page": 131,
+          "ref": "6.2.1"
+        },
+        {
+          "number": 726,
+          "page": 131,
+          "ref": "6.2.2"
+        },
+        {
+          "number": 727,
+          "page": 131,
+          "ref": "6.2.4"
+        },
+        {
+          "number": 728,
+          "page": 131,
+          "ref": "6.2.4"
+        },
+        {
+          "number": 729,
+          "page": 132,
+          "ref": "6.2.4 (a)"
+        },
+        {
+          "number": 730,
+          "page": 132,
+          "ref": "6.2.4 (b)"
+        },
+        {
+          "number": 731,
+          "page": 132,
+          "ref": "6.2.4(c)"
+        },
+        {
+          "number": 732,
+          "page": 132,
+          "ref": "6.2.4(c)"
+        },
+        {
+          "number": 733,
+          "page": 132,
+          "ref": "6.2.4(c)"
+        },
+        {
+          "number": 734,
+          "page": 132,
+          "ref": "6.2.4"
+        },
+        {
+          "number": 735,
+          "page": 133,
+          "ref": "6.2.4(c)"
+        },
+        {
+          "number": 736,
+          "page": 133,
+          "ref": "6.2.4(c)"
+        },
+        {
+          "number": 737,
+          "page": 133,
+          "ref": "6.2.4(c)"
+        },
+        {
+          "number": 738,
+          "page": 133,
+          "ref": "6.2.4(c)"
+        },
+        {
+          "number": 739,
+          "page": 133,
+          "ref": "6.2.4(c)(iii)"
+        },
+        {
+          "number": 740,
+          "page": 134,
+          "ref": "6.2.5(a)"
+        },
+        {
+          "number": 741,
+          "page": 134,
+          "ref": "6.2.5(a)"
+        },
+        {
+          "number": 742,
+          "page": 134,
+          "ref": "6.2.5"
+        },
+        {
+          "number": 743,
+          "page": 134,
+          "ref": "6.2.5(f)"
+        },
+        {
+          "number": 744,
+          "page": 134,
+          "ref": "6.2.5(f)(i)"
+        },
+        {
+          "number": 745,
+          "page": 135,
+          "ref": "6.2.5(f)(ii)"
+        },
+        {
+          "number": 746,
+          "page": 135,
+          "ref": "6.2.5(f)(ii)"
+        },
+        {
+          "number": 747,
+          "page": 135,
+          "ref": "6.2.5(f)(ii)"
+        },
+        {
+          "number": 748,
+          "page": 135,
+          "ref": "6.2.5(f)(i)"
+        },
+        {
+          "number": 749,
+          "page": 135,
+          "ref": "6.2.5 (f) 2.1(a)"
+        },
+        {
+          "number": 750,
+          "page": 136,
+          "ref": "6.2.5(a)(i)"
+        },
+        {
+          "number": 751,
+          "page": 136,
+          "ref": "6.1.1"
+        },
+        {
+          "number": 752,
+          "page": 136,
+          "ref": "6.1.1b"
+        },
+        {
+          "number": 753,
+          "page": 136,
+          "ref": "6.1.1b"
+        },
+        {
+          "number": 754,
+          "page": 136,
+          "ref": "6.1.1b"
+        },
+        {
+          "number": 755,
+          "page": 137,
+          "ref": "6.1.1b"
+        },
+        {
+          "number": 756,
+          "page": 137,
+          "ref": "6.1.1c"
+        },
+        {
+          "number": 757,
+          "page": 137,
+          "ref": "6.1.1c"
+        },
+        {
+          "number": 758,
+          "page": 137,
+          "ref": "6.1.1d"
+        },
+        {
+          "number": 759,
+          "page": 137,
+          "ref": "6.1.1d"
+        },
+        {
+          "number": 760,
+          "page": 137,
+          "ref": "6.1.1d"
+        },
+        {
+          "number": 761,
+          "page": 138,
+          "ref": "6.1.1e"
+        },
+        {
+          "number": 762,
+          "page": 138,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 763,
+          "page": 138,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 764,
+          "page": 138,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 765,
+          "page": 138,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 766,
+          "page": 139,
+          "ref": "6.1.1f"
+        },
+        {
+          "number": 767,
+          "page": 139,
+          "ref": "6.1.1g"
+        },
+        {
+          "number": 768,
+          "page": 139,
+          "ref": "6.1.1g"
+        },
+        {
+          "number": 769,
+          "page": 139,
+          "ref": "6.1.1g"
+        },
+        {
+          "number": 770,
+          "page": 139,
+          "ref": "6.1.1g"
+        },
+        {
+          "number": 771,
+          "page": 140,
+          "ref": "6.1.1g"
+        },
+        {
+          "number": 772,
+          "page": 140,
+          "ref": "6.1.1g"
+        },
+        {
+          "number": 773,
+          "page": 140,
+          "ref": "6.1.1g"
+        },
+        {
+          "number": 774,
+          "page": 140,
+          "ref": "6.1.2"
+        },
+        {
+          "number": 775,
+          "page": 140,
+          "ref": "6.1.2"
+        },
+        {
+          "number": 776,
+          "page": 141,
+          "ref": "6.1.2a"
+        },
+        {
+          "number": 777,
+          "page": 141,
+          "ref": "6.1.2a"
+        },
+        {
+          "number": 778,
+          "page": 141,
+          "ref": "6.1.2a"
+        },
+        {
+          "number": 779,
+          "page": 141,
+          "ref": "6.1.2a"
+        },
+        {
+          "number": 780,
+          "page": 141,
+          "ref": "6.1.2b"
+        },
+        {
+          "number": 781,
+          "page": 141,
+          "ref": "6.1.2b"
+        },
+        {
+          "number": 782,
+          "page": 142,
+          "ref": "6.1.2b"
+        },
+        {
+          "number": 783,
+          "page": 142,
+          "ref": "6.1.2b"
+        },
+        {
+          "number": 784,
+          "page": 142,
+          "ref": "6.1.2b"
+        },
+        {
+          "number": 785,
+          "page": 142,
+          "ref": "6.1.3"
+        },
+        {
+          "number": 786,
+          "page": 142,
+          "ref": "6.1.3"
+        },
+        {
+          "number": 787,
+          "page": 142,
+          "ref": "6.1.3a"
+        },
+        {
+          "number": 788,
+          "page": 143,
+          "ref": "6.1.3a"
+        },
+        {
+          "number": 789,
+          "page": 143,
+          "ref": "6.1.3a"
+        },
+        {
+          "number": 790,
+          "page": 143,
+          "ref": "6.1.3a"
+        },
+        {
+          "number": 791,
+          "page": 143,
+          "ref": "6.1.3b"
+        },
+        {
+          "number": 792,
+          "page": 143,
+          "ref": "6.1.3b"
+        },
+        {
+          "number": 793,
+          "page": 143,
+          "ref": "6.1.3b"
+        },
+        {
+          "number": 794,
+          "page": 144,
+          "ref": "6.1.3b"
+        },
+        {
+          "number": 795,
+          "page": 144,
+          "ref": "6.1.3b"
+        },
+        {
+          "number": 796,
+          "page": 144,
+          "ref": "6.1.3b"
+        },
+        {
+          "number": 797,
+          "page": 144,
+          "ref": "6.1.3b"
+        },
+        {
+          "number": 798,
+          "page": 144,
+          "ref": "6.1.3b"
+        },
+        {
+          "number": 799,
+          "page": 145,
+          "ref": "6.1.3c"
+        },
+        {
+          "number": 800,
+          "page": 145,
+          "ref": "6.2.1"
+        },
+        {
+          "number": 801,
+          "page": 145,
+          "ref": "6.2.1"
+        },
+        {
+          "number": 802,
+          "page": 145,
+          "ref": "6.2.1"
+        },
+        {
+          "number": 803,
+          "page": 145,
+          "ref": "6.2.3"
+        },
+        {
+          "number": 804,
+          "page": 145,
+          "ref": "6.2.3"
+        },
+        {
+          "number": 805,
+          "page": 146,
+          "ref": "6.2.4c"
+        },
+        {
+          "number": 806,
+          "page": 146,
+          "ref": "6.2.4c"
+        },
+        {
+          "number": 807,
+          "page": 146,
+          "ref": "6.2.4c"
+        },
+        {
+          "number": 808,
+          "page": 146,
+          "ref": "6.2.4c"
+        },
+        {
+          "number": 809,
+          "page": 146,
+          "ref": "6.2.4"
+        },
+        {
+          "number": 810,
+          "page": 146,
+          "ref": "6.2.4"
+        },
+        {
+          "number": 811,
+          "page": 147,
+          "ref": "6.2.4"
+        },
+        {
+          "number": 812,
+          "page": 147,
+          "ref": "6.2.4"
+        },
+        {
+          "number": 813,
+          "page": 147,
+          "ref": "6.2.5(a)"
+        },
+        {
+          "number": 814,
+          "page": 147,
+          "ref": "6.2.5"
+        },
+        {
+          "number": 815,
+          "page": 147,
+          "ref": "6.2.5"
+        },
+        {
+          "number": 816,
+          "page": 148,
+          "ref": "6.2.5"
+        },
+        {
+          "number": 817,
+          "page": 148,
+          "ref": "6.2.5"
+        },
+        {
+          "number": 818,
+          "page": 148,
+          "ref": "6.2.5"
+        },
+        {
+          "number": 819,
+          "page": 148,
+          "ref": "6.2.5(g)"
+        },
+        {
+          "number": 820,
+          "page": 148,
+          "ref": "6.2.5(g)"
+        },
+        {
+          "number": 821,
+          "page": 149,
+          "ref": "6.2.5(g)"
+        },
+        {
+          "number": 822,
+          "page": 149,
+          "ref": "6.2.5(g)"
+        },
+        {
+          "number": 823,
+          "page": 149,
+          "ref": "6.2.5(g)"
+        },
+        {
+          "number": 824,
+          "page": 149,
+          "ref": "6.2.5(g)"
+        },
+        {
+          "number": 825,
+          "page": 149,
+          "ref": "6.2.5(g)"
+        },
+        {
+          "number": 826,
+          "page": 150,
+          "ref": "6.2.5(g)"
+        },
+        {
+          "number": 827,
+          "page": 150,
+          "ref": "6.2.5(g)"
+        },
+        {
+          "number": 828,
+          "page": 150,
+          "ref": "6.2.5(g)"
+        },
+        {
+          "number": 829,
+          "page": 150,
+          "ref": "6.2.5(g)"
+        },
+        {
+          "number": 830,
+          "page": 150,
+          "ref": "6.2.5(g)"
+        },
+        {
+          "number": 831,
+          "page": 151,
+          "ref": "6.2.5(g)"
+        },
+        {
+          "number": 832,
+          "page": 151,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 833,
+          "page": 151,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 834,
+          "page": 151,
+          "ref": "7.2.2"
+        },
+        {
+          "number": 835,
+          "page": 151,
+          "ref": "7.6"
+        },
+        {
+          "number": 836,
+          "page": 152,
+          "ref": "7.5.2"
+        },
+        {
+          "number": 837,
+          "page": 152,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 838,
+          "page": 152,
+          "ref": "7.5.1"
+        },
+        {
+          "number": 839,
+          "page": 152,
+          "ref": "7.5.1(b)(iii)& (iv)"
+        },
+        {
+          "number": 840,
+          "page": 152,
+          "ref": "7.4.5"
+        },
+        {
+          "number": 841,
+          "page": 153,
+          "ref": "7.4.5"
+        },
+        {
+          "number": 842,
+          "page": 153,
+          "ref": "7.4.7"
+        },
+        {
+          "number": 843,
+          "page": 153,
+          "ref": "7.4.7"
+        },
+        {
+          "number": 844,
+          "page": 153,
+          "ref": "7.4.6"
+        },
+        {
+          "number": 845,
+          "page": 153,
+          "ref": "7.4.6"
+        },
+        {
+          "number": 846,
+          "page": 154,
+          "ref": "7.4.7"
+        },
+        {
+          "number": 847,
+          "page": 154,
+          "ref": "7.4.7c"
+        },
+        {
+          "number": 848,
+          "page": 154,
+          "ref": "7.4.7c"
+        },
+        {
+          "number": 849,
+          "page": 154,
+          "ref": "7.4.7c"
+        },
+        {
+          "number": 850,
+          "page": 154,
+          "ref": "7.4.7"
+        },
+        {
+          "number": 851,
+          "page": 155,
+          "ref": "7.4.7"
+        },
+        {
+          "number": 852,
+          "page": 155,
+          "ref": "7.4.7"
+        },
+        {
+          "number": 853,
+          "page": 155,
+          "ref": "7.4.7c"
+        },
+        {
+          "number": 854,
+          "page": 155,
+          "ref": "7.4.5"
+        },
+        {
+          "number": 855,
+          "page": 155,
+          "ref": "7.4.5"
+        },
+        {
+          "number": 856,
+          "page": 156,
+          "ref": "7.4.5"
+        },
+        {
+          "number": 857,
+          "page": 156,
+          "ref": "7.4.7"
+        },
+        {
+          "number": 858,
+          "page": 156,
+          "ref": "7.1.2"
+        },
+        {
+          "number": 859,
+          "page": 156,
+          "ref": "7.5.1"
+        },
+        {
+          "number": 860,
+          "page": 156,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 861,
+          "page": 157,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 862,
+          "page": 157,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 863,
+          "page": 157,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 864,
+          "page": 157,
+          "ref": "7.5"
+        },
+        {
+          "number": 865,
+          "page": 157,
+          "ref": "7.5"
+        },
+        {
+          "number": 866,
+          "page": 158,
+          "ref": "7.5"
+        },
+        {
+          "number": 867,
+          "page": 158,
+          "ref": "7.5.1"
+        },
+        {
+          "number": 868,
+          "page": 158,
+          "ref": "7.5.1"
+        },
+        {
+          "number": 869,
+          "page": 158,
+          "ref": "7.5.1"
+        },
+        {
+          "number": 870,
+          "page": 158,
+          "ref": "7.6.1"
+        },
+        {
+          "number": 871,
+          "page": 159,
+          "ref": "7.1"
+        },
+        {
+          "number": 872,
+          "page": 159,
+          "ref": "7.1"
+        },
+        {
+          "number": 873,
+          "page": 159,
+          "ref": "7.1"
+        },
+        {
+          "number": 874,
+          "page": 159,
+          "ref": "7.1.1"
+        },
+        {
+          "number": 875,
+          "page": 159,
+          "ref": "7.1.1"
+        },
+        {
+          "number": 876,
+          "page": 159,
+          "ref": "7.1.1"
+        },
+        {
+          "number": 877,
+          "page": 160,
+          "ref": "7.1.2"
+        },
+        {
+          "number": 878,
+          "page": 160,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 879,
+          "page": 160,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 880,
+          "page": 160,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 881,
+          "page": 160,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 882,
+          "page": 160,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 883,
+          "page": 161,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 884,
+          "page": 161,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 885,
+          "page": 161,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 886,
+          "page": 161,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 887,
+          "page": 161,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 888,
+          "page": 162,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 889,
+          "page": 162,
+          "ref": "7.2.1"
+        },
+        {
+          "number": 890,
+          "page": 162,
+          "ref": "7.2.2"
+        },
+        {
+          "number": 891,
+          "page": 162,
+          "ref": "7.3"
+        },
+        {
+          "number": 892,
+          "page": 162,
+          "ref": "7.3.1"
+        },
+        {
+          "number": 893,
+          "page": 163,
+          "ref": "7.3.1"
+        },
+        {
+          "number": 894,
+          "page": 163,
+          "ref": "7.3.1"
+        },
+        {
+          "number": 895,
+          "page": 163,
+          "ref": "7.3.1"
+        },
+        {
+          "number": 896,
+          "page": 163,
+          "ref": "7.3.1"
+        },
+        {
+          "number": 897,
+          "page": 163,
+          "ref": "7.3.1"
+        },
+        {
+          "number": 898,
+          "page": 163,
+          "ref": "7.3.2"
+        },
+        {
+          "number": 899,
+          "page": 164,
+          "ref": "7.3.2"
+        },
+        {
+          "number": 900,
+          "page": 164,
+          "ref": "7.3.2"
+        },
+        {
+          "number": 901,
+          "page": 164,
+          "ref": "7.3.2"
+        },
+        {
+          "number": 902,
+          "page": 164,
+          "ref": "7.3.2"
+        },
+        {
+          "number": 903,
+          "page": 164,
+          "ref": "7.3.3"
+        },
+        {
+          "number": 904,
+          "page": 165,
+          "ref": "7.3.3"
+        },
+        {
+          "number": 905,
+          "page": 165,
+          "ref": "7.4.3"
+        },
+        {
+          "number": 906,
+          "page": 165,
+          "ref": "7.4.3"
+        },
+        {
+          "number": 907,
+          "page": 165,
+          "ref": "7.4.5"
+        },
+        {
+          "number": 908,
+          "page": 165,
+          "ref": "7.4.6"
+        },
+        {
+          "number": 909,
+          "page": 166,
+          "ref": "7.4.6"
+        },
+        {
+          "number": 910,
+          "page": 166,
+          "ref": "7.4.6"
+        },
+        {
+          "number": 911,
+          "page": 166,
+          "ref": "7.4.6"
+        },
+        {
+          "number": 912,
+          "page": 166,
+          "ref": "7.5"
+        },
+        {
+          "number": 913,
+          "page": 166,
+          "ref": "7.5"
+        },
+        {
+          "number": 914,
+          "page": 166,
+          "ref": "7.6"
+        },
+        {
+          "number": 915,
+          "page": 167,
+          "ref": "7.6"
+        },
+        {
+          "number": 916,
+          "page": 167,
+          "ref": "7.6"
+        },
+        {
+          "number": 917,
+          "page": 167,
+          "ref": "7.6"
+        },
+        {
+          "number": 918,
+          "page": 167,
+          "ref": "7.6"
+        },
+        {
+          "number": 919,
+          "page": 167,
+          "ref": "7.6"
+        }
+      ]
+    },
+    {
+      "paper": "P3",
+      "sourcePdf": "D:\\Downloads\\IIQE\\試卷三⾧期保險模擬試題2025年版.pdf",
+      "sourcePdfSha256": "c2467d0c0306ce69b4b85293144ce668891c15e00681d10ef23c8edebc8e7bf4",
+      "target": "D:\\Downloads\\IIQE\\iiqe-app\\data\\questions-p3-mock.json",
+      "expectedCount": 865,
+      "currentCount": 865,
+      "extractedCount": 865,
+      "sourceAnswerAvailability": {
+        "available": 847,
+        "unavailable": 18
+      },
+      "answerConflicts": [],
+      "validationErrors": [],
+      "valid": true,
+      "anchorPages": [
+        {
+          "number": 1,
+          "page": 2,
+          "ref": "1.3.1"
+        },
+        {
+          "number": 2,
+          "page": 2,
+          "ref": "1.3.1"
+        },
+        {
+          "number": 3,
+          "page": 2,
+          "ref": "1.2.2"
+        },
+        {
+          "number": 4,
+          "page": 2,
+          "ref": "1.2 (e)"
+        },
+        {
+          "number": 5,
+          "page": 2,
+          "ref": "1.3.2(b)"
+        },
+        {
+          "number": 6,
+          "page": 3,
+          "ref": "1.3.2(a)"
+        },
+        {
+          "number": 7,
+          "page": 3,
+          "ref": "1.3.2a"
+        },
+        {
+          "number": 8,
+          "page": 3,
+          "ref": "1.2.1"
+        },
+        {
+          "number": 9,
+          "page": 3,
+          "ref": "1.2(h)(ii)"
+        },
+        {
+          "number": 10,
+          "page": 3,
+          "ref": "1.3.2a"
+        },
+        {
+          "number": 11,
+          "page": 4,
+          "ref": "1.3.1a"
+        },
+        {
+          "number": 12,
+          "page": 4,
+          "ref": "1.1"
+        },
+        {
+          "number": 13,
+          "page": 4,
+          "ref": "1.2.3(a)"
+        },
+        {
+          "number": 14,
+          "page": 4,
+          "ref": "1.2.3"
+        },
+        {
+          "number": 15,
+          "page": 4,
+          "ref": "1.1"
+        },
+        {
+          "number": 16,
+          "page": 5,
+          "ref": "1.2.1"
+        },
+        {
+          "number": 17,
+          "page": 5,
+          "ref": "1.2.1"
+        },
+        {
+          "number": 18,
+          "page": 5,
+          "ref": "1.2.1(h)"
+        },
+        {
+          "number": 19,
+          "page": 5,
+          "ref": "1.2.1(h)(iii)"
+        },
+        {
+          "number": 20,
+          "page": 6,
+          "ref": "1.2.1(h)"
+        },
+        {
+          "number": 21,
+          "page": 6,
+          "ref": "1.2.2"
+        },
+        {
+          "number": 22,
+          "page": 6,
+          "ref": "1.2.2"
+        },
+        {
+          "number": 23,
+          "page": 6,
+          "ref": "1.2.2(e)"
+        },
+        {
+          "number": 24,
+          "page": 6,
+          "ref": "1.2.3"
+        },
+        {
+          "number": 25,
+          "page": 7,
+          "ref": "1.2.3"
+        },
+        {
+          "number": 26,
+          "page": 7,
+          "ref": "1.2.3(b)"
+        },
+        {
+          "number": 27,
+          "page": 7,
+          "ref": "1.2.3(c)"
+        },
+        {
+          "number": 28,
+          "page": 7,
+          "ref": "1.3.1a"
+        },
+        {
+          "number": 29,
+          "page": 7,
+          "ref": "1.3.1a(b)"
+        },
+        {
+          "number": 30,
+          "page": 7,
+          "ref": "1.3.2a"
+        },
+        {
+          "number": 31,
+          "page": 8,
+          "ref": "1.3.2b"
+        },
+        {
+          "number": 32,
+          "page": 8,
+          "ref": "1.3.2c"
+        },
+        {
+          "number": 33,
+          "page": 8,
+          "ref": "1.2.2"
+        },
+        {
+          "number": 34,
+          "page": 8,
+          "ref": "1.1"
+        },
+        {
+          "number": 35,
+          "page": 9,
+          "ref": "1.1"
+        },
+        {
+          "number": 36,
+          "page": 9,
+          "ref": "1.1"
+        },
+        {
+          "number": 37,
+          "page": 9,
+          "ref": "1.1"
+        },
+        {
+          "number": 38,
+          "page": 9,
+          "ref": "1.1"
+        },
+        {
+          "number": 39,
+          "page": 9,
+          "ref": "1.1"
+        },
+        {
+          "number": 40,
+          "page": 10,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 41,
+          "page": 10,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 42,
+          "page": 10,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 43,
+          "page": 10,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 44,
+          "page": 10,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 45,
+          "page": 11,
+          "ref": "1.1.1"
+        },
+        {
+          "number": 46,
+          "page": 11,
+          "ref": "1.2"
+        },
+        {
+          "number": 47,
+          "page": 11,
+          "ref": "1.2"
+        },
+        {
+          "number": 48,
+          "page": 11,
+          "ref": "1.2.1"
+        },
+        {
+          "number": 49,
+          "page": 11,
+          "ref": "1.2.1"
+        },
+        {
+          "number": 50,
+          "page": 12,
+          "ref": "1.2.1"
+        },
+        {
+          "number": 51,
+          "page": 12,
+          "ref": "1.2.1"
+        },
+        {
+          "number": 52,
+          "page": 12,
+          "ref": "1.2.1"
+        },
+        {
+          "number": 53,
+          "page": 12,
+          "ref": "1.2.1"
+        },
+        {
+          "number": 54,
+          "page": 12,
+          "ref": "1.2.1"
+        },
+        {
+          "number": 55,
+          "page": 12,
+          "ref": "1.2.1"
+        },
+        {
+          "number": 56,
+          "page": 13,
+          "ref": "1.2.1"
+        },
+        {
+          "number": 57,
+          "page": 13,
+          "ref": "1.2.1(b)"
+        },
+        {
+          "number": 58,
+          "page": 13,
+          "ref": "1.2.1(c)"
+        },
+        {
+          "number": 59,
+          "page": 13,
+          "ref": "1.2.1(c)&(d)"
+        },
+        {
+          "number": 60,
+          "page": 13,
+          "ref": "1.2.1(c)&(f)"
+        },
+        {
+          "number": 61,
+          "page": 14,
+          "ref": "1.2.1(d)"
+        },
+        {
+          "number": 62,
+          "page": 14,
+          "ref": "1.2.1(d)"
+        },
+        {
+          "number": 63,
+          "page": 14,
+          "ref": "1.2.1(d)"
+        },
+        {
+          "number": 64,
+          "page": 14,
+          "ref": "1.2.1(d)(iii)"
+        },
+        {
+          "number": 65,
+          "page": 14,
+          "ref": "1.2.1(e)"
+        },
+        {
+          "number": 66,
+          "page": 14,
+          "ref": "1.2.1(f)"
+        },
+        {
+          "number": 67,
+          "page": 15,
+          "ref": "1.2.1(g)"
+        },
+        {
+          "number": 68,
+          "page": 15,
+          "ref": "1.2.1(h)"
+        },
+        {
+          "number": 69,
+          "page": 15,
+          "ref": "1.2.1(h)"
+        },
+        {
+          "number": 70,
+          "page": 15,
+          "ref": "1.2.1(h)"
+        },
+        {
+          "number": 71,
+          "page": 15,
+          "ref": "1.2.1(h)(iii)"
+        },
+        {
+          "number": 72,
+          "page": 15,
+          "ref": "1.2.1(h)(ii)"
+        },
+        {
+          "number": 73,
+          "page": 16,
+          "ref": "1.2.2"
+        },
+        {
+          "number": 74,
+          "page": 16,
+          "ref": "1.2.2"
+        },
+        {
+          "number": 75,
+          "page": 16,
+          "ref": "1.2.2"
+        },
+        {
+          "number": 76,
+          "page": 16,
+          "ref": "1.2.2"
+        },
+        {
+          "number": 77,
+          "page": 16,
+          "ref": "1.2.2"
+        },
+        {
+          "number": 78,
+          "page": 17,
+          "ref": "1.2.2(d)"
+        },
+        {
+          "number": 79,
+          "page": 17,
+          "ref": "1.2.2(e)"
+        },
+        {
+          "number": 80,
+          "page": 17,
+          "ref": "1.2.3(a)"
+        },
+        {
+          "number": 81,
+          "page": 17,
+          "ref": "1.2.3(a)(ii)"
+        },
+        {
+          "number": 82,
+          "page": 17,
+          "ref": "1.2.3(b)"
+        },
+        {
+          "number": 83,
+          "page": 17,
+          "ref": "1.2.3(b)"
+        },
+        {
+          "number": 84,
+          "page": 18,
+          "ref": "1.2.3(c)"
+        },
+        {
+          "number": 85,
+          "page": 18,
+          "ref": "1.2.3(c)"
+        },
+        {
+          "number": 86,
+          "page": 18,
+          "ref": "1.2.3(c)"
+        },
+        {
+          "number": 87,
+          "page": 18,
+          "ref": "1.2.3註"
+        },
+        {
+          "number": 88,
+          "page": 18,
+          "ref": "1.2.3註"
+        },
+        {
+          "number": 89,
+          "page": 18,
+          "ref": "1.2.3註"
+        },
+        {
+          "number": 90,
+          "page": 19,
+          "ref": "1.3.1"
+        },
+        {
+          "number": 91,
+          "page": 19,
+          "ref": "1.3.1"
+        },
+        {
+          "number": 92,
+          "page": 19,
+          "ref": "1.3.1a"
+        },
+        {
+          "number": 93,
+          "page": 19,
+          "ref": "1.3.1a"
+        },
+        {
+          "number": 94,
+          "page": 19,
+          "ref": "1.3.1a"
+        },
+        {
+          "number": 95,
+          "page": 19,
+          "ref": "1.3.1a"
+        },
+        {
+          "number": 96,
+          "page": 20,
+          "ref": "1.3.1a 註"
+        },
+        {
+          "number": 97,
+          "page": 20,
+          "ref": "1.3.1a 註"
+        },
+        {
+          "number": 98,
+          "page": 20,
+          "ref": "1.3.1a(c)"
+        },
+        {
+          "number": 99,
+          "page": 20,
+          "ref": "1.3.1b"
+        },
+        {
+          "number": 100,
+          "page": 20,
+          "ref": "1.3.1b 註"
+        },
+        {
+          "number": 101,
+          "page": 20,
+          "ref": "1.3.1b(a)註"
+        },
+        {
+          "number": 102,
+          "page": 21,
+          "ref": "1.3.1b註"
+        },
+        {
+          "number": 103,
+          "page": 21,
+          "ref": "1.3.1b註"
+        },
+        {
+          "number": 104,
+          "page": 21,
+          "ref": "1.3.2a"
+        },
+        {
+          "number": 105,
+          "page": 21,
+          "ref": "1.3.2b&c(ii)"
+        },
+        {
+          "number": 106,
+          "page": 21,
+          "ref": "1.3.2b(a)"
+        },
+        {
+          "number": 107,
+          "page": 21,
+          "ref": "1.3.2b(c)"
+        },
+        {
+          "number": 108,
+          "page": 22,
+          "ref": "1.3.2b(c)"
+        },
+        {
+          "number": 109,
+          "page": 22,
+          "ref": "1.3.2b(iv)"
+        },
+        {
+          "number": 110,
+          "page": 22,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 111,
+          "page": 22,
+          "ref": ".1.2"
+        },
+        {
+          "number": 112,
+          "page": 22,
+          "ref": ".1.3"
+        },
+        {
+          "number": 113,
+          "page": 22,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 114,
+          "page": 23,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 115,
+          "page": 23,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 116,
+          "page": 23,
+          "ref": "2.3.1"
+        },
+        {
+          "number": 117,
+          "page": 23,
+          "ref": "2.2.1"
+        },
+        {
+          "number": 118,
+          "page": 23,
+          "ref": "2.1.1&2.1.2"
+        },
+        {
+          "number": 119,
+          "page": 24,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 120,
+          "page": 24,
+          "ref": "2.1.1a(c)"
+        },
+        {
+          "number": 121,
+          "page": 24,
+          "ref": "2(a)&(b)"
+        },
+        {
+          "number": 122,
+          "page": 24,
+          "ref": "2(b)"
+        },
+        {
+          "number": 123,
+          "page": 24,
+          "ref": "2(b)"
+        },
+        {
+          "number": 124,
+          "page": 25,
+          "ref": "2(b)(i)"
+        },
+        {
+          "number": 125,
+          "page": 25,
+          "ref": "2(c)"
+        },
+        {
+          "number": 126,
+          "page": 25,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 127,
+          "page": 25,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 128,
+          "page": 25,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 129,
+          "page": 25,
+          "ref": "2.1.1a(b)"
+        },
+        {
+          "number": 130,
+          "page": 26,
+          "ref": "2.1.1a(c)"
+        },
+        {
+          "number": 131,
+          "page": 26,
+          "ref": "2.1.1b"
+        },
+        {
+          "number": 132,
+          "page": 26,
+          "ref": "2.1.1b(a)"
+        },
+        {
+          "number": 133,
+          "page": 26,
+          "ref": "2.1.2(d)"
+        },
+        {
+          "number": 134,
+          "page": 26,
+          "ref": "2.1.2(d)"
+        },
+        {
+          "number": 135,
+          "page": 26,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 136,
+          "page": 27,
+          "ref": "2.1.3(a)(i)"
+        },
+        {
+          "number": 137,
+          "page": 27,
+          "ref": "2.2.1"
+        },
+        {
+          "number": 138,
+          "page": 27,
+          "ref": "2.2.1(b)"
+        },
+        {
+          "number": 139,
+          "page": 27,
+          "ref": "2.2.1(c)"
+        },
+        {
+          "number": 140,
+          "page": 27,
+          "ref": "2.2.1"
+        },
+        {
+          "number": 141,
+          "page": 27,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 142,
+          "page": 28,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 143,
+          "page": 28,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 144,
+          "page": 28,
+          "ref": "2.3.1"
+        },
+        {
+          "number": 145,
+          "page": 28,
+          "ref": "2.3.1(a)"
+        },
+        {
+          "number": 146,
+          "page": 28,
+          "ref": "2.3.1(a)"
+        },
+        {
+          "number": 147,
+          "page": 28,
+          "ref": "2.3.1(a)"
+        },
+        {
+          "number": 148,
+          "page": 29,
+          "ref": "2.3.1(a)"
+        },
+        {
+          "number": 149,
+          "page": 29,
+          "ref": "2.3.1(a)"
+        },
+        {
+          "number": 150,
+          "page": 29,
+          "ref": "2.3.1(b)"
+        },
+        {
+          "number": 151,
+          "page": 29,
+          "ref": "2.3.1(b)"
+        },
+        {
+          "number": 152,
+          "page": 29,
+          "ref": "2.3.1(b)"
+        },
+        {
+          "number": 153,
+          "page": 30,
+          "ref": "2.3.1(b)"
+        },
+        {
+          "number": 154,
+          "page": 30,
+          "ref": "2.3.1(a)(b)(iv )"
+        },
+        {
+          "number": 155,
+          "page": 30,
+          "ref": "2.4(c)"
+        },
+        {
+          "number": 156,
+          "page": 30,
+          "ref": "2.4(h)"
+        },
+        {
+          "number": 157,
+          "page": 30,
+          "ref": "2(a)"
+        },
+        {
+          "number": 158,
+          "page": 31,
+          "ref": "2(a)"
+        },
+        {
+          "number": 159,
+          "page": 31,
+          "ref": "2(b)"
+        },
+        {
+          "number": 160,
+          "page": 31,
+          "ref": "2(b)"
+        },
+        {
+          "number": 161,
+          "page": 31,
+          "ref": "2(c)"
+        },
+        {
+          "number": 162,
+          "page": 31,
+          "ref": "2.1"
+        },
+        {
+          "number": 163,
+          "page": 32,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 164,
+          "page": 32,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 165,
+          "page": 32,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 166,
+          "page": 32,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 167,
+          "page": 32,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 168,
+          "page": 32,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 169,
+          "page": 33,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 170,
+          "page": 33,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 171,
+          "page": 33,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 172,
+          "page": 33,
+          "ref": "2.1.1"
+        },
+        {
+          "number": 173,
+          "page": 33,
+          "ref": "2.1.1 &"
+        },
+        {
+          "number": 174,
+          "page": 33,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 175,
+          "page": 34,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 176,
+          "page": 34,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 177,
+          "page": 34,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 178,
+          "page": 34,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 179,
+          "page": 34,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 180,
+          "page": 35,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 181,
+          "page": 35,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 182,
+          "page": 35,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 183,
+          "page": 35,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 184,
+          "page": 35,
+          "ref": "2.1.1a"
+        },
+        {
+          "number": 185,
+          "page": 36,
+          "ref": "2.1.1a ( b )"
+        },
+        {
+          "number": 186,
+          "page": 36,
+          "ref": "2.1.1a ( b )"
+        },
+        {
+          "number": 187,
+          "page": 36,
+          "ref": "2.1.1a(a)"
+        },
+        {
+          "number": 188,
+          "page": 36,
+          "ref": "2.1.1a(a)"
+        },
+        {
+          "number": 189,
+          "page": 36,
+          "ref": "2.1.1a(b)"
+        },
+        {
+          "number": 190,
+          "page": 36,
+          "ref": "2.1.1a(b)"
+        },
+        {
+          "number": 191,
+          "page": 37,
+          "ref": "2.1.1a(b)"
+        },
+        {
+          "number": 192,
+          "page": 37,
+          "ref": "2.1.1a(b)"
+        },
+        {
+          "number": 193,
+          "page": 37,
+          "ref": "2.1.1a(b)"
+        },
+        {
+          "number": 194,
+          "page": 37,
+          "ref": "2.1.1a(b)(ii)"
+        },
+        {
+          "number": 195,
+          "page": 37,
+          "ref": "2.1.1a(b)(iii)"
+        },
+        {
+          "number": 196,
+          "page": 38,
+          "ref": "2.1.1a(c)"
+        },
+        {
+          "number": 197,
+          "page": 38,
+          "ref": "2.1.1a(c)"
+        },
+        {
+          "number": 198,
+          "page": 38,
+          "ref": "2.1.1a(c)"
+        },
+        {
+          "number": 199,
+          "page": 38,
+          "ref": "2.1.1b(a)"
+        },
+        {
+          "number": 200,
+          "page": 38,
+          "ref": "2.1.1b(a)"
+        },
+        {
+          "number": 201,
+          "page": 39,
+          "ref": "2.1.1b(b)"
+        },
+        {
+          "number": 202,
+          "page": 39,
+          "ref": "2.1.1b(b)"
+        },
+        {
+          "number": 203,
+          "page": 39,
+          "ref": "2.1.1b(b)"
+        },
+        {
+          "number": 204,
+          "page": 39,
+          "ref": "2.1.1b(b)"
+        },
+        {
+          "number": 205,
+          "page": 39,
+          "ref": "2.1.1b(b)"
+        },
+        {
+          "number": 206,
+          "page": 40,
+          "ref": "2.1.1b(b)"
+        },
+        {
+          "number": 207,
+          "page": 40,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 208,
+          "page": 40,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 209,
+          "page": 40,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 210,
+          "page": 40,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 211,
+          "page": 40,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 212,
+          "page": 41,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 213,
+          "page": 41,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 214,
+          "page": 41,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 215,
+          "page": 41,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 216,
+          "page": 41,
+          "ref": "2.1.2"
+        },
+        {
+          "number": 217,
+          "page": 42,
+          "ref": "2.1.2(b)"
+        },
+        {
+          "number": 218,
+          "page": 42,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 219,
+          "page": 42,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 220,
+          "page": 42,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 221,
+          "page": 42,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 222,
+          "page": 42,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 223,
+          "page": 43,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 224,
+          "page": 43,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 225,
+          "page": 43,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 226,
+          "page": 43,
+          "ref": "2.1.3"
+        },
+        {
+          "number": 227,
+          "page": 43,
+          "ref": "2.1.3(a)"
+        },
+        {
+          "number": 228,
+          "page": 44,
+          "ref": "2.1.3(a)"
+        },
+        {
+          "number": 229,
+          "page": 44,
+          "ref": "2.1.3(a)"
+        },
+        {
+          "number": 230,
+          "page": 44,
+          "ref": "2.1.3(a)"
+        },
+        {
+          "number": 231,
+          "page": 44,
+          "ref": "2.1.3(a)(i)"
+        },
+        {
+          "number": 232,
+          "page": 44,
+          "ref": "2.1.3(c)"
+        },
+        {
+          "number": 233,
+          "page": 44,
+          "ref": "2.1.3(c)"
+        },
+        {
+          "number": 234,
+          "page": 45,
+          "ref": "2.1.3(c)"
+        },
+        {
+          "number": 235,
+          "page": 45,
+          "ref": "2.2.1"
+        },
+        {
+          "number": 236,
+          "page": 45,
+          "ref": "2.2.1"
+        },
+        {
+          "number": 237,
+          "page": 45,
+          "ref": "2.2.1"
+        },
+        {
+          "number": 238,
+          "page": 45,
+          "ref": "2.2.1"
+        },
+        {
+          "number": 239,
+          "page": 45,
+          "ref": "2.2.1"
+        },
+        {
+          "number": 240,
+          "page": 46,
+          "ref": "2.2.1(a)"
+        },
+        {
+          "number": 241,
+          "page": 46,
+          "ref": "2.2.1(a)"
+        },
+        {
+          "number": 242,
+          "page": 46,
+          "ref": "2.2.1(b)"
+        },
+        {
+          "number": 243,
+          "page": 46,
+          "ref": "2.2.1(c)"
+        },
+        {
+          "number": 244,
+          "page": 46,
+          "ref": "2.2.1(e)"
+        },
+        {
+          "number": 245,
+          "page": 46,
+          "ref": "2.2.1(f)"
+        },
+        {
+          "number": 246,
+          "page": 47,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 247,
+          "page": 47,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 248,
+          "page": 47,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 249,
+          "page": 47,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 250,
+          "page": 47,
+          "ref": "2.2.2"
+        },
+        {
+          "number": 251,
+          "page": 47,
+          "ref": "2.2.2(a)"
+        },
+        {
+          "number": 252,
+          "page": 48,
+          "ref": "2.2.2(a)"
+        },
+        {
+          "number": 253,
+          "page": 48,
+          "ref": "2.2.2(a)"
+        },
+        {
+          "number": 254,
+          "page": 48,
+          "ref": "2.2.2(c)"
+        },
+        {
+          "number": 255,
+          "page": 48,
+          "ref": "2.3"
+        },
+        {
+          "number": 256,
+          "page": 48,
+          "ref": "2.3"
+        },
+        {
+          "number": 257,
+          "page": 48,
+          "ref": "2.3(a)"
+        },
+        {
+          "number": 258,
+          "page": 49,
+          "ref": "2.3(a)"
+        },
+        {
+          "number": 259,
+          "page": 49,
+          "ref": "2.3(b)"
+        },
+        {
+          "number": 260,
+          "page": 49,
+          "ref": "2.3.1"
+        },
+        {
+          "number": 261,
+          "page": 49,
+          "ref": "2.3.1"
+        },
+        {
+          "number": 262,
+          "page": 49,
+          "ref": "2.3.1(a)"
+        },
+        {
+          "number": 263,
+          "page": 50,
+          "ref": "2.3.1(c)"
+        },
+        {
+          "number": 264,
+          "page": 50,
+          "ref": "2.3.1(d)"
+        },
+        {
+          "number": 265,
+          "page": 50,
+          "ref": "2.3.2"
+        },
+        {
+          "number": 266,
+          "page": 50,
+          "ref": "2.4"
+        },
+        {
+          "number": 267,
+          "page": 50,
+          "ref": "2.4"
+        },
+        {
+          "number": 268,
+          "page": 50,
+          "ref": "2.4 & 5.4.1(b)"
+        },
+        {
+          "number": 269,
+          "page": 51,
+          "ref": "2.4(a)"
+        },
+        {
+          "number": 270,
+          "page": 51,
+          "ref": "2.4(b)"
+        },
+        {
+          "number": 271,
+          "page": 51,
+          "ref": "2.4(c)"
+        },
+        {
+          "number": 272,
+          "page": 51,
+          "ref": "2.4(d)"
+        },
+        {
+          "number": 273,
+          "page": 51,
+          "ref": "2.4(d)"
+        },
+        {
+          "number": 274,
+          "page": 51,
+          "ref": "2.4(e)"
+        },
+        {
+          "number": 275,
+          "page": 51,
+          "ref": "2.4(e)"
+        },
+        {
+          "number": 276,
+          "page": 52,
+          "ref": "2.4(e)"
+        },
+        {
+          "number": 277,
+          "page": 52,
+          "ref": "2.4(f)"
+        },
+        {
+          "number": 278,
+          "page": 52,
+          "ref": "2.4(f)"
+        },
+        {
+          "number": 279,
+          "page": 52,
+          "ref": "2.4(g)"
+        },
+        {
+          "number": 280,
+          "page": 52,
+          "ref": "2.4(h)"
+        },
+        {
+          "number": 281,
+          "page": 52,
+          "ref": "3.4.1"
+        },
+        {
+          "number": 282,
+          "page": 53,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 283,
+          "page": 53,
+          "ref": "3.1.2"
+        },
+        {
+          "number": 284,
+          "page": 53,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 285,
+          "page": 53,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 286,
+          "page": 53,
+          "ref": "2.3.1b"
+        },
+        {
+          "number": 287,
+          "page": 53,
+          "ref": "3.2.1(a)"
+        },
+        {
+          "number": 288,
+          "page": 54,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 289,
+          "page": 54,
+          "ref": "3.1.2"
+        },
+        {
+          "number": 290,
+          "page": 54,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 291,
+          "page": 54,
+          "ref": "3.1.2"
+        },
+        {
+          "number": 292,
+          "page": 54,
+          "ref": "3.5"
+        },
+        {
+          "number": 293,
+          "page": 55,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 294,
+          "page": 55,
+          "ref": "3"
+        },
+        {
+          "number": 295,
+          "page": 55,
+          "ref": "3.1.1"
+        },
+        {
+          "number": 296,
+          "page": 55,
+          "ref": "3.1"
+        },
+        {
+          "number": 297,
+          "page": 55,
+          "ref": "3.1.1(a)"
+        },
+        {
+          "number": 298,
+          "page": 55,
+          "ref": "3.1.1&3.1.2"
+        },
+        {
+          "number": 299,
+          "page": 56,
+          "ref": "3.1.1(c )"
+        },
+        {
+          "number": 300,
+          "page": 56,
+          "ref": "3.1.1(a )"
+        },
+        {
+          "number": 301,
+          "page": 56,
+          "ref": "3.1.1(d)"
+        },
+        {
+          "number": 302,
+          "page": 56,
+          "ref": "3.1.1(d)"
+        },
+        {
+          "number": 303,
+          "page": 56,
+          "ref": "3.2"
+        },
+        {
+          "number": 304,
+          "page": 57,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 305,
+          "page": 57,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 306,
+          "page": 57,
+          "ref": "3.2.1註"
+        },
+        {
+          "number": 307,
+          "page": 57,
+          "ref": "3.2.1(a)"
+        },
+        {
+          "number": 308,
+          "page": 57,
+          "ref": "3.2.1(a)(ii)"
+        },
+        {
+          "number": 309,
+          "page": 58,
+          "ref": "3.2.1(a)"
+        },
+        {
+          "number": 310,
+          "page": 58,
+          "ref": "3.2.1(b)"
+        },
+        {
+          "number": 311,
+          "page": 58,
+          "ref": "3.2.1(b)(iv)"
+        },
+        {
+          "number": 312,
+          "page": 58,
+          "ref": "3.2.1(b)"
+        },
+        {
+          "number": 313,
+          "page": 58,
+          "ref": "3.3"
+        },
+        {
+          "number": 314,
+          "page": 59,
+          "ref": "3.3(c)"
+        },
+        {
+          "number": 315,
+          "page": 59,
+          "ref": "3.3.1(e)"
+        },
+        {
+          "number": 316,
+          "page": 59,
+          "ref": "3.3.1(e)"
+        },
+        {
+          "number": 317,
+          "page": 59,
+          "ref": "3.3.1(e)"
+        },
+        {
+          "number": 318,
+          "page": 60,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 319,
+          "page": 60,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 320,
+          "page": 60,
+          "ref": "3.4.1(a)"
+        },
+        {
+          "number": 321,
+          "page": 60,
+          "ref": "3.4.1(a)"
+        },
+        {
+          "number": 322,
+          "page": 60,
+          "ref": "3.4.1(b)"
+        },
+        {
+          "number": 323,
+          "page": 61,
+          "ref": "3.4.1"
+        },
+        {
+          "number": 324,
+          "page": 61,
+          "ref": "3.4.2"
+        },
+        {
+          "number": 325,
+          "page": 61,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 326,
+          "page": 61,
+          "ref": "3.5.1(b)"
+        },
+        {
+          "number": 327,
+          "page": 61,
+          "ref": "3.6"
+        },
+        {
+          "number": 328,
+          "page": 61,
+          "ref": "3.6.1"
+        },
+        {
+          "number": 329,
+          "page": 62,
+          "ref": "3.1"
+        },
+        {
+          "number": 330,
+          "page": 62,
+          "ref": "3.1.1"
+        },
+        {
+          "number": 331,
+          "page": 62,
+          "ref": "3.1.1"
+        },
+        {
+          "number": 332,
+          "page": 62,
+          "ref": "3.1.1"
+        },
+        {
+          "number": 333,
+          "page": 62,
+          "ref": "3.1.1"
+        },
+        {
+          "number": 334,
+          "page": 62,
+          "ref": "3.1.1"
+        },
+        {
+          "number": 335,
+          "page": 63,
+          "ref": "3.1.1"
+        },
+        {
+          "number": 336,
+          "page": 63,
+          "ref": "3.1.1"
+        },
+        {
+          "number": 337,
+          "page": 63,
+          "ref": "3.1.1(a)"
+        },
+        {
+          "number": 338,
+          "page": 63,
+          "ref": "3.1.1(a)"
+        },
+        {
+          "number": 339,
+          "page": 63,
+          "ref": "3.1.1(a)"
+        },
+        {
+          "number": 340,
+          "page": 63,
+          "ref": "3.1.1(a)"
+        },
+        {
+          "number": 341,
+          "page": 64,
+          "ref": "3.1.1(a)"
+        },
+        {
+          "number": 342,
+          "page": 64,
+          "ref": "3.1.1(a)"
+        },
+        {
+          "number": 343,
+          "page": 64,
+          "ref": "3.1.1(a)"
+        },
+        {
+          "number": 344,
+          "page": 64,
+          "ref": "3.1.1(a)"
+        },
+        {
+          "number": 345,
+          "page": 64,
+          "ref": "3.1.1(a)"
+        },
+        {
+          "number": 346,
+          "page": 64,
+          "ref": "3.1.1(a)"
+        },
+        {
+          "number": 347,
+          "page": 65,
+          "ref": "3.1.1(b)"
+        },
+        {
+          "number": 348,
+          "page": 65,
+          "ref": "3.1.1(c)"
+        },
+        {
+          "number": 349,
+          "page": 65,
+          "ref": "3.1.1(d)"
+        },
+        {
+          "number": 350,
+          "page": 65,
+          "ref": "3.1.1(d)"
+        },
+        {
+          "number": 351,
+          "page": 65,
+          "ref": "3.1.1(d)"
+        },
+        {
+          "number": 352,
+          "page": 65,
+          "ref": "3.1.2"
+        },
+        {
+          "number": 353,
+          "page": 66,
+          "ref": "3.1.2"
+        },
+        {
+          "number": 354,
+          "page": 66,
+          "ref": "3.1.2"
+        },
+        {
+          "number": 355,
+          "page": 66,
+          "ref": "3.1.2"
+        },
+        {
+          "number": 356,
+          "page": 66,
+          "ref": "3.1.2"
+        },
+        {
+          "number": 357,
+          "page": 66,
+          "ref": "3.1.2"
+        },
+        {
+          "number": 358,
+          "page": 66,
+          "ref": "3.1.2(a)"
+        },
+        {
+          "number": 359,
+          "page": 67,
+          "ref": "3.1.2(b)"
+        },
+        {
+          "number": 360,
+          "page": 67,
+          "ref": "3.1.2(c)"
+        },
+        {
+          "number": 361,
+          "page": 67,
+          "ref": "3.1.2(d)"
+        },
+        {
+          "number": 362,
+          "page": 67,
+          "ref": "3.1.2(d)"
+        },
+        {
+          "number": 363,
+          "page": 67,
+          "ref": "3.1.2(d)"
+        },
+        {
+          "number": 364,
+          "page": 67,
+          "ref": "3.2"
+        },
+        {
+          "number": 365,
+          "page": 68,
+          "ref": "3.2"
+        },
+        {
+          "number": 366,
+          "page": 68,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 367,
+          "page": 68,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 368,
+          "page": 68,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 369,
+          "page": 68,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 370,
+          "page": 69,
+          "ref": "3.2.1"
+        },
+        {
+          "number": 371,
+          "page": 69,
+          "ref": "3.2.1(a)"
+        },
+        {
+          "number": 372,
+          "page": 69,
+          "ref": "3.2.2(a)"
+        },
+        {
+          "number": 373,
+          "page": 69,
+          "ref": "3.2.1(a)"
+        },
+        {
+          "number": 374,
+          "page": 69,
+          "ref": "3.2.1(a)"
+        },
+        {
+          "number": 375,
+          "page": 70,
+          "ref": "3.2.1(a)"
+        },
+        {
+          "number": 376,
+          "page": 70,
+          "ref": "3.2.1(a)"
+        },
+        {
+          "number": 377,
+          "page": 70,
+          "ref": "3.2.1(a)"
+        },
+        {
+          "number": 378,
+          "page": 70,
+          "ref": "3.2.1(a)"
+        },
+        {
+          "number": 379,
+          "page": 70,
+          "ref": "3.2.1(a)"
+        },
+        {
+          "number": 380,
+          "page": 71,
+          "ref": "3.2.1(a)"
+        },
+        {
+          "number": 381,
+          "page": 71,
+          "ref": "3.2.1(a)(ii)"
+        },
+        {
+          "number": 382,
+          "page": 71,
+          "ref": "3.2.1(a)註"
+        },
+        {
+          "number": 383,
+          "page": 71,
+          "ref": "3.2.1(a)註"
+        },
+        {
+          "number": 384,
+          "page": 71,
+          "ref": "3.2.1(a)註"
+        },
+        {
+          "number": 385,
+          "page": 71,
+          "ref": "3.2.1(a)註"
+        },
+        {
+          "number": 386,
+          "page": 72,
+          "ref": "3.2.1(a)註"
+        },
+        {
+          "number": 387,
+          "page": 72,
+          "ref": "3.2.1(a)註"
+        },
+        {
+          "number": 388,
+          "page": 72,
+          "ref": "3.2.1(a)註"
+        },
+        {
+          "number": 389,
+          "page": 72,
+          "ref": "3.2.1(b)"
+        },
+        {
+          "number": 390,
+          "page": 72,
+          "ref": "3.2.1(b)"
+        },
+        {
+          "number": 391,
+          "page": 73,
+          "ref": "3.2.1(b)"
+        },
+        {
+          "number": 392,
+          "page": 73,
+          "ref": "3.2.1(b)"
+        },
+        {
+          "number": 393,
+          "page": 73,
+          "ref": "3.2.1(b)"
+        },
+        {
+          "number": 394,
+          "page": 73,
+          "ref": "3.2.1(b)"
+        },
+        {
+          "number": 395,
+          "page": 73,
+          "ref": "3.2.1(b)"
+        },
+        {
+          "number": 396,
+          "page": 74,
+          "ref": "3.2.1(b)"
+        },
+        {
+          "number": 397,
+          "page": 74,
+          "ref": "3.2.1(b)"
+        },
+        {
+          "number": 398,
+          "page": 74,
+          "ref": "3.2.2(a)"
+        },
+        {
+          "number": 399,
+          "page": 74,
+          "ref": "3.2.2(b)"
+        },
+        {
+          "number": 400,
+          "page": 74,
+          "ref": "3.2.2c"
+        },
+        {
+          "number": 401,
+          "page": 75,
+          "ref": "3.2.2c"
+        },
+        {
+          "number": 402,
+          "page": 75,
+          "ref": "3.3"
+        },
+        {
+          "number": 403,
+          "page": 75,
+          "ref": "3.3"
+        },
+        {
+          "number": 404,
+          "page": 75,
+          "ref": "3.3"
+        },
+        {
+          "number": 405,
+          "page": 75,
+          "ref": "3.3"
+        },
+        {
+          "number": 406,
+          "page": 75,
+          "ref": "3.3"
+        },
+        {
+          "number": 407,
+          "page": 76,
+          "ref": "3.3"
+        },
+        {
+          "number": 408,
+          "page": 76,
+          "ref": "3.3"
+        },
+        {
+          "number": 409,
+          "page": 76,
+          "ref": "3.3"
+        },
+        {
+          "number": 410,
+          "page": 76,
+          "ref": "3.3(d)"
+        },
+        {
+          "number": 411,
+          "page": 76,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 412,
+          "page": 76,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 413,
+          "page": 77,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 414,
+          "page": 77,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 415,
+          "page": 77,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 416,
+          "page": 77,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 417,
+          "page": 77,
+          "ref": "3.3.1"
+        },
+        {
+          "number": 418,
+          "page": 77,
+          "ref": "3.3.1(e)"
+        },
+        {
+          "number": 419,
+          "page": 78,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 420,
+          "page": 78,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 421,
+          "page": 78,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 422,
+          "page": 78,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 423,
+          "page": 78,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 424,
+          "page": 78,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 425,
+          "page": 79,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 426,
+          "page": 79,
+          "ref": "3.3.2"
+        },
+        {
+          "number": 427,
+          "page": 79,
+          "ref": "3.4"
+        },
+        {
+          "number": 428,
+          "page": 79,
+          "ref": "3.4"
+        },
+        {
+          "number": 429,
+          "page": 79,
+          "ref": "3.4"
+        },
+        {
+          "number": 430,
+          "page": 79,
+          "ref": "3.4"
+        },
+        {
+          "number": 431,
+          "page": 80,
+          "ref": "3.4"
+        },
+        {
+          "number": 432,
+          "page": 80,
+          "ref": "3.4(a)"
+        },
+        {
+          "number": 433,
+          "page": 80,
+          "ref": "3.4(b)"
+        },
+        {
+          "number": 434,
+          "page": 80,
+          "ref": "3.4(b)"
+        },
+        {
+          "number": 435,
+          "page": 80,
+          "ref": "3.4(c)"
+        },
+        {
+          "number": 436,
+          "page": 81,
+          "ref": "3.4(c)"
+        },
+        {
+          "number": 437,
+          "page": 81,
+          "ref": "3.4(c)"
+        },
+        {
+          "number": 438,
+          "page": 81,
+          "ref": "3.5"
+        },
+        {
+          "number": 439,
+          "page": 81,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 440,
+          "page": 81,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 441,
+          "page": 81,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 442,
+          "page": 82,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 443,
+          "page": 82,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 444,
+          "page": 82,
+          "ref": "3.5.1"
+        },
+        {
+          "number": 445,
+          "page": 82,
+          "ref": "3.5.1(a)"
+        },
+        {
+          "number": 446,
+          "page": 82,
+          "ref": "3.5.1(a)"
+        },
+        {
+          "number": 447,
+          "page": 82,
+          "ref": "3.5.1(c)"
+        },
+        {
+          "number": 448,
+          "page": 83,
+          "ref": "3.5.1(c)"
+        },
+        {
+          "number": 449,
+          "page": 83,
+          "ref": "3.5.1(d)"
+        },
+        {
+          "number": 450,
+          "page": 83,
+          "ref": "3.5.1(e)"
+        },
+        {
+          "number": 451,
+          "page": 83,
+          "ref": "3.5.1(f)"
+        },
+        {
+          "number": 452,
+          "page": 83,
+          "ref": "3.5.1(f)"
+        },
+        {
+          "number": 453,
+          "page": 83,
+          "ref": "3.6"
+        },
+        {
+          "number": 454,
+          "page": 84,
+          "ref": "3.6"
+        },
+        {
+          "number": 455,
+          "page": 84,
+          "ref": "3.6"
+        },
+        {
+          "number": 456,
+          "page": 84,
+          "ref": "3.6"
+        },
+        {
+          "number": 457,
+          "page": 84,
+          "ref": "3.6.1"
+        },
+        {
+          "number": 458,
+          "page": 84,
+          "ref": "3.6.1"
+        },
+        {
+          "number": 459,
+          "page": 84,
+          "ref": "3.6.1"
+        },
+        {
+          "number": 460,
+          "page": 85,
+          "ref": "3.6.1"
+        },
+        {
+          "number": 461,
+          "page": 85,
+          "ref": "3.6.1"
+        },
+        {
+          "number": 462,
+          "page": 85,
+          "ref": "3.6.1"
+        },
+        {
+          "number": 463,
+          "page": 85,
+          "ref": "3.6.1"
+        },
+        {
+          "number": 464,
+          "page": 85,
+          "ref": "4.4"
+        },
+        {
+          "number": 465,
+          "page": 86,
+          "ref": "4.11"
+        },
+        {
+          "number": 466,
+          "page": 86,
+          "ref": "4.3"
+        },
+        {
+          "number": 467,
+          "page": 86,
+          "ref": "4.9"
+        },
+        {
+          "number": 468,
+          "page": 86,
+          "ref": "4.8"
+        },
+        {
+          "number": 469,
+          "page": 86,
+          "ref": "4.12.1"
+        },
+        {
+          "number": 470,
+          "page": 86,
+          "ref": "4.10"
+        },
+        {
+          "number": 471,
+          "page": 87,
+          "ref": "4.1"
+        },
+        {
+          "number": 472,
+          "page": 87,
+          "ref": "4.8"
+        },
+        {
+          "number": 473,
+          "page": 87,
+          "ref": "4.11"
+        },
+        {
+          "number": 474,
+          "page": 87,
+          "ref": "4.3"
+        },
+        {
+          "number": 475,
+          "page": 87,
+          "ref": "4.3"
+        },
+        {
+          "number": 476,
+          "page": 87,
+          "ref": "4.7"
+        },
+        {
+          "number": 477,
+          "page": 88,
+          "ref": "4.1"
+        },
+        {
+          "number": 478,
+          "page": 88,
+          "ref": "4.1"
+        },
+        {
+          "number": 479,
+          "page": 88,
+          "ref": "4.2"
+        },
+        {
+          "number": 480,
+          "page": 88,
+          "ref": "4.2"
+        },
+        {
+          "number": 481,
+          "page": 88,
+          "ref": "4.4(c)"
+        },
+        {
+          "number": 482,
+          "page": 89,
+          "ref": "4.4(c)"
+        },
+        {
+          "number": 483,
+          "page": 89,
+          "ref": "4.4(c)"
+        },
+        {
+          "number": 484,
+          "page": 89,
+          "ref": "4.4(c)"
+        },
+        {
+          "number": 485,
+          "page": 89,
+          "ref": "4.4(c)"
+        },
+        {
+          "number": 486,
+          "page": 89,
+          "ref": "4.5"
+        },
+        {
+          "number": 487,
+          "page": 90,
+          "ref": "4.5"
+        },
+        {
+          "number": 488,
+          "page": 90,
+          "ref": "4.5"
+        },
+        {
+          "number": 489,
+          "page": 90,
+          "ref": "4.5"
+        },
+        {
+          "number": 490,
+          "page": 90,
+          "ref": "4.7"
+        },
+        {
+          "number": 491,
+          "page": 90,
+          "ref": "4.7"
+        },
+        {
+          "number": 492,
+          "page": 90,
+          "ref": "4.9"
+        },
+        {
+          "number": 493,
+          "page": 91,
+          "ref": "4.9"
+        },
+        {
+          "number": 494,
+          "page": 91,
+          "ref": "4.9"
+        },
+        {
+          "number": 495,
+          "page": 91,
+          "ref": "4.9"
+        },
+        {
+          "number": 496,
+          "page": 91,
+          "ref": "4.9"
+        },
+        {
+          "number": 497,
+          "page": 91,
+          "ref": "4.9"
+        },
+        {
+          "number": 498,
+          "page": 91,
+          "ref": "4.10註"
+        },
+        {
+          "number": 499,
+          "page": 91,
+          "ref": "4.11"
+        },
+        {
+          "number": 500,
+          "page": 92,
+          "ref": "4.11(e )"
+        },
+        {
+          "number": 501,
+          "page": 92,
+          "ref": "4.12"
+        },
+        {
+          "number": 502,
+          "page": 92,
+          "ref": "4.12"
+        },
+        {
+          "number": 503,
+          "page": 92,
+          "ref": "4.3"
+        },
+        {
+          "number": 504,
+          "page": 92,
+          "ref": "4.4(b)"
+        },
+        {
+          "number": 505,
+          "page": 93,
+          "ref": "4.5"
+        },
+        {
+          "number": 506,
+          "page": 93,
+          "ref": "4.5(a)"
+        },
+        {
+          "number": 507,
+          "page": 93,
+          "ref": "4.5(a)"
+        },
+        {
+          "number": 508,
+          "page": 93,
+          "ref": "4.7"
+        },
+        {
+          "number": 509,
+          "page": 93,
+          "ref": "4.7(d)"
+        },
+        {
+          "number": 510,
+          "page": 93,
+          "ref": "4.8(a)"
+        },
+        {
+          "number": 511,
+          "page": 94,
+          "ref": "4.9"
+        },
+        {
+          "number": 512,
+          "page": 94,
+          "ref": "4.9"
+        },
+        {
+          "number": 513,
+          "page": 94,
+          "ref": "4.9"
+        },
+        {
+          "number": 514,
+          "page": 94,
+          "ref": "4.9(e)(ii)"
+        },
+        {
+          "number": 515,
+          "page": 94,
+          "ref": "4.10"
+        },
+        {
+          "number": 516,
+          "page": 94,
+          "ref": "4"
+        },
+        {
+          "number": 517,
+          "page": 95,
+          "ref": "4.1"
+        },
+        {
+          "number": 518,
+          "page": 95,
+          "ref": "4.1"
+        },
+        {
+          "number": 519,
+          "page": 95,
+          "ref": "4.1"
+        },
+        {
+          "number": 520,
+          "page": 95,
+          "ref": "4.1"
+        },
+        {
+          "number": 521,
+          "page": 95,
+          "ref": "4.1"
+        },
+        {
+          "number": 522,
+          "page": 95,
+          "ref": "4.1"
+        },
+        {
+          "number": 523,
+          "page": 96,
+          "ref": "4.1"
+        },
+        {
+          "number": 524,
+          "page": 96,
+          "ref": "4.1"
+        },
+        {
+          "number": 525,
+          "page": 96,
+          "ref": "4.2"
+        },
+        {
+          "number": 526,
+          "page": 96,
+          "ref": "4.2"
+        },
+        {
+          "number": 527,
+          "page": 96,
+          "ref": "4.2"
+        },
+        {
+          "number": 528,
+          "page": 96,
+          "ref": "4.2"
+        },
+        {
+          "number": 529,
+          "page": 97,
+          "ref": "4.2"
+        },
+        {
+          "number": 530,
+          "page": 97,
+          "ref": "4.2"
+        },
+        {
+          "number": 531,
+          "page": 97,
+          "ref": "4.2"
+        },
+        {
+          "number": 532,
+          "page": 97,
+          "ref": "4.2"
+        },
+        {
+          "number": 533,
+          "page": 97,
+          "ref": "4.2"
+        },
+        {
+          "number": 534,
+          "page": 98,
+          "ref": "4.2"
+        },
+        {
+          "number": 535,
+          "page": 98,
+          "ref": "4.2"
+        },
+        {
+          "number": 536,
+          "page": 98,
+          "ref": "4.2"
+        },
+        {
+          "number": 537,
+          "page": 98,
+          "ref": "4.3"
+        },
+        {
+          "number": 538,
+          "page": 98,
+          "ref": "4.3"
+        },
+        {
+          "number": 539,
+          "page": 99,
+          "ref": "4.3"
+        },
+        {
+          "number": 540,
+          "page": 99,
+          "ref": "4.3"
+        },
+        {
+          "number": 541,
+          "page": 99,
+          "ref": "4.3"
+        },
+        {
+          "number": 542,
+          "page": 99,
+          "ref": "4.3"
+        },
+        {
+          "number": 543,
+          "page": 99,
+          "ref": "4.3"
+        },
+        {
+          "number": 544,
+          "page": 99,
+          "ref": "4.3"
+        },
+        {
+          "number": 545,
+          "page": 100,
+          "ref": "4.3"
+        },
+        {
+          "number": 546,
+          "page": 100,
+          "ref": "4.3"
+        },
+        {
+          "number": 547,
+          "page": 100,
+          "ref": "4.3"
+        },
+        {
+          "number": 548,
+          "page": 100,
+          "ref": "4.3"
+        },
+        {
+          "number": 549,
+          "page": 100,
+          "ref": "4.3"
+        },
+        {
+          "number": 550,
+          "page": 100,
+          "ref": "4.4"
+        },
+        {
+          "number": 551,
+          "page": 101,
+          "ref": "4.4"
+        },
+        {
+          "number": 552,
+          "page": 101,
+          "ref": "4.4"
+        },
+        {
+          "number": 553,
+          "page": 101,
+          "ref": "4.4"
+        },
+        {
+          "number": 554,
+          "page": 101,
+          "ref": "4.4"
+        },
+        {
+          "number": 555,
+          "page": 101,
+          "ref": "4.4"
+        },
+        {
+          "number": 556,
+          "page": 101,
+          "ref": "4.4(b)"
+        },
+        {
+          "number": 557,
+          "page": 102,
+          "ref": "4.4(b)"
+        },
+        {
+          "number": 558,
+          "page": 102,
+          "ref": "4.5"
+        },
+        {
+          "number": 559,
+          "page": 102,
+          "ref": "4.5"
+        },
+        {
+          "number": 560,
+          "page": 102,
+          "ref": "4.5"
+        },
+        {
+          "number": 561,
+          "page": 102,
+          "ref": "4.5"
+        },
+        {
+          "number": 562,
+          "page": 102,
+          "ref": "4.5"
+        },
+        {
+          "number": 563,
+          "page": 103,
+          "ref": "4.5"
+        },
+        {
+          "number": 564,
+          "page": 103,
+          "ref": "4.5"
+        },
+        {
+          "number": 565,
+          "page": 103,
+          "ref": "4.5"
+        },
+        {
+          "number": 566,
+          "page": 103,
+          "ref": "4.5"
+        },
+        {
+          "number": 567,
+          "page": 103,
+          "ref": "4.5"
+        },
+        {
+          "number": 568,
+          "page": 103,
+          "ref": "4.5"
+        },
+        {
+          "number": 569,
+          "page": 104,
+          "ref": "4.5"
+        },
+        {
+          "number": 570,
+          "page": 104,
+          "ref": "4.5"
+        },
+        {
+          "number": 571,
+          "page": 104,
+          "ref": "4.5"
+        },
+        {
+          "number": 572,
+          "page": 104,
+          "ref": "4.5"
+        },
+        {
+          "number": 573,
+          "page": 104,
+          "ref": "4.5"
+        },
+        {
+          "number": 574,
+          "page": 104,
+          "ref": "4.6"
+        },
+        {
+          "number": 575,
+          "page": 105,
+          "ref": "4.6"
+        },
+        {
+          "number": 576,
+          "page": 105,
+          "ref": "4.6"
+        },
+        {
+          "number": 577,
+          "page": 105,
+          "ref": "4.6"
+        },
+        {
+          "number": 578,
+          "page": 105,
+          "ref": "4.6"
+        },
+        {
+          "number": 579,
+          "page": 105,
+          "ref": "4.6"
+        },
+        {
+          "number": 580,
+          "page": 105,
+          "ref": "4.6"
+        },
+        {
+          "number": 581,
+          "page": 106,
+          "ref": "4.6"
+        },
+        {
+          "number": 582,
+          "page": 106,
+          "ref": "4.6"
+        },
+        {
+          "number": 583,
+          "page": 106,
+          "ref": "4.6"
+        },
+        {
+          "number": 584,
+          "page": 106,
+          "ref": "4.6"
+        },
+        {
+          "number": 585,
+          "page": 106,
+          "ref": "4.6"
+        },
+        {
+          "number": 586,
+          "page": 106,
+          "ref": "4.6"
+        },
+        {
+          "number": 587,
+          "page": 106,
+          "ref": "4.6"
+        },
+        {
+          "number": 588,
+          "page": 107,
+          "ref": "4.6"
+        },
+        {
+          "number": 589,
+          "page": 107,
+          "ref": "4.6"
+        },
+        {
+          "number": 590,
+          "page": 107,
+          "ref": "4.7"
+        },
+        {
+          "number": 591,
+          "page": 107,
+          "ref": "4.7"
+        },
+        {
+          "number": 592,
+          "page": 107,
+          "ref": "4.7"
+        },
+        {
+          "number": 593,
+          "page": 107,
+          "ref": "4.7"
+        },
+        {
+          "number": 594,
+          "page": 108,
+          "ref": "4.7"
+        },
+        {
+          "number": 595,
+          "page": 108,
+          "ref": "4.7"
+        },
+        {
+          "number": 596,
+          "page": 108,
+          "ref": "4.7"
+        },
+        {
+          "number": 597,
+          "page": 108,
+          "ref": "4.7"
+        },
+        {
+          "number": 598,
+          "page": 108,
+          "ref": "4.7"
+        },
+        {
+          "number": 599,
+          "page": 108,
+          "ref": "4.7"
+        },
+        {
+          "number": 600,
+          "page": 109,
+          "ref": "4.7"
+        },
+        {
+          "number": 601,
+          "page": 109,
+          "ref": "4.7"
+        },
+        {
+          "number": 602,
+          "page": 109,
+          "ref": "4.7"
+        },
+        {
+          "number": 603,
+          "page": 109,
+          "ref": "4.8"
+        },
+        {
+          "number": 604,
+          "page": 109,
+          "ref": "4.8"
+        },
+        {
+          "number": 605,
+          "page": 110,
+          "ref": "4.8"
+        },
+        {
+          "number": 606,
+          "page": 110,
+          "ref": "4.8"
+        },
+        {
+          "number": 607,
+          "page": 110,
+          "ref": "4.8"
+        },
+        {
+          "number": 608,
+          "page": 110,
+          "ref": "4.8"
+        },
+        {
+          "number": 609,
+          "page": 110,
+          "ref": "4.8"
+        },
+        {
+          "number": 610,
+          "page": 111,
+          "ref": "4.8"
+        },
+        {
+          "number": 611,
+          "page": 111,
+          "ref": "4.8"
+        },
+        {
+          "number": 612,
+          "page": 111,
+          "ref": "4.8"
+        },
+        {
+          "number": 613,
+          "page": 111,
+          "ref": "4.8"
+        },
+        {
+          "number": 614,
+          "page": 111,
+          "ref": "4.8"
+        },
+        {
+          "number": 615,
+          "page": 111,
+          "ref": "4.8"
+        },
+        {
+          "number": 616,
+          "page": 112,
+          "ref": "4.8"
+        },
+        {
+          "number": 617,
+          "page": 112,
+          "ref": "4.8"
+        },
+        {
+          "number": 618,
+          "page": 112,
+          "ref": "4.8"
+        },
+        {
+          "number": 619,
+          "page": 112,
+          "ref": "4.9"
+        },
+        {
+          "number": 620,
+          "page": 112,
+          "ref": "4.9"
+        },
+        {
+          "number": 621,
+          "page": 112,
+          "ref": "4.9"
+        },
+        {
+          "number": 622,
+          "page": 113,
+          "ref": "4.9"
+        },
+        {
+          "number": 623,
+          "page": 113,
+          "ref": "4.9"
+        },
+        {
+          "number": 624,
+          "page": 113,
+          "ref": "4.9"
+        },
+        {
+          "number": 625,
+          "page": 113,
+          "ref": "4.9"
+        },
+        {
+          "number": 626,
+          "page": 113,
+          "ref": "4.9"
+        },
+        {
+          "number": 627,
+          "page": 113,
+          "ref": "4.9"
+        },
+        {
+          "number": 628,
+          "page": 114,
+          "ref": "4.9"
+        },
+        {
+          "number": 629,
+          "page": 114,
+          "ref": "4.9"
+        },
+        {
+          "number": 630,
+          "page": 114,
+          "ref": "4.9"
+        },
+        {
+          "number": 631,
+          "page": 114,
+          "ref": "4.9"
+        },
+        {
+          "number": 632,
+          "page": 114,
+          "ref": "4.9"
+        },
+        {
+          "number": 633,
+          "page": 114,
+          "ref": "4.9"
+        },
+        {
+          "number": 634,
+          "page": 115,
+          "ref": "4.9"
+        },
+        {
+          "number": 635,
+          "page": 115,
+          "ref": "4.9(e )(i)"
+        },
+        {
+          "number": 636,
+          "page": 115,
+          "ref": "4.9(e )(ii)"
+        },
+        {
+          "number": 637,
+          "page": 115,
+          "ref": "4.10"
+        },
+        {
+          "number": 638,
+          "page": 115,
+          "ref": "4.10"
+        },
+        {
+          "number": 639,
+          "page": 115,
+          "ref": "4.10"
+        },
+        {
+          "number": 640,
+          "page": 116,
+          "ref": "4.10"
+        },
+        {
+          "number": 641,
+          "page": 116,
+          "ref": "4.10"
+        },
+        {
+          "number": 642,
+          "page": 116,
+          "ref": "4.10"
+        },
+        {
+          "number": 643,
+          "page": 116,
+          "ref": "4.10"
+        },
+        {
+          "number": 644,
+          "page": 116,
+          "ref": "4.10"
+        },
+        {
+          "number": 645,
+          "page": 117,
+          "ref": "4.10"
+        },
+        {
+          "number": 646,
+          "page": 117,
+          "ref": "4.11"
+        },
+        {
+          "number": 647,
+          "page": 117,
+          "ref": "4.11"
+        },
+        {
+          "number": 648,
+          "page": 117,
+          "ref": "4.11"
+        },
+        {
+          "number": 649,
+          "page": 117,
+          "ref": "4.11"
+        },
+        {
+          "number": 650,
+          "page": 117,
+          "ref": "4.11"
+        },
+        {
+          "number": 651,
+          "page": 118,
+          "ref": "4.11"
+        },
+        {
+          "number": 652,
+          "page": 118,
+          "ref": "4.11(c )"
+        },
+        {
+          "number": 653,
+          "page": 118,
+          "ref": "4.12"
+        },
+        {
+          "number": 654,
+          "page": 118,
+          "ref": "4.12"
+        },
+        {
+          "number": 655,
+          "page": 118,
+          "ref": "4.12"
+        },
+        {
+          "number": 656,
+          "page": 118,
+          "ref": "4.12"
+        },
+        {
+          "number": 657,
+          "page": 119,
+          "ref": "4.12"
+        },
+        {
+          "number": 658,
+          "page": 119,
+          "ref": "4.12"
+        },
+        {
+          "number": 659,
+          "page": 119,
+          "ref": "4.12"
+        },
+        {
+          "number": 660,
+          "page": 119,
+          "ref": "4.12"
+        },
+        {
+          "number": 661,
+          "page": 119,
+          "ref": "4.12"
+        },
+        {
+          "number": 662,
+          "page": 119,
+          "ref": "4.12"
+        },
+        {
+          "number": 663,
+          "page": 120,
+          "ref": "5.2.2(b)"
+        },
+        {
+          "number": 664,
+          "page": 120,
+          "ref": "5.2.11"
+        },
+        {
+          "number": 665,
+          "page": 120,
+          "ref": "5.6.2(d)"
+        },
+        {
+          "number": 666,
+          "page": 120,
+          "ref": "5.2.10"
+        },
+        {
+          "number": 667,
+          "page": 120,
+          "ref": "5.2.6"
+        },
+        {
+          "number": 668,
+          "page": 120,
+          "ref": "5.6.2"
+        },
+        {
+          "number": 669,
+          "page": 121,
+          "ref": "5.3.1(a)"
+        },
+        {
+          "number": 670,
+          "page": 121,
+          "ref": "5.3.1(b)"
+        },
+        {
+          "number": 671,
+          "page": 121,
+          "ref": "5.1(a)"
+        },
+        {
+          "number": 672,
+          "page": 121,
+          "ref": "5.1.1(d)"
+        },
+        {
+          "number": 673,
+          "page": 121,
+          "ref": "5.2.7"
+        },
+        {
+          "number": 674,
+          "page": 122,
+          "ref": "5.2.6"
+        },
+        {
+          "number": 675,
+          "page": 122,
+          "ref": "5.2.6"
+        },
+        {
+          "number": 676,
+          "page": 122,
+          "ref": "5.1(g)"
+        },
+        {
+          "number": 677,
+          "page": 122,
+          "ref": "5.2.6"
+        },
+        {
+          "number": 678,
+          "page": 122,
+          "ref": "5.2.6"
+        },
+        {
+          "number": 679,
+          "page": 123,
+          "ref": "5.2.3"
+        },
+        {
+          "number": 680,
+          "page": 123,
+          "ref": "5.2.7"
+        },
+        {
+          "number": 681,
+          "page": 123,
+          "ref": "5.1.1(a)"
+        },
+        {
+          "number": 682,
+          "page": 123,
+          "ref": "5.2.4(g)"
+        },
+        {
+          "number": 683,
+          "page": 123,
+          "ref": "5.2.8"
+        },
+        {
+          "number": 684,
+          "page": 124,
+          "ref": "5"
+        },
+        {
+          "number": 685,
+          "page": 124,
+          "ref": "5.1.1(b)"
+        },
+        {
+          "number": 686,
+          "page": 124,
+          "ref": "5.1.1(c)"
+        },
+        {
+          "number": 687,
+          "page": 124,
+          "ref": "5.2.1(c)"
+        },
+        {
+          "number": 688,
+          "page": 124,
+          "ref": "5.2.2"
+        },
+        {
+          "number": 689,
+          "page": 125,
+          "ref": "5.2.2(b)"
+        },
+        {
+          "number": 690,
+          "page": 125,
+          "ref": "5.2.4"
+        },
+        {
+          "number": 691,
+          "page": 125,
+          "ref": "5.2.4"
+        },
+        {
+          "number": 692,
+          "page": 125,
+          "ref": "5.2.6a"
+        },
+        {
+          "number": 693,
+          "page": 125,
+          "ref": "5.2.6(a)"
+        },
+        {
+          "number": 694,
+          "page": 126,
+          "ref": "5.2.6a"
+        },
+        {
+          "number": 695,
+          "page": 126,
+          "ref": "5.2.8"
+        },
+        {
+          "number": 696,
+          "page": 126,
+          "ref": "5.2.7a"
+        },
+        {
+          "number": 697,
+          "page": 126,
+          "ref": "5.2.7a"
+        },
+        {
+          "number": 698,
+          "page": 126,
+          "ref": "5.2.7a"
+        },
+        {
+          "number": 699,
+          "page": 127,
+          "ref": "5.2.7b"
+        },
+        {
+          "number": 700,
+          "page": 127,
+          "ref": "5.2.7c"
+        },
+        {
+          "number": 701,
+          "page": 127,
+          "ref": "5.2.8"
+        },
+        {
+          "number": 702,
+          "page": 127,
+          "ref": "5.2.8"
+        },
+        {
+          "number": 703,
+          "page": 127,
+          "ref": "5.2.8"
+        },
+        {
+          "number": 704,
+          "page": 128,
+          "ref": "5.2.8"
+        },
+        {
+          "number": 705,
+          "page": 128,
+          "ref": "5.2.8"
+        },
+        {
+          "number": 706,
+          "page": 128,
+          "ref": "5.2.10"
+        },
+        {
+          "number": 707,
+          "page": 128,
+          "ref": "5.3.1"
+        },
+        {
+          "number": 708,
+          "page": 128,
+          "ref": "5.3.1(a)"
+        },
+        {
+          "number": 709,
+          "page": 128,
+          "ref": "5.3.1(a)"
+        },
+        {
+          "number": 710,
+          "page": 129,
+          "ref": "5.3.1(b)"
+        },
+        {
+          "number": 711,
+          "page": 129,
+          "ref": "5.5.1"
+        },
+        {
+          "number": 712,
+          "page": 129,
+          "ref": "5.6.2(d)"
+        },
+        {
+          "number": 713,
+          "page": 129,
+          "ref": "5.6.2(d)"
+        },
+        {
+          "number": 714,
+          "page": 129,
+          "ref": "5.6.2(d)"
+        },
+        {
+          "number": 715,
+          "page": 130,
+          "ref": "5.6.3"
+        },
+        {
+          "number": 716,
+          "page": 130,
+          "ref": "5.6.3"
+        },
+        {
+          "number": 717,
+          "page": 130,
+          "ref": "5.6.3"
+        },
+        {
+          "number": 718,
+          "page": 130,
+          "ref": "5.1(a)"
+        },
+        {
+          "number": 719,
+          "page": 130,
+          "ref": "5.1(a)"
+        },
+        {
+          "number": 720,
+          "page": 130,
+          "ref": "5.1(a)"
+        },
+        {
+          "number": 721,
+          "page": 131,
+          "ref": "5.1(a)"
+        },
+        {
+          "number": 722,
+          "page": 131,
+          "ref": "5.1(a)"
+        },
+        {
+          "number": 723,
+          "page": 131,
+          "ref": "5.1(a)"
+        },
+        {
+          "number": 724,
+          "page": 131,
+          "ref": "5.1(a)"
+        },
+        {
+          "number": 725,
+          "page": 131,
+          "ref": "5.1(b)"
+        },
+        {
+          "number": 726,
+          "page": 131,
+          "ref": "5.1(b)"
+        },
+        {
+          "number": 727,
+          "page": 132,
+          "ref": "5.1.1"
+        },
+        {
+          "number": 728,
+          "page": 132,
+          "ref": "5.1.1(a)"
+        },
+        {
+          "number": 729,
+          "page": 132,
+          "ref": "5.1.1(a)"
+        },
+        {
+          "number": 730,
+          "page": 132,
+          "ref": "5.1.1(b)"
+        },
+        {
+          "number": 731,
+          "page": 132,
+          "ref": "5.1.1(d)"
+        },
+        {
+          "number": 732,
+          "page": 132,
+          "ref": "5.1.1(e)"
+        },
+        {
+          "number": 733,
+          "page": 133,
+          "ref": "5.1.1(e)"
+        },
+        {
+          "number": 734,
+          "page": 133,
+          "ref": "5.1.1(f)"
+        },
+        {
+          "number": 735,
+          "page": 133,
+          "ref": "5.1.1(g)"
+        },
+        {
+          "number": 736,
+          "page": 133,
+          "ref": "5.1.1(g)"
+        },
+        {
+          "number": 737,
+          "page": 133,
+          "ref": "5.1.1(f)"
+        },
+        {
+          "number": 738,
+          "page": 133,
+          "ref": "5.2.1"
+        },
+        {
+          "number": 739,
+          "page": 134,
+          "ref": "5.2.1(a)"
+        },
+        {
+          "number": 740,
+          "page": 134,
+          "ref": "5.2.1(a)"
+        },
+        {
+          "number": 741,
+          "page": 134,
+          "ref": "5.2.1(b)"
+        },
+        {
+          "number": 742,
+          "page": 134,
+          "ref": "5.2.1(b)"
+        },
+        {
+          "number": 743,
+          "page": 134,
+          "ref": "5.2.1(b)"
+        },
+        {
+          "number": 744,
+          "page": 134,
+          "ref": "5.2.1(c)"
+        },
+        {
+          "number": 745,
+          "page": 135,
+          "ref": "5.2.1(c)"
+        },
+        {
+          "number": 746,
+          "page": 135,
+          "ref": "5.2.1(c)"
+        },
+        {
+          "number": 747,
+          "page": 135,
+          "ref": "5.2.2(a)"
+        },
+        {
+          "number": 748,
+          "page": 135,
+          "ref": "5.2.2(b)"
+        },
+        {
+          "number": 749,
+          "page": 135,
+          "ref": "5.2.2(b)"
+        },
+        {
+          "number": 750,
+          "page": 135,
+          "ref": "5.2.2(b)"
+        },
+        {
+          "number": 751,
+          "page": 136,
+          "ref": "5.2.2(b)"
+        },
+        {
+          "number": 752,
+          "page": 136,
+          "ref": "5.2.2(b)"
+        },
+        {
+          "number": 753,
+          "page": 136,
+          "ref": "5.2.2(b)"
+        },
+        {
+          "number": 754,
+          "page": 136,
+          "ref": "5.2.2(b)"
+        },
+        {
+          "number": 755,
+          "page": 136,
+          "ref": "5.2.2(b)"
+        },
+        {
+          "number": 756,
+          "page": 137,
+          "ref": "5.2.2(b)"
+        },
+        {
+          "number": 757,
+          "page": 137,
+          "ref": "5.2.3a"
+        },
+        {
+          "number": 758,
+          "page": 137,
+          "ref": "5.2.3b"
+        },
+        {
+          "number": 759,
+          "page": 137,
+          "ref": "5.2.4"
+        },
+        {
+          "number": 760,
+          "page": 137,
+          "ref": "5.2.4"
+        },
+        {
+          "number": 761,
+          "page": 138,
+          "ref": "5.2.4(g)"
+        },
+        {
+          "number": 762,
+          "page": 138,
+          "ref": "5.2.5(a)"
+        },
+        {
+          "number": 763,
+          "page": 138,
+          "ref": "5.2.5(a)"
+        },
+        {
+          "number": 764,
+          "page": 138,
+          "ref": "5.2.5(a)"
+        },
+        {
+          "number": 765,
+          "page": 138,
+          "ref": "5.2.5(a)"
+        },
+        {
+          "number": 766,
+          "page": 138,
+          "ref": "5.2.5(a)"
+        },
+        {
+          "number": 767,
+          "page": 139,
+          "ref": "5.2.5c (i)"
+        },
+        {
+          "number": 768,
+          "page": 139,
+          "ref": "5.2.5(c)"
+        },
+        {
+          "number": 769,
+          "page": 139,
+          "ref": "5.2.6a"
+        },
+        {
+          "number": 770,
+          "page": 139,
+          "ref": "5.2.6a(b)(i)"
+        },
+        {
+          "number": 771,
+          "page": 139,
+          "ref": "5.2.6a(a)"
+        },
+        {
+          "number": 772,
+          "page": 139,
+          "ref": "5.2.6"
+        },
+        {
+          "number": 773,
+          "page": 140,
+          "ref": "5.2.7a"
+        },
+        {
+          "number": 774,
+          "page": 140,
+          "ref": "5.2.7a"
+        },
+        {
+          "number": 775,
+          "page": 140,
+          "ref": "5.2.8"
+        },
+        {
+          "number": 776,
+          "page": 140,
+          "ref": "5.2.10"
+        },
+        {
+          "number": 777,
+          "page": 140,
+          "ref": "5.2.10"
+        },
+        {
+          "number": 778,
+          "page": 140,
+          "ref": "5.2.6a"
+        },
+        {
+          "number": 779,
+          "page": 141,
+          "ref": "5.2.6a"
+        },
+        {
+          "number": 780,
+          "page": 141,
+          "ref": "5.2.6a(a)"
+        },
+        {
+          "number": 781,
+          "page": 141,
+          "ref": "5.2.6b"
+        },
+        {
+          "number": 782,
+          "page": 141,
+          "ref": "5.2.6b(c)"
+        },
+        {
+          "number": 783,
+          "page": 141,
+          "ref": "5.2.7a"
+        },
+        {
+          "number": 784,
+          "page": 141,
+          "ref": "5.2.7a"
+        },
+        {
+          "number": 785,
+          "page": 142,
+          "ref": "5.2.7a"
+        },
+        {
+          "number": 786,
+          "page": 142,
+          "ref": "5.2.7a"
+        },
+        {
+          "number": 787,
+          "page": 142,
+          "ref": "5.2.7a"
+        },
+        {
+          "number": 788,
+          "page": 142,
+          "ref": "5.2.7a"
+        },
+        {
+          "number": 789,
+          "page": 142,
+          "ref": "5.2.7b"
+        },
+        {
+          "number": 790,
+          "page": 142,
+          "ref": "5.2.7c"
+        },
+        {
+          "number": 791,
+          "page": 143,
+          "ref": "5.2.7c"
+        },
+        {
+          "number": 792,
+          "page": 143,
+          "ref": "5.2.8"
+        },
+        {
+          "number": 793,
+          "page": 143,
+          "ref": "5.2.9"
+        },
+        {
+          "number": 794,
+          "page": 143,
+          "ref": "5.2.10"
+        },
+        {
+          "number": 795,
+          "page": 143,
+          "ref": "5.3"
+        },
+        {
+          "number": 796,
+          "page": 143,
+          "ref": "5.3"
+        },
+        {
+          "number": 797,
+          "page": 144,
+          "ref": "5.3"
+        },
+        {
+          "number": 798,
+          "page": 144,
+          "ref": "5.3"
+        },
+        {
+          "number": 799,
+          "page": 144,
+          "ref": "5.3"
+        },
+        {
+          "number": 800,
+          "page": 144,
+          "ref": "5.3"
+        },
+        {
+          "number": 801,
+          "page": 144,
+          "ref": "5.3"
+        },
+        {
+          "number": 802,
+          "page": 144,
+          "ref": "5.3.1"
+        },
+        {
+          "number": 803,
+          "page": 145,
+          "ref": "5.3.1"
+        },
+        {
+          "number": 804,
+          "page": 145,
+          "ref": "5.3.1(a)"
+        },
+        {
+          "number": 805,
+          "page": 145,
+          "ref": "5.3.1(a)"
+        },
+        {
+          "number": 806,
+          "page": 145,
+          "ref": "5.3.1(a)"
+        },
+        {
+          "number": 807,
+          "page": 145,
+          "ref": "5.3.1(a)"
+        },
+        {
+          "number": 808,
+          "page": 145,
+          "ref": "5.3.1(a)"
+        },
+        {
+          "number": 809,
+          "page": 146,
+          "ref": "5.3.1(b)"
+        },
+        {
+          "number": 810,
+          "page": 146,
+          "ref": "5.3.1(b)"
+        },
+        {
+          "number": 811,
+          "page": 146,
+          "ref": "5.3.1(b)"
+        },
+        {
+          "number": 812,
+          "page": 146,
+          "ref": "5.3.1(b)"
+        },
+        {
+          "number": 813,
+          "page": 146,
+          "ref": "5.3.1註"
+        },
+        {
+          "number": 814,
+          "page": 147,
+          "ref": "5.3.1註"
+        },
+        {
+          "number": 815,
+          "page": 147,
+          "ref": "5.3.1註"
+        },
+        {
+          "number": 816,
+          "page": 147,
+          "ref": "5.3.2"
+        },
+        {
+          "number": 817,
+          "page": 147,
+          "ref": "5.3.2"
+        },
+        {
+          "number": 818,
+          "page": 147,
+          "ref": "5.3.2"
+        },
+        {
+          "number": 819,
+          "page": 148,
+          "ref": "5.3.2"
+        },
+        {
+          "number": 820,
+          "page": 148,
+          "ref": "5.3.2"
+        },
+        {
+          "number": 821,
+          "page": 148,
+          "ref": "5.3.2"
+        },
+        {
+          "number": 822,
+          "page": 148,
+          "ref": "5.3.2"
+        },
+        {
+          "number": 823,
+          "page": 148,
+          "ref": "5.3.2"
+        },
+        {
+          "number": 824,
+          "page": 149,
+          "ref": "5.3.3"
+        },
+        {
+          "number": 825,
+          "page": 149,
+          "ref": "5.3.3"
+        },
+        {
+          "number": 826,
+          "page": 149,
+          "ref": "5.3.3"
+        },
+        {
+          "number": 827,
+          "page": 149,
+          "ref": "5.3.3"
+        },
+        {
+          "number": 828,
+          "page": 149,
+          "ref": "5.3.2b"
+        },
+        {
+          "number": 829,
+          "page": 150,
+          "ref": "5.3.3(b)"
+        },
+        {
+          "number": 830,
+          "page": 150,
+          "ref": "5.4"
+        },
+        {
+          "number": 831,
+          "page": 150,
+          "ref": "5.4.1"
+        },
+        {
+          "number": 832,
+          "page": 150,
+          "ref": "5.4.1"
+        },
+        {
+          "number": 833,
+          "page": 150,
+          "ref": "5.4.1(a)"
+        },
+        {
+          "number": 834,
+          "page": 150,
+          "ref": "5.4.1(b)"
+        },
+        {
+          "number": 835,
+          "page": 151,
+          "ref": "5.5"
+        },
+        {
+          "number": 836,
+          "page": 151,
+          "ref": "5.5"
+        },
+        {
+          "number": 837,
+          "page": 151,
+          "ref": "5.5"
+        },
+        {
+          "number": 838,
+          "page": 151,
+          "ref": "5.5"
+        },
+        {
+          "number": 839,
+          "page": 151,
+          "ref": "5.5"
+        },
+        {
+          "number": 840,
+          "page": 151,
+          "ref": "5.5"
+        },
+        {
+          "number": 841,
+          "page": 152,
+          "ref": "5.5"
+        },
+        {
+          "number": 842,
+          "page": 152,
+          "ref": "5.5.1"
+        },
+        {
+          "number": 843,
+          "page": 152,
+          "ref": "5.5.1"
+        },
+        {
+          "number": 844,
+          "page": 152,
+          "ref": "5.5.1"
+        },
+        {
+          "number": 845,
+          "page": 152,
+          "ref": "5.5.1"
+        },
+        {
+          "number": 846,
+          "page": 152,
+          "ref": "5.5.1"
+        },
+        {
+          "number": 847,
+          "page": 153,
+          "ref": "5.5.1"
+        },
+        {
+          "number": 848,
+          "page": 153,
+          "ref": "5.6"
+        },
+        {
+          "number": 849,
+          "page": 153,
+          "ref": "5.6.1"
+        },
+        {
+          "number": 850,
+          "page": 153,
+          "ref": "5.6.1"
+        },
+        {
+          "number": 851,
+          "page": 153,
+          "ref": "5.6.1"
+        },
+        {
+          "number": 852,
+          "page": 153,
+          "ref": "5.6.1"
+        },
+        {
+          "number": 853,
+          "page": 154,
+          "ref": "5.6.3"
+        },
+        {
+          "number": 854,
+          "page": 154,
+          "ref": "5.6.3"
+        },
+        {
+          "number": 855,
+          "page": 154,
+          "ref": "5.6.2"
+        },
+        {
+          "number": 856,
+          "page": 154,
+          "ref": "5.6.2"
+        },
+        {
+          "number": 857,
+          "page": 154,
+          "ref": "5.6.2"
+        },
+        {
+          "number": 858,
+          "page": 154,
+          "ref": "5.6.2"
+        },
+        {
+          "number": 859,
+          "page": 155,
+          "ref": "5.6.2"
+        },
+        {
+          "number": 860,
+          "page": 155,
+          "ref": "5.6.2"
+        },
+        {
+          "number": 861,
+          "page": 155,
+          "ref": "5.6.2(d)"
+        },
+        {
+          "number": 862,
+          "page": 155,
+          "ref": "5.6.2(d)(i)"
+        },
+        {
+          "number": 863,
+          "page": 155,
+          "ref": "5.6.2(d)(iv)"
+        },
+        {
+          "number": 864,
+          "page": 156,
+          "ref": "5.6.2(d)(iv)"
+        },
+        {
+          "number": 865,
+          "page": 156,
+          "ref": "5.6.3"
+        }
+      ]
+    }
+  ],
+  "valid": true
+}

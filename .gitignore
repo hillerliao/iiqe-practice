@@ -79,6 +79,7 @@ __pycache__/
 *.json.bak.*
 
 # local scratch artifacts (never commit)
+/tmp-audit-render/
 page_code.txt
 page_local.html
 rec_out.json
