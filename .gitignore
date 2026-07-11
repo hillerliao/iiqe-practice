@@ -88,3 +88,6 @@ scripts/mock_p3.json
 scripts/p3_clean.json
 scripts/_mock_*.txt
 GIT_PUSH_REVIEW_*.md
+
+# local deploy helper (may contain hardcoded IP)
+deploy-with-ip.ps1
