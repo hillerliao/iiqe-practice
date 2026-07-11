@@ -61,7 +61,19 @@ export async function POST(req: NextRequest) {
     answers: [],
   };
 
-  await createAttempt(record);
+  try {
+    await createAttempt(record);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.error("[api/attempts] createAttempt 失敗:", message);
+    return NextResponse.json(
+      {
+        error: "資料庫寫入失敗,請稍後重試",
+        detail: process.env.NODE_ENV !== "production" ? message : undefined,
+      },
+      { status: 500 }
+    );
+  }
 
   let questions: any[] | undefined;
   if (fromAttemptId) {

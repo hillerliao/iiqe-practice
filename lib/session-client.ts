@@ -7,6 +7,12 @@ import { getSessionId } from "@/lib/session";
 
 let ensured: Promise<void> | null = null;
 
+// 儲存最近一次 session 建立失敗的原因,供 UI 層讀取以顯示具體錯誤
+let _lastSessionError: string | null = null;
+export function getLastSessionError(): string | null {
+  return _lastSessionError;
+}
+
 async function establish(force: boolean): Promise<void> {
   if (typeof window === "undefined") return;
   const run = (async () => {
@@ -14,14 +20,35 @@ async function establish(force: boolean): Promise<void> {
     // force=true 時不帶 ensureOnly,服務端會以此 id 重建會話（切換識別碼用）。
     const id = getSessionId();
     try {
-      await fetch("/api/session", {
+      const res = await fetch("/api/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ id, ensureOnly: !force }),
       });
+      if (!res.ok) {
+        let detail = `HTTP ${res.status}`;
+        try {
+          const body = await res.clone().json();
+          if (body && typeof body.error === "string") {
+            detail = body.error;
+          } else if (body && typeof body.code === "string") {
+            detail = body.code;
+          }
+        } catch {
+          // body 無法解析,使用 HTTP 狀態碼
+        }
+        _lastSessionError = detail;
+        console.error(
+          `[session-client] 會話建立失敗: ${detail}。` +
+          "後續需要身份驗證的請求（如建立作答、收藏、筆記）將返回 401。"
+        );
+      } else {
+        _lastSessionError = null;
+      }
     } catch {
-      // 忽略網路錯誤,後續請求會自然重試
+      // 網路錯誤,後續請求會自然重試
+      _lastSessionError = "網路連線失敗";
     }
   })();
   ensured = run;

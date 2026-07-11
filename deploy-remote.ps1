@@ -38,7 +38,7 @@ if (Test-Path $tarball) { Remove-Item -Force $tarball }
 # tar 列表:覆盖 VPS 运行时需要的全部文件
 # 注意:prisma/ 含 schema.prisma;data/ 含题库 JSON(给 seed 用);scripts/ 含 verify-storage.ts
 $tarItems = @('.next','public','scripts','prisma','data','app','components','lib',
-              'package.json','package-lock.json','next.config.ts','tsconfig.json')
+              'package.json','package-lock.json','next.config.ts','tsconfig.json','prisma.config.ts')
 $tarList = $tarItems | Where-Object { Test-Path $_ }
 
 # PowerShell 5.1 没有原生 tar(Win10 1803+ 有 tar.exe),用 Compress-Archive 走 zip 改走 tar

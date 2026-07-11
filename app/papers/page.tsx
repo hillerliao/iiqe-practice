@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Play, Shuffle, History } from "lucide-react";
-import { authedFetch } from "@/lib/session-client";
+import { authedFetch, getLastSessionError } from "@/lib/session-client";
 
 type PaperInfo = {
   id: string;
@@ -138,8 +138,9 @@ function PaperSetupInner() {
         }),
       });
       if (!aRes.ok) {
-        // 嘗試解析伺服器回傳的具體原因(503 AUTH_NOT_CONFIGURED、401 等),
+        // 嘗試解析伺服器回傳的具體原因(503 AUTH_NOT_CONFIGURED、401、500 等),
         // 讓使用者與管理員能區分「後端配置問題」與「業務錯誤」。
+        const statusCode = aRes.status;
         let detail = "";
         try {
           const errBody = await aRes.clone().json();
@@ -148,6 +149,18 @@ function PaperSetupInner() {
           }
         } catch {
           // 忽略解析失敗,維持通用訊息
+        }
+        // 若 detail 為空或僅是「未授權」,檢查 session 建立階段是否有已知錯誤
+        // (例如 AUTH_SECRET 未設定 → /api/session 503),補上根因資訊
+        if (!detail || detail === "未授權") {
+          const sessionErr = getLastSessionError();
+          if (sessionErr) {
+            detail = detail
+              ? `${detail} (根因: ${sessionErr})`
+              : `會話建立失敗: ${sessionErr} → 後續請求 ${statusCode}`;
+          } else if (!detail) {
+            detail = `HTTP ${statusCode}`;
+          }
         }
         throw new Error(
           detail ? `建立作答 session 失敗：${detail}` : "建立作答 session 失敗"
