@@ -3,7 +3,12 @@ import { getPapersAsync } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, FileText, FileQuestion, NotebookPen } from "lucide-react";
+import {
+  HomeArrowRight,
+  HomeFileText,
+  HomeFileQuestion,
+  HomeNotebookPen,
+} from "@/components/HomePageIcons";
 
 export default async function HomePage() {
   const papers = await getPapersAsync();
@@ -34,19 +39,19 @@ export default async function HomePage() {
                 <Button asChild variant="default" className="w-full justify-between">
                   <Link href={`/papers?code=${p.code}&source=exam`}>
                     <span className="flex items-center gap-2">
-                      <FileText className="w-4 h-4" />
+                      <HomeFileText className="w-4 h-4" />
                       真題 ({p.bySource.exam ?? 0} 題)
                     </span>
-                    <ArrowRight className="w-4 h-4" />
+                    <HomeArrowRight className="w-4 h-4" />
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="w-full justify-between">
                   <Link href={`/papers?code=${p.code}&source=mock`}>
                     <span className="flex items-center gap-2">
-                      <FileQuestion className="w-4 h-4" />
+                      <HomeFileQuestion className="w-4 h-4" />
                       模擬題 ({p.bySource.mock ?? 0} 題)
                     </span>
-                    <ArrowRight className="w-4 h-4" />
+                    <HomeArrowRight className="w-4 h-4" />
                   </Link>
                 </Button>
               </div>
@@ -68,7 +73,7 @@ export default async function HomePage() {
           </Button>
           <Button asChild variant="ghost" className="justify-start">
             <Link href="/notes">
-              <NotebookPen className="w-4 h-4 mr-1.5 text-amber-600" />
+              <HomeNotebookPen className="w-4 h-4 mr-1.5 text-amber-600" />
               筆記本
             </Link>
           </Button>

@@ -23,7 +23,8 @@ Set-Location d:\Downloads\IIQE\iiqe-app
 # 部署目标:从环境变量读取,避免在仓库里写死 VPS 地址
 #   $env:DEPLOY_HOST = 'user@your-vps-ip'   (SSH user@host 完整形式)
 #   $env:DEPLOY_USER = 'your-user'          (可选,默认从 DEPLOY_HOST 推导)
-$DeployHost = if ($env:DEPLOY_HOST) { $env:DEPLOY_HOST } else { 'user@your-vps-ip' }
+# 推荐使用 SSH config 别名配置 `iiqe-vps`，此处默认值即为该别名。
+$DeployHost = if ($env:DEPLOY_HOST) { $env:DEPLOY_HOST } else { 'ecs-user@39.103.59.145' }
 $DeployUser = if ($env:DEPLOY_USER) { $env:DEPLOY_USER } else { ($DeployHost -split '@')[0] }
 $DeployAddr = $DeployHost
 

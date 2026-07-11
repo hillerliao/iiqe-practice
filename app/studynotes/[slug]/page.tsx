@@ -3,10 +3,13 @@
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, ArrowUp } from "lucide-react";
 import { getHandbook, listHandbookSlugs } from "@/lib/handbook";
 import { HandbookTOC } from "./HandbookTOC";
 import { BackToTop } from "./BackToTop";
+import {
+  HandbookArrowLeft,
+  HandbookBookOpen,
+} from "@/components/HandbookPageIcons";
 
 type Params = { slug: string };
 
@@ -42,10 +45,10 @@ export default async function HandbookPage({
           href="/"
           className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1 shrink-0"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <HandbookArrowLeft className="w-4 h-4" />
           <span className="hidden sm:inline">返回首頁</span>
         </Link>
-        <BookOpen className="w-4 h-4 text-muted-foreground shrink-0" />
+        <HandbookBookOpen className="w-4 h-4 text-muted-foreground shrink-0" />
         <div className="flex-1 min-w-0">
           <h1 className="text-base lg:text-lg font-semibold truncate">{data.title}</h1>
           <p className="text-xs text-muted-foreground truncate">{data.version}</p>

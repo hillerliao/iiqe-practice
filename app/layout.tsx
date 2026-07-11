@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
-import { Home, BarChart3, BookOpen, Star, Settings } from "lucide-react";
+import {
+  NavHome,
+  NavBarChart3,
+  NavBookOpen,
+  NavStar,
+  NavSettings,
+} from "@/components/NavIcons";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SetupReminder } from "@/components/SetupReminder";
@@ -85,7 +91,7 @@ export default async function RootLayout({
                 href="/"
                 className="font-semibold text-base sm:text-lg flex items-center gap-1.5 sm:gap-2 shrink-0 whitespace-nowrap"
               >
-                <BookOpen className="w-5 h-5 shrink-0" />
+                <NavBookOpen className="w-5 h-5 shrink-0" />
                 <span className="hidden min-[380px]:inline">IIQE 做题家</span>
                 <span className="min-[380px]:hidden">IIQE</span>
               </Link>
@@ -94,28 +100,28 @@ export default async function RootLayout({
                   href="/"
                   className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                 >
-                  <Home className="w-4 h-4" />
+                  <NavHome className="w-4 h-4" />
                   <span className="hidden md:inline">首頁</span>
                 </Link>
                 <Link
                   href="/stats"
                   className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                 >
-                  <BarChart3 className="w-4 h-4" />
+                  <NavBarChart3 className="w-4 h-4" />
                   <span className="hidden md:inline">統計</span>
                 </Link>
                 <Link
                   href="/wrongbook"
                   className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                 >
-                  <BookOpen className="w-4 h-4" />
+                  <NavBookOpen className="w-4 h-4" />
                   <span className="hidden md:inline">錯題本</span>
                 </Link>
                 <Link
                   href="/favorites"
                   className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                 >
-                  <Star className="w-4 h-4" />
+                  <NavStar className="w-4 h-4" />
                   <span className="hidden md:inline">收藏</span>
                 </Link>
                 {defaultSlug && handbookEntries.length > 0 && (
@@ -125,7 +131,7 @@ export default async function RootLayout({
                   href="/settings"
                   className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
                 >
-                  <Settings className="w-4 h-4" />
+                  <NavSettings className="w-4 h-4" />
                   <span className="hidden md:inline">設定</span>
                 </Link>
               </nav>

@@ -19,12 +19,12 @@ export function getHandbookSlugByPaper(paperCode: string | null | undefined): st
 
 /**
  * 給定題目 ref(如 "1.1", "1.1.2a", "3.4"),產生研習手冊錨點 URL。
- * - "1.1"  -> "/handbook/exam1-2024.html#ch-1-1"
- * - "1.1.2a" -> "/handbook/exam1-2024.html#ch-1-1-2"(取前 3 段,忽略字母後綴)
- * - "3.4" -> "/handbook/exam1-2024.html#ch-3-4"
+ * - "1.1"  -> "/studynotes/exam1-2024#ch-1-1"
+ * - "1.1.2a" -> "/studynotes/exam1-2024#ch-1-1-2"(取前 3 段,忽略字母後綴)
+ * - "3.4" -> "/studynotes/exam1-2024#ch-3-4"
  *
- * 注意:URL 指向 public/handbook/<slug>.html 靜態 HTML(Next 直接 serve),
- * 不再走 /studynotes/[slug] SSR 路由。
+ * 注意:URL 指向 /studynotes/[slug] SSR 路由(React 页面,支援目錄聯動),
+ * 不再使用 public/handbook/<slug>.html 靜態文件。
  *
  * @param slug 研習手冊 slug
  * @param ref 題目 ref
@@ -46,7 +46,7 @@ export function getHandbookHref(
     }
     if (!exists) return null;
   }
-  return `/handbook/${slug}.html#${anchorId}`;
+  return `/studynotes/${slug}#${anchorId}`;
 }
 
 /**

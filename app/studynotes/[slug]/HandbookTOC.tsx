@@ -15,7 +15,8 @@ type Props = {
 export function HandbookTOC({ chapters }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const tocRef = useRef<HTMLElement>(null);
+  const desktopTocRef = useRef<HTMLElement>(null);
+  const mobileTocRef = useRef<HTMLElement>(null);
 
   // 進入時若有 hash,捲動到該錨點
   useEffect(() => {
@@ -53,6 +54,38 @@ export function HandbookTOC({ chapters }: Props) {
     return () => observer.disconnect();
   }, [chapters]);
 
+  // 目錄自動滾動：當 activeId 變化時，將目錄项滾動到可視區域（居中顯示）
+  useEffect(() => {
+    if (!activeId) return;
+
+    // 優先使用桌面側邊欄，若無則用移動端抽屉（打開時）
+    const container = desktopTocRef.current || (mobileOpen ? mobileTocRef.current : null);
+    if (!container) return;
+
+    const activeElement = container.querySelector(`li[id="toc-item-${activeId}"]`) as HTMLElement;
+    if (!activeElement) return;
+
+    // 檢查元素是否已經在可視區域内（上下各留 60px 緩衝）
+    const containerRect = container.getBoundingClientRect();
+    const itemRect = activeElement.getBoundingClientRect();
+    const margin = 60;
+
+    const isVisible =
+      itemRect.top >= containerRect.top + margin &&
+      itemRect.bottom <= containerRect.bottom - margin;
+
+    if (isVisible) return; // 已經可見，不需要滾動
+
+    // 計算滾動位置，讓元素居中顯示
+    const relativeTop = itemRect.top - containerRect.top;
+    const targetScrollTop = container.scrollTop + relativeTop - (container.clientHeight / 2) + (activeElement.clientHeight / 2);
+
+    container.scrollTo({
+      top: Math.max(0, targetScrollTop),
+      behavior: "smooth",
+    });
+  }, [activeId, mobileOpen]);
+
   // 點擊側邊欄項時捲動 + 在 mobile 自動關閉 drawer
   const handleClick = useCallback(
     (id: string) => {
@@ -79,7 +112,7 @@ export function HandbookTOC({ chapters }: Props) {
               ? "text-foreground/90"
               : "text-muted-foreground text-xs";
         return (
-          <li key={ch.id} className={indent}>
+          <li key={ch.id} id={`toc-item-${ch.id}`} className={indent}>
             <a
               href={`#${ch.id}`}
               onClick={(e) => {
@@ -127,7 +160,7 @@ export function HandbookTOC({ chapters }: Props) {
       )}
 
       <aside
-        ref={tocRef}
+        ref={desktopTocRef}
         data-state={mobileOpen ? "open" : "closed"}
         className={cn(
           // 基礎 layout
@@ -149,6 +182,7 @@ export function HandbookTOC({ chapters }: Props) {
 
       {/* Mobile 專用 drawer(用 fixed 定位獨立於 desktop sidebar) */}
       <aside
+        ref={mobileTocRef}
         data-mobile-toc
         className={cn(
           "lg:hidden fixed top-14 left-0 z-30 w-72 max-w-[85vw] h-[calc(100vh-3.5rem)]",
