@@ -34,7 +34,7 @@ export function HandbookNavLink({
   const router = useRouter();
   const pathname = usePathname();
   const activeSlug = (() => {
-    const m = pathname?.match(/^\/handbook\/([^/.]+)\.html$/);
+    const m = pathname?.match(/^\/studynotes\/([^/]+)$/);
     return m ? m[1] : null;
   })();
 
@@ -49,7 +49,7 @@ export function HandbookNavLink({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" sideOffset={8} className="min-w-[240px]">
         {handbooks.map((h) => {
-          const href = `/handbook/${h.slug}.html`;
+          const href = `/studynotes/${h.slug}`;
           const isActive = h.slug === activeSlug;
           return (
             <DropdownMenuItem
