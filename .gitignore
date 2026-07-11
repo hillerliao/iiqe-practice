@@ -75,6 +75,9 @@ __pycache__/
 # prisma db backups (contain real user data, not schema)
 *.db.bak*
 
+# local JSON backups (timestamped scratch artifacts, never commit)
+*.json.bak.*
+
 # local scratch artifacts (never commit)
 page_code.txt
 page_local.html
