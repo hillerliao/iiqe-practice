@@ -227,19 +227,20 @@ def patch_upstream(rel: str, dry: bool, log: list[str]) -> int:
             log.append(f"  [{rel}] INSERT q=46 after idx={idx45} (q=45)")
             changed += 1
 
-    # 2) 補 Q47 (插在 q=46 之後 - 但 q=46 剛插;用原始 idx45+1 邏輯找)
-    #    簡化:重新 find q=46
-    idx46 = find_idx_by_num(arr, 46, key="q")
-    if idx46 == -1:
-        log.append(f"  [{rel}] q=46 NOT FOUND (插 Q47 失敗)")
-    else:
+    # 2) 補 Q47 (插在 q=46 之後)
+    #    用「虛擬 anchor」idx46_pos (= idx45+1),因為在 dry-run 模式下 Q46 還沒被真的 insert,
+    #    find q=46 會回 -1。直接算位置更可靠。
+    if idx45 != -1:
+        idx46_pos = idx45 + 1   # Q46 將被插入的位置
         if find_idx_by_num(arr, 47, key="q") != -1:
             log.append(f"  [{rel}] q=47 already exists — SKIP")
         else:
             if not dry:
-                arr.insert(idx46 + 1, upstream_entry(Q47, 47))
-            log.append(f"  [{rel}] INSERT q=47 after idx={idx46} (q=46)")
+                arr.insert(idx46_pos + 1, upstream_entry(Q47, 47))
+            log.append(f"  [{rel}] INSERT q=47 after idx={idx46_pos} (q=46)")
             changed += 1
+    else:
+        log.append(f"  [{rel}] q=45 NOT FOUND (插 Q47 失敗)")
 
     # 3) 覆寫 Q48 (原本是合併鬼,改成真 Q48)
     idx48 = find_idx_by_num(arr, 48, key="q")

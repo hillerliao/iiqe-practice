@@ -17,7 +17,16 @@ import sys
 from pathlib import Path
 import pdfplumber
 
-PDF = Path(r"D:\Downloads\IIQE\卷三 - 长期保险 - 2022 年版.pdf")
+# 對應 commit c79aa12 的資料來源:
+#   - Q46/Q47/Q48/Q78/Q79/Q154 → Paper 3 每月必讀試題
+#   - Q161/Q162 措辭來源 → 卷三研習手冊 (Handbook 3.4.1(a))
+# 兩份 PDF 都可 probe;若想讀研習手冊,把 PDF_PATH 換成"卷三 - 长期保险 - 2022 年版.pdf"。
+PDF_PATH_CANDIDATES = (
+    Path(r"D:\Downloads\IIQE\Paper 3 每月必讀試題 (8月份).pdf"),
+    Path(r"D:\Downloads\IIQE\卷三 - 长期保险 - 2022 年版.pdf"),
+)
+
+PDF = next((p for p in PDF_PATH_CANDIDATES if p.exists()), PDF_PATH_CANDIDATES[0])
 
 
 def get_pages() -> list[str]:
