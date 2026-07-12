@@ -3,15 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "dev:webpack": "next dev --webpack",
+    "dev": "next dev --webpack",
+    "dev:turbopack": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "prep-data": "tsx scripts/prep-data.ts",
     "prisma:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "verify:storage": "tsx scripts/verify-storage.ts"
+    "verify:storage": "tsx scripts/verify-storage.ts",
+    "verify:question-text": "tsx scripts/verify-question-text.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

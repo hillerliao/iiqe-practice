@@ -50,6 +50,9 @@ next-env.d.ts
 # sqlite dev database
 *.db
 *.db-journal
+*.db-shm
+*.db-wal
+*.db.backup.*
 
 # IDE / AI agent artifacts
 .codebuddy
@@ -91,7 +94,11 @@ scripts/mock_p1.json
 scripts/mock_p3.json
 scripts/p3_clean.json
 scripts/_mock_*.txt
+scripts/test_question_*.mts
 GIT_PUSH_REVIEW_*.md
+.cache_paper1.json
+.cache-prod-*.db-shm
+.cache-prod-*.db-wal
 
 # local deploy helper (may contain hardcoded IP)
 deploy-with-ip.ps1

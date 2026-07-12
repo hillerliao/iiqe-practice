@@ -3,6 +3,8 @@
 
 import type { ChapterEntry } from "./handbook";
 
+export const PUBLIC_SITE_ORIGIN = "https://iiqe.liaozh.top";
+
 /**
  * 依試卷代碼取得對應的研習手冊 slug。
  * P1 → exam1-2024(保險原理及實務 2024)
@@ -12,13 +14,14 @@ import type { ChapterEntry } from "./handbook";
 export function getHandbookSlugByPaper(paperCode: string | null | undefined): string | null {
   if (!paperCode) return null;
   const code = paperCode.trim().toUpperCase();
-  if (code === "P1") return "exam1-2024";
-  if (code === "P3") return "exam3-2022";
+  if (code === "P1" || code.startsWith("卷一")) return "exam1-2024";
+  if (code === "P3" || code.startsWith("卷三")) return "exam3-2022";
   return null;
 }
 
 /**
- * 給定題目 ref(如 "1.1", "1.1.2a", "3.4"),產生研習手冊錨點 URL。
+ * 給定題目 ref(如 "2(c)", "1.1", "1.1.2a", "3.4"),產生研習手冊錨點 URL。
+ * - "2(c)" -> "/studynotes/exam3-2022#ch-2"
  * - "1.1"  -> "/studynotes/exam1-2024#ch-1-1"
  * - "1.1.2a" -> "/studynotes/exam1-2024#ch-1-1-2"(取前 3 段,忽略字母後綴)
  * - "3.4" -> "/studynotes/exam1-2024#ch-3-4"
@@ -37,7 +40,7 @@ export function getHandbookHref(
 ): string | null {
   if (!ref) return null;
   const parts = ref.split(".").map((p) => p.match(/^\d+/)?.[0] ?? "").filter(Boolean);
-  if (parts.length < 2) return null;
+  if (parts.length < 1) return null;
   const anchorId = `ch-${parts.join("-")}`;
   if (chapterIds) {
     let exists = false;
@@ -63,6 +66,21 @@ export function getHandbookHrefForQuestion(
   if (!slug) return null;
   const ids = chapterIdsBySlug?.[slug];
   return getHandbookHref(slug, ref, ids);
+}
+
+/**
+ * 產生可供外部搜尋或 AI 服務讀取的公開研習手冊網址。
+ * 已知卷別但無法定位章節時,回退到該卷手冊首頁。
+ */
+export function getPublicHandbookUrlForQuestion(
+  paperCode: string | null | undefined,
+  ref: string | null | undefined,
+): string | null {
+  const slug = getHandbookSlugByPaper(paperCode);
+  if (!slug) return null;
+
+  const handbookPath = (ref && getHandbookHref(slug, ref)) || `/studynotes/${slug}`;
+  return new URL(handbookPath, PUBLIC_SITE_ORIGIN).toString();
 }
 
 /** 從 chapters 陣列中提取 id 集合(方便傳給 getHandbookHref 驗證) */

@@ -28,10 +28,16 @@ TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 # 純唯讀:即便 prod.db 拿不到也只警告、不中止(老 prod.db 不存在場景)。
 echo "---[0.5/10] pre-flight audit---"
 mkdir -p "$AUDIT_DIR"
-DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" \
-  AUDIT_PHASE=pre \
-  npx tsx scripts/deploy-audit.ts pre "$AUDIT_DIR" 2>&1 | tail -25 || \
-    echo "!!! [warn] deploy-audit pre-flight 失敗(不阻斷部署)"
+if [ -f "$APP/prisma/prod.db" ]; then
+  (
+    cd "$APP"
+    DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" \
+      AUDIT_PHASE=pre \
+      npx tsx scripts/deploy-audit.ts pre "$AUDIT_DIR" 2>&1 | tail -25
+  ) || echo "!!! [warn] deploy-audit pre-flight 失败(不阻斷部署)"
+else
+  echo "!!! [warn] pre-flight audit skipped: $APP/prisma/prod.db 不存在"
+fi
 
 cd "$ROOT"
 
@@ -44,7 +50,13 @@ ls -la iiqe-update-new
 echo "---[2/9] backup prod.db---"
 mkdir -p "$BACKUP_DIR"
 if [ -f "$APP/prisma/prod.db" ]; then
-  cp -a "$APP/prisma/prod.db" "$BACKUP_DIR/prod.${TIMESTAMP}.db"
+  # SQLite WAL 模式下不能直接复制主库文件;在线 backup 会合并 WAL 并生成一致性快照。
+  (
+    cd "$APP"
+    npx tsx -e \
+      "import Database from 'better-sqlite3'; void (async () => { const db=new Database('$APP/prisma/prod.db',{readonly:true}); await db.backup('$BACKUP_DIR/prod.${TIMESTAMP}.db'); db.close(); })();" \
+      2>&1 | tail -20
+  )
   echo "backup: $BACKUP_DIR/prod.${TIMESTAMP}.db"
 else
   echo "no existing prod.db; skip backup"
@@ -63,9 +75,9 @@ for item in .next public scripts prisma data lib app components package.json pac
 done
 ls -la iiqe-app-runtime-new
 
-# 保留旧 prod.db(node_modules 会随 npm ci 重新装,prod.db 不在 tar 里)
-if [ -f "$APP/prisma/prod.db" ]; then
-  cp -a "$APP/prisma/prod.db" "iiqe-app-runtime-new/prisma/prod.db"
+# 保留一致性快照;不能直接复制 WAL 模式下的主文件,否则会丢掉尚未 checkpoint 的答案。
+if [ -f "$BACKUP_DIR/prod.${TIMESTAMP}.db" ]; then
+  cp -a "$BACKUP_DIR/prod.${TIMESTAMP}.db" "iiqe-app-runtime-new/prisma/prod.db"
 fi
 # 保留 .env.production / .env(VPS 运行时配置)
 if [ -f "$APP/.env.production" ]; then

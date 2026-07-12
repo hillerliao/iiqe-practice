@@ -27,13 +27,13 @@ from datetime import datetime
 CJK = r"\u4e00-\u9fff"
 # 要清除的「空格類」字元(不含換行/tab,避免破壞多行結構)
 SPACE = r"[ \u00a0\u3000]"
-PAT = re.compile(rf"(?<=[{CJK}]){SPACE}+|{SPACE}+(?=[{CJK}])")
+PAT = re.compile(rf"([{CJK}]){SPACE}+(?=[{CJK}])")
 
 
 def clean(text):
     if not text:
         return text
-    return PAT.sub("", text)
+    return PAT.sub(r"\1", text)
 
 
 def has_stray(text):

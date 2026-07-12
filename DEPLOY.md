@@ -1,11 +1,21 @@
 # IIQE App 部署到 VPS
 
-本项目保留两条**互斥**的生产部署路径：
+> [!IMPORTANT]
+> **本项目当前日常发布固定走“本机 build → SCP 上传构建产物 → VPS PM2 重启”路线。**
+> 收到“部署 VPS”指令时，必须在本机运行 `npm run build`，确认成功后运行 `powershell.exe -ExecutionPolicy Bypass -File .\deploy-remote.ps1`。**不要改走 GitHub Actions，也不要在 VPS 上 build。** 除非用户明确要求切换部署架构，否则不得自行选择其他路线。
 
-- **Docker Compose**：宿主 Nginx 反向代理 Docker 容器，SQLite 位于 Docker named volume 的 `/data/prod.db`。
-- **PM2 + GitHub Actions**：GitHub 推送 `main` 后触发 VPS 拉取、构建和 PM2 重载，SQLite 位于 VPS 的共享目录。
+当前发布链路：
 
-同一台服务器同一套站点只能选择一条路径。不要让 Docker 和 PM2 同时监听 `127.0.0.1:3001`，也不要在未迁移数据库的情况下从一条路径直接切到另一条路径。
+```text
+本机 npm run build
+  → deploy-remote.ps1 打包 .next 与运行时文件
+  → SCP 上传至 ecs-user@39.103.59.145
+  → VPS deploy-remote.sh 备份数据库、校验并原子替换
+  → PM2 重启 iiqe-app
+  → 输出部署前后数据库 audit
+```
+
+仓库也保留 **PM2 + GitHub Actions** 和 **Docker Compose** 配置，供未来迁移或灾备使用，但它们不是当前日常发布路线。不同路线的代码替换方式和数据库目录约定不同，不得交替执行；切换前必须明确获得用户授权并完成数据库迁移与验证。
 
 ---
 
@@ -272,6 +282,33 @@ docker compose up -d --build
 
 ---
 
-## C. 旧的上传构建产物脚本
+## C. 当前日常发布：本机构建并上传
 
-仓库根目录的 `deploy-remote.sh` 与 `deploy-remote.ps1` 是早期“本机 build → 打包 `.next` → SCP 到 VPS → PM2 restart”的流程。它们保留以便追溯，但不要与 A 节的 Git 拉取式发布交替使用：两者使用不同的代码替换方式和数据库目录约定。
+这是当前唯一默认的日常部署路线。除非用户明确要求迁移架构，否则“部署 VPS”始终指本节流程，不指 A 节 GitHub Actions，也不指 B 节 Docker。
+
+### C.1 标准命令
+
+在 Windows 项目根目录执行：
+
+```powershell
+npm run build
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+powershell.exe -ExecutionPolicy Bypass -File .\deploy-remote.ps1
+```
+
+不得跳过本机 build，也不得用旧 `.next` 部署。`deploy-remote.ps1` 会将当前工作区的 `.next`、运行时源码、题库数据、Prisma 文件和依赖清单打包上传，因此它可以发布尚未提交的本地修改；执行前应确认这些修改都是本次计划上线的内容。
+
+### C.2 脚本行为与验收
+
+1. `deploy-remote.ps1` 检查 `.next`，打包 `iiqe-runtime-update.tar.gz` 并上传到 `ecs-user@39.103.59.145`。
+2. VPS 上的 `deploy-remote.sh` 在替换应用前对 SQLite 做在线一致性备份，并保留上一版运行目录用于回滚。
+3. 新运行目录执行 Prisma generate、非破坏性 schema push、幂等 seed、题目去重和 storage verification；任一关键检查失败则不替换线上应用。
+4. 校验通过后原子替换目录、重启 `iiqe-app`，并输出 PM2 状态与部署前后数据库 audit。
+5. 部署成功必须同时看到 `deploy OK`、PM2 `online` 和 post-flight audit；不能仅以 SCP 上传成功作为完成依据。
+
+### C.3 路线防误用
+
+- **不要触发 `.github/workflows/deploy-vps.yml`**：该流程会让 VPS 从 Git 拉代码并在 VPS build，不是当前路线，也不会包含未提交的本地修改。
+- **不要运行 `scripts/deploy-pm2-from-git.sh`**：它会 `git reset --hard` 与 `git clean -ffd`，且使用另一套共享数据库目录约定。
+- **不要执行 Docker Compose 部署**：Docker 使用 named volume，数据库位置与当前 PM2 上传路线不同。
+- 如果本机 build 失败，停止部署并修复；不得退回旧 `.next`，也不得临时改走 VPS build 绕过错误。

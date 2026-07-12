@@ -421,12 +421,33 @@ function PracticeInner() {
       ) {
         e.preventDefault();
         const q = buildSearchQuery({
+          number: currentQ.number,
           question: currentQ.question,
           options: currentQ.options,
           ref: currentQ.ref || undefined,
+          paper: attempt?.paperCode || undefined,
         });
         window.open(
           `https://www.google.com/search?q=${encodeURIComponent(q)}`,
+          "_blank",
+          "noopener,noreferrer"
+        );
+      } else if (
+        (key === "k" || key === "K") &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey
+      ) {
+        e.preventDefault();
+        const q = buildSearchQuery({
+          number: currentQ.number,
+          question: currentQ.question,
+          options: currentQ.options,
+          ref: currentQ.ref || undefined,
+          paper: attempt?.paperCode || undefined,
+        });
+        window.open(
+          `https://www.kimi.com/?prefill_prompt=${encodeURIComponent(q)}&send_immediately=true`,
           "_blank",
           "noopener,noreferrer"
         );
@@ -689,18 +710,20 @@ function PracticeInner() {
               <span className="hidden md:inline">搜尋</span>
             </Button>
             {searchOpen && (() => {
-              const q = buildSearchQuery({ question: currentQ.question, options: currentQ.options, ref: currentQ.ref || undefined });
+              const q = buildSearchQuery({ number: currentQ.number, question: currentQ.question, options: currentQ.options, ref: currentQ.ref || undefined, paper: attempt?.paperCode || undefined });
               const enc = encodeURIComponent(q);
               const urls = {
                 google: `https://www.google.com/search?q=${enc}`,
-                baidu: `https://www.baidu.com/s?wd=${enc}`,
+                baidu: `https://chat.baidu.com/search?word=${enc}`,
                 chatgpt: `https://chatgpt.com/?q=${enc}&hints=search&ref=ext`,
+                kimi: `https://www.kimi.com/?prefill_prompt=${enc}&send_immediately=true`,
               };
               return (
                 <div className="absolute bottom-full right-0 mb-1 z-50 min-w-[130px] rounded-lg border border-border bg-popover shadow-lg py-1">
                   <a href={urls.google} target="_blank" rel="noopener noreferrer" onClick={() => setSearchOpen(false)} className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30">Google</a>
                   <a href={urls.baidu} target="_blank" rel="noopener noreferrer" onClick={() => setSearchOpen(false)} className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30">百度</a>
                   <a href={urls.chatgpt} target="_blank" rel="noopener noreferrer" onClick={() => setSearchOpen(false)} className="flex items-center gap-2 px-3 py-1.5 text-sm text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">ChatGPT</a>
+                  <a href={urls.kimi} target="_blank" rel="noopener noreferrer" onClick={() => setSearchOpen(false)} className="flex items-center gap-2 px-3 py-1.5 text-sm text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30">Kimi</a>
                 </div>
               );
             })()}
@@ -757,6 +780,7 @@ function PracticeInner() {
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">G</kbd> 跳題</span>
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">X</kbd> 複製</span>
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">S</kbd> Google 搜尋</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">K</kbd> Kimi</span>
       </div>
 
       <ToastContainer toasts={toasts} />
@@ -891,6 +915,25 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
       ) {
         e.preventDefault();
         noteButtonRef.current?.toggleEditor();
+      } else if (
+        (key === "k" || key === "K") &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey
+      ) {
+        e.preventDefault();
+        const query = buildSearchQuery({
+          number: q.number,
+          question: q.question,
+          options: q.options,
+          ref: q.ref || undefined,
+          paper: paperCode || undefined,
+        });
+        window.open(
+          `https://www.kimi.com/?prefill_prompt=${encodeURIComponent(query)}&send_immediately=true`,
+          "_blank",
+          "noopener,noreferrer"
+        );
       }
     }
     window.addEventListener("keydown", onKey);

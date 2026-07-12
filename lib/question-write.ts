@@ -10,24 +10,25 @@
 // 注意:此模塊只在 backend === "sqlite" 時被調用;上層 API route 已校驗。
 
 import fs from "node:fs/promises";
-// path.join 不能被 turbopack/webpack 静态分析,这里用字符串拼接避免 build warning
-// const path = await import("node:path");
+import path from "node:path";
 import {
   upsertQuestionSqlite,
   getQuestionSqlite,
 } from "@/lib/kv-sqlite";
 import { resolveMapping, type QuestionSource } from "@/lib/admin-question-meta";
 import type { QuestionData } from "@/lib/data";
+import { normalizeQuestionFields } from "@/lib/question-text";
 
 /**
  * 寫入題目:SQLite 主存 + JSON 原子快照。
  * @throws 當前 backend 非 sqlite 時由上層校驗拋錯
  */
 export async function saveQuestion(q: QuestionData): Promise<void> {
+  const normalized = normalizeQuestionFields(q);
   // 1) SQLite 主存(必須先成功)
-  await upsertQuestionSqlite(q);
+  await upsertQuestionSqlite(normalized);
   // 2) JSON 快照(原子寫)
-  await persistToJson(q);
+  await persistToJson(normalized);
 }
 
 /**
@@ -65,9 +66,30 @@ export async function readQuestionLatest(id: string): Promise<QuestionData | nul
 
 // ---------- JSON 原子寫 ----------
 
+const DATA_DIRECTORY = path.join(process.cwd(), "data");
+
+const QUESTION_JSON_FILES = {
+  "P1:exam": "questions-p1-exam.json",
+  "P1:mock": "questions-p1-mock.json",
+  "P3:exam": "questions-p3-exam.json",
+  "P3:mock": "questions-p3-mock.json",
+} as const;
+
+function resolveQuestionJsonPath(
+  paperCode: string,
+  source: QuestionSource
+): string {
+  const key = `${paperCode}:${source}` as keyof typeof QUESTION_JSON_FILES;
+  const fileName = QUESTION_JSON_FILES[key];
+  if (!fileName) {
+    throw new Error(`沒有對應的 JSON 快照: paperCode=${paperCode}, source=${source}`);
+  }
+  return path.join(DATA_DIRECTORY, fileName);
+}
+
 async function persistToJson(q: QuestionData): Promise<void> {
   const mapping = resolveMapping(q);
-  const fullPath = `${process.cwd()}/${mapping.file}`;
+  const fullPath = resolveQuestionJsonPath(mapping.paperCode, mapping.source);
 
   // 讀舊內容(讀不到則視為空數組,只對新增場景有意義——編輯場景必須存在)
   let arr: QuestionData[];

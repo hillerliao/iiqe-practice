@@ -49,7 +49,7 @@ if (Test-Path $tarball) { Remove-Item -Force $tarball }
 # 注意:prisma/ 含 schema.prisma;data/ 含题库 JSON(给 seed 用);scripts/ 含 verify-storage.ts
 $tarItems = @('.next','public','scripts','prisma','data','app','components','lib',
               'package.json','package-lock.json','next.config.ts','tsconfig.json','prisma.config.ts')
-$tarList = $tarItems | Where-Object { Test-Path $_ }
+$tarList = $tarItems | Where-Object { Test-Path -LiteralPath $_ }
 
 # PowerShell 5.1 没有原生 tar(Win10 1803+ 有 tar.exe),用 Compress-Archive 走 zip 改走 tar
 # 这里假设环境有 tar.exe(Git for Windows / Windows 10+ 自带)
@@ -58,9 +58,13 @@ $tarList = $tarItems | Where-Object { Test-Path $_ }
 # 绝对路径 symlink(如 /d/Downloads/...)写进这里,跨平台会失效。next start
 # 启动时如果找不到会自己从 $APP/node_modules/require,不依赖这层 symlink。
 $paths = ($tarList | ForEach-Object { '"' + $_ + '"' }) -join ' '
-$tarCmd = "tar -czf $tarball --exclude=`.next/node_modules $paths"
+$tarCmd = "tar -czf $tarball --exclude=.next/node_modules $paths"
 Write-Output "[1/4] packing: $tarCmd"
-cmd /c $tarCmd 2>&1 | Out-Null
+& 'D:\apps\Git\usr\bin\tar.exe' -czf $tarball '--exclude=.next/node_modules' @tarList
+if ($LASTEXITCODE -ne 0) {
+  Write-Output "ERROR: tar failed (exit=$LASTEXITCODE)"
+  exit 1
+}
 if (-not (Test-Path $tarball)) {
   Write-Output "ERROR: tarball not produced"
   exit 1

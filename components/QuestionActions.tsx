@@ -36,11 +36,12 @@ export function QuestionActions({
   const [copied, setCopied] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  const query = buildSearchQuery({ question, options, ref });
+  const query = buildSearchQuery({ number, question, options, ref, paper });
   const encoded = encodeURIComponent(query);
   const googleUrl = `https://www.google.com/search?q=${encoded}`;
-  const baiduUrl = `https://www.baidu.com/s?wd=${encoded}`;
+  const baiduUrl = `https://chat.baidu.com/search?word=${encoded}`;
   const chatgptUrl = `https://chatgpt.com/?q=${encoded}&hints=search&ref=ext`;
+  const kimiUrl = `https://www.kimi.com/?prefill_prompt=${encoded}&send_immediately=true`;
 
   const iconSize = size === "xs" ? "w-3 h-3" : "w-3.5 h-3.5";
   const itemIconSize = size === "xs" ? "w-3.5 h-3.5" : "w-4 h-4";
@@ -142,6 +143,16 @@ export function QuestionActions({
           >
             <MessageCircle className={itemIconSize} />
             ChatGPT
+          </a>
+          <a
+            href={kimiUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30"
+          >
+            <MessageCircle className={itemIconSize} />
+            Kimi
           </a>
         </div>
       )}

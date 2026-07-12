@@ -29,15 +29,15 @@ from datetime import datetime
 # Space-like chars only (excludes \n / \t so we never collapse line breaks).
 # Kept identical to clean_stray_spaces.py (SQLite) to avoid eating newlines.
 SPACE = r"[ \u00a0\u3000]"
-# A space adjacent (on either side) to a CJK ideograph.
-STRAY_RE = re.compile(rf"(?<=[一-鿿]){SPACE}+|{SPACE}+(?=[一-鿿])")
+# A space between two CJK ideographs.
+STRAY_RE = re.compile(rf"([㐀-䶿一-鿿豈-﫿]){SPACE}+(?=[㐀-䶿一-鿿豈-﫿])")
 
 # CJK ranges we treat as "Han": common (\u4e00-\u9fff) plus ext A and compat.
 HAN = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
 
 
 def strip_text(s: str) -> str:
-    return STRAY_RE.sub("", s)
+    return STRAY_RE.sub(r"\1", s)
 
 
 def clean_node(node, stats):

@@ -272,12 +272,34 @@ export function RedoPractice({
           .then(() => toast("已複製題目並開啟 Google"))
           .catch(() => {});
         const q = buildSearchQuery({
+          number: s.current.question.number,
           question: s.current.question.question,
           options: s.current.question.options,
           ref: s.current.question.ref || undefined,
+          paper: s.current.paperCode || undefined,
         });
         window.open(
           `https://www.google.com/search?q=${encodeURIComponent(q)}`,
+          "_blank",
+          "noopener,noreferrer"
+        );
+      } else if (
+        (key === "k" || key === "K") &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey &&
+        s.current
+      ) {
+        e.preventDefault();
+        const q = buildSearchQuery({
+          number: s.current.question.number,
+          question: s.current.question.question,
+          options: s.current.question.options,
+          ref: s.current.question.ref || undefined,
+          paper: s.current.paperCode || undefined,
+        });
+        window.open(
+          `https://www.kimi.com/?prefill_prompt=${encodeURIComponent(q)}&send_immediately=true`,
           "_blank",
           "noopener,noreferrer"
         );
@@ -607,6 +629,12 @@ export function RedoPractice({
             S
           </kbd>{" "}
           複製題目 + Google 搜尋
+        </span>
+        <span>
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
+            K
+          </kbd>{" "}
+          Kimi
         </span>
         <span>
           <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">

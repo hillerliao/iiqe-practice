@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { normalizeQuestionFields, normalizeQuestionText } from "../lib/question-text";
 
 const SCRIPT_DIR = __dirname;
 const ROOT = path.resolve(SCRIPT_DIR, "..");
@@ -51,7 +52,7 @@ function normalize(raw: RawQuestion[], paperCode: string, source: "exam" | "mock
     seen.set(baseId.replace(/-(\d+)$/, ""), count + 1);
 
     if (legacy) {
-      const stem = q.stem?.trim() ?? "";
+      const stem = normalizeQuestionText(q.stem?.trim() ?? "");
       const opts = Array.isArray(q.opts) ? optsArrayToObject(q.opts) : (q.opts ?? {});
       const ans = (q.ans ?? "").toLowerCase();
       return {
@@ -59,7 +60,12 @@ function normalize(raw: RawQuestion[], paperCode: string, source: "exam" | "mock
         number: num,
         ref: q.ref ?? "",
         question: stem,
-        options: opts as Record<string, string>,
+        options: Object.fromEntries(
+          Object.entries(opts as Record<string, string>).map(([key, value]) => [
+            key,
+            normalizeQuestionText(value),
+          ]),
+        ),
         answer: ans,
         explanation: null,
         page: null,
@@ -69,7 +75,7 @@ function normalize(raw: RawQuestion[], paperCode: string, source: "exam" | "mock
     }
     const opts = typeof q.options === "string" ? JSON.parse(q.options) : (q.options ?? {});
     const ans = (q.answer ?? "").toLowerCase();
-    return {
+    return normalizeQuestionFields({
       id: baseId,
       number: num,
       ref: q.ref ?? "",
@@ -80,7 +86,7 @@ function normalize(raw: RawQuestion[], paperCode: string, source: "exam" | "mock
       page: q.page ?? null,
       source,
       sourceLabel,
-    };
+    });
   });
 }
 

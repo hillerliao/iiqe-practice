@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getPublicHandbookUrlForQuestion } from "@/lib/handbook-refs";
 
 type CopyQuestionButtonProps = {
   number?: number;
@@ -15,6 +16,14 @@ type CopyQuestionButtonProps = {
   variant?: "ghost" | "outline";
   size?: "xs" | "sm" | "default";
   label?: boolean;
+};
+
+export type QuestionTextOptions = {
+  number?: number;
+  question: string;
+  options: Record<string, string>;
+  ref?: string;
+  paper?: string;
 };
 
 /**
@@ -46,15 +55,13 @@ export function formatPaperLabel(paper: string | undefined | null): string {
  * paper: 傳入 paperCode (如 "P1" / "P3") 或已映射的中文卷別 (如 "卷三")。
  *        與 ref 同時存在時會拼成 [卷三 1.2.2(e)];若只傳 ref 則維持舊格式 [REF]。
  */
-export function formatQuestionText(opts: {
-  number?: number;
-  question: string;
-  options: Record<string, string>;
-  ref?: string;
-  paper?: string;
-}): string {
+export function buildQuestionTextLines(opts: QuestionTextOptions): string[] {
   const { number, question, options, ref, paper } = opts;
   const lines: string[] = ["（香港保險中介人資格考試相關題目,請答題並作通俗解釋，如果可能也介绍相关规则背后的根本原因）"];
+  const handbookUrl = getPublicHandbookUrlForQuestion(paper, ref);
+  if (handbookUrl) {
+    lines.push(`答题依据请不要胡编乱造，要依据研习手册 ${handbookUrl} 对应章节的内容。`);
+  }
   const paperLabel = formatPaperLabel(paper);
   const refTag = ref ? `[${ref}]` : "";
   const headerParts: string[] = [];
@@ -74,7 +81,11 @@ export function formatQuestionText(opts: {
       lines.push(`${letter.toUpperCase()}. ${text}`);
     }
   }
-  return lines.join("\n");
+  return lines;
+}
+
+export function formatQuestionText(opts: QuestionTextOptions): string {
+  return buildQuestionTextLines(opts).join("\n");
 }
 
 export function CopyQuestionButton({
