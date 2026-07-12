@@ -102,3 +102,15 @@ if ($sshExit -ne 0) {
   exit $sshExit
 }
 Write-Output "[4/4] deploy OK"
+
+# 5) 显示 deploy-audit 最后的 pre/post 比对(部署前后 prod.db 列数变化)。
+#    deploy-remote.sh 内部已经做了 pre [0.5/10] 与 post [10/10] 两次快照,
+#    这里把它们都拉回来并打印 diff,这样任何 attempt/answer 的异常都会即时可见。
+#    失败也不致命:audit 文件可能因权限问题读不到,只是少打一段。
+Write-Output ''
+Write-Output '[5/5] deploy audit (snapshots from VPS)'
+$auditPre  = & 'C:\Windows\System32\OpenSSH\ssh.exe' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o BatchMode=yes ${DeployAddr} 'ls -1t /home/'$DeployUser'/iiqe-audit/audit-*-pre.txt 2>/dev/null | head -1' 2>$null
+$auditPost = & 'C:\Windows\System32\OpenSSH\ssh.exe' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o BatchMode=yes ${DeployAddr} 'ls -1t /home/'$DeployUser'/iiqe-audit/audit-*-post.txt 2>/dev/null | head -1' 2>$null
+
+if ($auditPre)  { Write-Output "-- pre snapshot: $auditPre"; & 'C:\Windows\System32\OpenSSH\ssh.exe' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o BatchMode=yes ${DeployAddr} "cat '$auditPre'" 2>$null }
+if ($auditPost) { Write-Output "-- post snapshot: $auditPost"; & 'C:\Windows\System32\OpenSSH\ssh.exe' -o ConnectTimeout=10 -o StrictHostKeyChecking=no -o BatchMode=yes ${DeployAddr} "cat '$auditPost'" 2>$null }

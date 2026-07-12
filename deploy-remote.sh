@@ -19,7 +19,19 @@ set -euo pipefail
 ROOT="/home/ecs-user"
 APP="$ROOT/iiqe-app"
 BACKUP_DIR="$ROOT/backups"
+AUDIT_DIR="${AUDIT_DIR:-$ROOT/iiqe-audit}"
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+
+# ---- pre-flight audit ----
+# 在做任何改動之前,先快照目前 prod.db 的列數 + per-session,寫到 $AUDIT_DIR。
+# 部署成功後由 [10/10] post-flight 拿同一份比對,輸出 diff。
+# 純唯讀:即便 prod.db 拿不到也只警告、不中止(老 prod.db 不存在場景)。
+echo "---[0.5/10] pre-flight audit---"
+mkdir -p "$AUDIT_DIR"
+DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" \
+  AUDIT_PHASE=pre \
+  npx tsx scripts/deploy-audit.ts pre "$AUDIT_DIR" 2>&1 | tail -25 || \
+    echo "!!! [warn] deploy-audit pre-flight 失敗(不阻斷部署)"
 
 cd "$ROOT"
 
@@ -157,5 +169,15 @@ pm2 restart iiqe-app 2>&1 || pm2 start npm --name iiqe-app -- run start -- -p 30
 pm2 save
 sleep 2
 pm2 status iiqe-app
+
+# ---- post-flight audit ----
+# 跟 pre-flight 比對。任何 row count 在 deploy 中被改都會被印出來。
+# 注意:若 deploy 期間使用者繼續作答,attempt/answer 數字可能增加 — 正常。
+echo "---[10/10] post-flight audit---"
+DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" \
+  AUDIT_PHASE=post \
+  IIQE_AUDIT_LAST="$AUDIT_DIR/last.json" \
+  npx tsx scripts/deploy-audit.ts post "$AUDIT_DIR" 2>&1 | tail -30 || \
+    echo "!!! [warn] deploy-audit post-flight 失敗(請手動比對 $AUDIT_DIR/last.json)"
 
 echo "---ok---"

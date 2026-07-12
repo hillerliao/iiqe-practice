@@ -175,6 +175,8 @@ GitHub Actions 到 VPS 的密钥仅负责 SSH 登录；VPS 从 GitHub `git fetch
 4. 构建成功后，通过 SQLite 的在线 backup API 备份现有数据库到 `~/iiqe-shared/backups/`，默认保留最近 14 份。
 5. 使用不接受数据丢失的 `prisma db push` 同步 schema，随后执行 seed 和 `verify-storage`。
 6. 使用 `ecosystem.config.cjs` 的单进程 fork 模式 `pm2 startOrReload --update-env`，并检查本机 `/api/papers`。
+7. **部署前后记录 prod.db 快照**：通过 `scripts/deploy-audit.ts` 在 `git reset` 之前与 PM2 reload 之后各采样一次，输出 Paper / Question / Attempt / Answer / Favorite / Note / Feedback 的行数与按 sessionId 的明细，保存到 `$SHARED_DIR/audit/`。post 阶段会与 pre 对比打印 diff。
+   - 看到 attempt/answer 行数变化时不必惊慌：deploy 期间用户继续作答属于正常噪音。比对的意义在于「是否出现 row count 跳崖式下跌（数据丢失）」，而不是「数字必须严格一致」。
 
 这不是严格的零停机发布：单个 Next.js/SQLite 进程重载会有极短暂的请求切换。其优先保证是：构建或 schema 校验失败不会中断旧进程；数据不随 Git 代码目录被清理。
 
@@ -196,6 +198,10 @@ git rev-parse HEAD
 
 # 查看数据库备份
 ls -lht /home/deploy/iiqe-shared/backups/
+
+# 查看最近一次 deploy 的 prod.db 快照与 diff
+ls -lht /home/deploy/iiqe-shared/audit/
+cat /home/deploy/iiqe-shared/audit/last.json
 ```
 
 回滚应在维护窗口进行：从 GitHub 找到一个仍属于 `main` 历史的已知良好提交，手动用该 SHA 调用发布脚本。脚本拒绝部署不属于当前 `origin/main` 历史的提交。若 schema 或数据已变化，先保留当前数据库备份，再评估是否恢复对应的 SQLite 备份；代码回滚本身不自动回滚数据库 schema。
