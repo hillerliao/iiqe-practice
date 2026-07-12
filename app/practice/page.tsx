@@ -370,6 +370,7 @@ function PracticeInner() {
         !e.ctrlKey &&
         !e.metaKey &&
         !e.altKey &&
+        !e.shiftKey &&
         ["1", "2", "3", "4", "a", "b", "c", "d"].includes(key) &&
         !isAnswered
       ) {
@@ -392,7 +393,36 @@ function PracticeInner() {
       ) {
         e.preventDefault();
         noteButtonRef.current?.toggleEditor();
-      } else if (key === "g" || key === "G") {
+      } else if (
+        e.shiftKey &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey &&
+        ["KeyG", "KeyB", "KeyC", "KeyK"].includes(e.code)
+      ) {
+        e.preventDefault();
+        const q = buildSearchQuery({
+          number: currentQ.number,
+          question: currentQ.question,
+          options: currentQ.options,
+          ref: currentQ.ref || undefined,
+          paper: attempt?.paperCode || undefined,
+        });
+        const encoded = encodeURIComponent(q);
+        const searchUrls: Record<string, string> = {
+          KeyG: `https://www.google.com/search?q=${encoded}`,
+          KeyB: `https://chat.baidu.com/search?word=${encoded}`,
+          KeyC: `https://chatgpt.com/?q=${encoded}&hints=search&ref=ext`,
+          KeyK: `https://www.kimi.com/?prefill_prompt=${encoded}&send_immediately=true`,
+        };
+        window.open(searchUrls[e.code], "_blank", "noopener,noreferrer");
+      } else if (
+        e.code === "KeyG" &&
+        !e.shiftKey &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey
+      ) {
         e.preventDefault();
         setShowJumpPanel((v) => !v);
       } else if (
@@ -413,44 +443,6 @@ function PracticeInner() {
           ?.writeText(text)
           .then(() => toast("已複製題目"))
           .catch(() => {});
-      } else if (
-        (key === "s" || key === "S") &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey
-      ) {
-        e.preventDefault();
-        const q = buildSearchQuery({
-          number: currentQ.number,
-          question: currentQ.question,
-          options: currentQ.options,
-          ref: currentQ.ref || undefined,
-          paper: attempt?.paperCode || undefined,
-        });
-        window.open(
-          `https://www.google.com/search?q=${encodeURIComponent(q)}`,
-          "_blank",
-          "noopener,noreferrer"
-        );
-      } else if (
-        (key === "k" || key === "K") &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey
-      ) {
-        e.preventDefault();
-        const q = buildSearchQuery({
-          number: currentQ.number,
-          question: currentQ.question,
-          options: currentQ.options,
-          ref: currentQ.ref || undefined,
-          paper: attempt?.paperCode || undefined,
-        });
-        window.open(
-          `https://www.kimi.com/?prefill_prompt=${encodeURIComponent(q)}&send_immediately=true`,
-          "_blank",
-          "noopener,noreferrer"
-        );
       } else if (key === "Enter" && currentIdx >= questions.length - 1) {
         e.preventDefault();
         handleFinish();
@@ -779,8 +771,10 @@ function PracticeInner() {
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">N</kbd> 筆記</span>
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">G</kbd> 跳題</span>
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">X</kbd> 複製</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">S</kbd> Google 搜尋</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">K</kbd> Kimi</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">⇧G</kbd> Google</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">⇧B</kbd> 百度</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">⇧C</kbd> ChatGPT</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">⇧K</kbd> Kimi</span>
       </div>
 
       <ToastContainer toasts={toasts} />
@@ -893,6 +887,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
         !e.ctrlKey &&
         !e.metaKey &&
         !e.altKey &&
+        !e.shiftKey &&
         ["1", "2", "3", "4", "a", "b", "c", "d"].includes(key) &&
         !picked
       ) {
@@ -916,10 +911,11 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
         e.preventDefault();
         noteButtonRef.current?.toggleEditor();
       } else if (
-        (key === "k" || key === "K") &&
+        e.shiftKey &&
         !e.ctrlKey &&
         !e.metaKey &&
-        !e.altKey
+        !e.altKey &&
+        ["KeyG", "KeyB", "KeyC", "KeyK"].includes(e.code)
       ) {
         e.preventDefault();
         const query = buildSearchQuery({
@@ -929,11 +925,14 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
           ref: q.ref || undefined,
           paper: paperCode || undefined,
         });
-        window.open(
-          `https://www.kimi.com/?prefill_prompt=${encodeURIComponent(query)}&send_immediately=true`,
-          "_blank",
-          "noopener,noreferrer"
-        );
+        const encoded = encodeURIComponent(query);
+        const searchUrls: Record<string, string> = {
+          KeyG: `https://www.google.com/search?q=${encoded}`,
+          KeyB: `https://chat.baidu.com/search?word=${encoded}`,
+          KeyC: `https://chatgpt.com/?q=${encoded}&hints=search&ref=ext`,
+          KeyK: `https://www.kimi.com/?prefill_prompt=${encoded}&send_immediately=true`,
+        };
+        window.open(searchUrls[e.code], "_blank", "noopener,noreferrer");
       }
     }
     window.addEventListener("keydown", onKey);

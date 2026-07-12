@@ -241,6 +241,7 @@ export function RedoPractice({
         !e.ctrlKey &&
         !e.metaKey &&
         !e.altKey &&
+        !e.shiftKey &&
         ["1", "2", "3", "4", "a", "b", "c", "d"].includes(key) &&
         !s.isAnswered &&
         s.current
@@ -253,41 +254,11 @@ export function RedoPractice({
           pickAnswerRef.current(letter);
         }
       } else if (
-        (key === "s" || key === "S") &&
+        e.shiftKey &&
         !e.ctrlKey &&
         !e.metaKey &&
         !e.altKey &&
-        s.current
-      ) {
-        e.preventDefault();
-        const text = formatQuestionText({
-          number: s.current.question.number,
-          question: s.current.question.question,
-          options: s.current.question.options,
-          ref: s.current.question.ref || undefined,
-          paper: s.current.paperCode || undefined,
-        });
-        navigator.clipboard
-          ?.writeText(text)
-          .then(() => toast("已複製題目並開啟 Google"))
-          .catch(() => {});
-        const q = buildSearchQuery({
-          number: s.current.question.number,
-          question: s.current.question.question,
-          options: s.current.question.options,
-          ref: s.current.question.ref || undefined,
-          paper: s.current.paperCode || undefined,
-        });
-        window.open(
-          `https://www.google.com/search?q=${encodeURIComponent(q)}`,
-          "_blank",
-          "noopener,noreferrer"
-        );
-      } else if (
-        (key === "k" || key === "K") &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey &&
+        ["KeyG", "KeyB", "KeyC", "KeyK"].includes(e.code) &&
         s.current
       ) {
         e.preventDefault();
@@ -298,11 +269,14 @@ export function RedoPractice({
           ref: s.current.question.ref || undefined,
           paper: s.current.paperCode || undefined,
         });
-        window.open(
-          `https://www.kimi.com/?prefill_prompt=${encodeURIComponent(q)}&send_immediately=true`,
-          "_blank",
-          "noopener,noreferrer"
-        );
+        const encoded = encodeURIComponent(q);
+        const searchUrls: Record<string, string> = {
+          KeyG: `https://www.google.com/search?q=${encoded}`,
+          KeyB: `https://chat.baidu.com/search?word=${encoded}`,
+          KeyC: `https://chatgpt.com/?q=${encoded}&hints=search&ref=ext`,
+          KeyK: `https://www.kimi.com/?prefill_prompt=${encoded}&send_immediately=true`,
+        };
+        window.open(searchUrls[e.code], "_blank", "noopener,noreferrer");
       } else if (
         (key === "x" || key === "X") &&
         !e.ctrlKey &&
@@ -626,13 +600,25 @@ export function RedoPractice({
         </span>
         <span>
           <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
-            S
+            ⇧G
           </kbd>{" "}
-          複製題目 + Google 搜尋
+          Google
         </span>
         <span>
           <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
-            K
+            ⇧B
+          </kbd>{" "}
+          百度
+        </span>
+        <span>
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
+            ⇧C
+          </kbd>{" "}
+          ChatGPT
+        </span>
+        <span>
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
+            ⇧K
           </kbd>{" "}
           Kimi
         </span>
