@@ -9,6 +9,7 @@ import {
   HomeFileQuestion,
   HomeNotebookPen,
 } from "@/components/HomePageIcons";
+import { RecentAttemptsCard } from "@/components/RecentAttemptsCard";
 
 export default async function HomePage() {
   const papers = await getPapersAsync();
@@ -58,6 +59,10 @@ export default async function HomePage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      <div className="mt-8">
+        <RecentAttemptsCard />
       </div>
 
       <Card className="mt-8">
