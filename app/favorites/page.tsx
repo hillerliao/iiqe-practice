@@ -12,8 +12,9 @@ import {
   Play,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getSessionId } from "@/lib/session";
+import { authedFetch } from "@/lib/session-client";
 import { QuestionActions } from "@/components/QuestionActions";
+import { QuestionStem } from "@/components/QuestionStem";
 import { NoteSection } from "@/components/NoteSection";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
 import { RedoPractice, type RedoItem } from "@/components/RedoPractice";
@@ -69,6 +70,7 @@ function FavItemCard({
               question={q.question}
               options={q.options}
               ref={q.ref || undefined}
+              paper={item.paperCode || undefined}
               size="xs"
             />
             {picked != null && (
@@ -110,7 +112,7 @@ function FavItemCard({
           </div>
         </div>
         <CardTitle className="text-base leading-relaxed mt-2">
-          {q.question}
+          <QuestionStem text={q.question} />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -177,8 +179,7 @@ export default function FavoritesPage() {
   const [practiceMode, setPracticeMode] = useState(false);
 
   const load = () => {
-    const sessionId = getSessionId();
-    fetch(`/api/favorites?sessionId=${sessionId}`)
+    authedFetch(`/api/favorites`)
       .then((r) => {
         if (!r.ok) throw new Error("載入收藏失敗");
         return r.json();
@@ -198,11 +199,7 @@ export default function FavoritesPage() {
   }, []);
 
   async function remove(qId: string) {
-    const sessionId = getSessionId();
-    await fetch(
-      `/api/favorites?sessionId=${sessionId}&questionId=${qId}`,
-      { method: "DELETE" }
-    );
+    await authedFetch(`/api/favorites?questionId=${qId}`, { method: "DELETE" });
     load();
   }
 

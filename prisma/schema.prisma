@@ -1,9 +1,11 @@
-// IIQE 刷題應用資料模型
-// Prisma 7 不再於 schema 中寫 datasource url,改在 prisma.config.ts 設定
+// Prisma schema: 兼容已存在的 prod.db(由最初 main 分支创建过),
+// 任何修改都不得破坏旧表名 / 主键 / 已有字段。新增字段只能 nullable 或带 default。
+// 表名用 @@map 显式映射,避免 Prisma 默认复数命名。
 
 generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  provider        = "prisma-client-js"
+  output          = "../lib/generated/prisma"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -11,20 +13,20 @@ datasource db {
 }
 
 model Paper {
-  id        String     @id @default(cuid())
+  id        String     @id
   code      String     @unique
   name      String
-  questions Question[]
-  attempts  Attempt[]
   createdAt DateTime   @default(now())
+  questions Question[]
+
+  @@map("Paper")
 }
 
 model Question {
-  id          String     @id @default(cuid())
+  id          String   @id
   paperId     String
-  paper       Paper      @relation(fields: [paperId], references: [id], onDelete: Cascade)
   number      Int
-  ref         String
+  ref         String?
   question    String
   options     String
   answer      String
@@ -32,24 +34,22 @@ model Question {
   page        Int?
   source      String
   sourceLabel String?
-  createdAt   DateTime   @default(now())
+  createdAt   DateTime @default(now())
+  paper       Paper    @relation(fields: [paperId], references: [id])
+  answers     Answer[]
 
-  answers   Answer[]
-  favorites Favorite[]
-  notes     Note[]
-
-  @@unique([paperId, number, source])
   @@index([paperId, source])
+  @@index([paperId, number])
+  @@map("Question")
 }
 
 model Attempt {
-  id          String    @id @default(cuid())
+  id          String    @id
   sessionId   String
   paperId     String
-  paper       Paper     @relation(fields: [paperId], references: [id], onDelete: Cascade)
   mode        String
   source      String?
-  startedAt   DateTime  @default(now())
+  startedAt   DateTime
   finishedAt  DateTime?
   durationSec Int?
   totalQ      Int
@@ -57,44 +57,67 @@ model Attempt {
   answers     Answer[]
 
   @@index([sessionId])
-  @@index([paperId])
+  @@index([sessionId, paperId, source])
+  @@index([startedAt])
+  @@map("Attempt")
 }
 
 model Answer {
-  id          String   @id @default(cuid())
+  id          String   @id
   attemptId   String
-  attempt     Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
   questionId  String
-  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   userAnswer  String
   isCorrect   Boolean
   timeSpentMs Int?
   createdAt   DateTime @default(now())
+  attempt     Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question    Question @relation(fields: [questionId], references: [id])
 
-  @@unique([attemptId, questionId])
+  @@index([attemptId])
   @@index([questionId])
+  @@map("Answer")
 }
 
 model Favorite {
-  id         String   @id @default(cuid())
+  id         String   @id
   sessionId  String
   questionId String
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
 
   @@unique([sessionId, questionId])
   @@index([sessionId])
+  @@map("Favorite")
 }
 
 model Note {
-  id         String   @id @default(cuid())
+  id         String   @id
   sessionId  String
   questionId String
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  content    String   // 純文字,1000 字上限在 API 層校驗
+  content    String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   @@unique([sessionId, questionId])
   @@index([sessionId])
+  @@map("Note")
+}
+
+model Feedback {
+  id          String   @id
+  sessionId   String
+  questionId  String
+  paperCode   String
+  source      String
+  sourceLabel String?
+  number      Int
+  ref         String?
+  category    String
+  description String
+  userAnswer  String?
+  userAgent   String   @default("")
+  createdAt   DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("Feedback")
 }

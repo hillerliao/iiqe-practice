@@ -1,83 +1,82 @@
-// GET   /api/attempt?id=...   — 取作答完整資料
-// PATCH /api/attempt          — 提交一題答案 / finish / favorite
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getAttempt, updateAttempt, getNote, listNotes, AnswerRecord } from "@/lib/kv";
+import { getQuestionById, getQuestions, getPapers } from "@/lib/data";
+import { requireSession } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+
   const url = new URL(req.url);
   const id = url.searchParams.get("id");
   if (!id) {
     return NextResponse.json({ error: "id 必填" }, { status: 400 });
   }
-  const attempt = await prisma.attempt.findUnique({
-    where: { id },
-    include: {
-      paper: true,
-      answers: {
-        include: { question: true },
-        orderBy: { question: { number: "asc" } },
-      },
-    },
-  });
+
+  const attempt = await getAttempt(id);
   if (!attempt) {
     return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
   }
+  // H2: 僅允許擁有者讀取自己的作答(含逐題筆記)
+  if (attempt.sessionId !== session.sessionId) {
+    return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
+  }
 
-  // 單獨查詢此 attempt session 的筆記(避免 include 鏈中自引用)
   const noteMap = new Map<string, string>();
   if (attempt.answers.length > 0) {
-    const noteRows = await prisma.note.findMany({
-      where: {
-        sessionId: attempt.sessionId,
-        questionId: { in: attempt.answers.map((a) => a.questionId) },
-      },
-      select: { questionId: true, content: true },
-    });
-    for (const n of noteRows) {
-      noteMap.set(n.questionId, n.content);
+    const questionIds = attempt.answers.map((a) => a.questionId);
+    const notes = await listNotes(attempt.sessionId, questionIds);
+    for (const [qid, n] of Object.entries(notes)) {
+      noteMap.set(qid, n.content);
     }
   }
-  // 查詢完整題目列表(用於跨 session 恢復進度時,不依賴瀏覽器存儲)
-  const allQuestions = await prisma.question.findMany({
-    where: { paperId: attempt.paperId, source: attempt.source ?? "exam" },
-    orderBy: { number: "asc" },
-  });
+
+  const allQuestions = getQuestions(attempt.paperId, attempt.source ?? "exam");
+  const paperInfo = getPapers().find((p) => p.id === attempt.paperId);
+
   return NextResponse.json({
     attempt: {
       ...attempt,
+      paper: paperInfo ? { name: paperInfo.name, code: paperInfo.code } : { name: attempt.paperId, code: attempt.paperId },
       allQuestions: allQuestions.map((q) => ({
         id: q.id,
         number: q.number,
         ref: q.ref,
         question: q.question,
-        options: JSON.parse(q.options),
+        options: q.options,
         answer: q.answer?.toLowerCase() ?? "",
         explanation: q.explanation,
         page: q.page,
       })),
-      answers: attempt.answers.map((a) => ({
-        id: a.id,
-        questionId: a.questionId,
-        userAnswer: a.userAnswer,
-        isCorrect: a.isCorrect,
-        timeSpentMs: a.timeSpentMs,
-        note: noteMap.get(a.questionId) ?? null,
-        question: {
-          id: a.question.id,
-          number: a.question.number,
-          ref: a.question.ref,
-          question: a.question.question,
-          options: JSON.parse(a.question.options),
-          answer: a.question.answer?.toLowerCase() ?? "",
-          explanation: a.question.explanation,
-          page: a.question.page,
-        },
-      })),
+      answers: attempt.answers.map((a) => {
+        const q = getQuestionById(a.questionId);
+        return {
+          id: `${a.questionId}_${id}`,
+          questionId: a.questionId,
+          userAnswer: a.userAnswer,
+          isCorrect: a.isCorrect,
+          timeSpentMs: a.timeSpentMs,
+          note: noteMap.get(a.questionId) ?? null,
+          question: q ? {
+            id: q.id,
+            number: q.number,
+            ref: q.ref,
+            question: q.question,
+            options: q.options,
+            answer: q.answer?.toLowerCase() ?? "",
+            explanation: q.explanation,
+            page: q.page,
+          } : null,
+        };
+      }),
     },
   });
 }
 
 export async function PATCH(req: NextRequest) {
+  const session = requireSession(req);
+  if (session instanceof NextResponse) return session;
+
   const body = await req.json();
   const { action, id } = body;
   if (!id) {
@@ -90,27 +89,38 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "questionId 必填" }, { status: 400 });
     }
     try {
-      const question = await prisma.question.findUnique({ where: { id: questionId } });
+      const question = getQuestionById(questionId);
       if (!question) {
         return NextResponse.json({ error: "Question not found" }, { status: 404 });
       }
       const isCorrect = (userAnswer ?? "").toUpperCase() === question.answer.toUpperCase();
-      const answer = await prisma.answer.upsert({
-        where: { attemptId_questionId: { attemptId: id, questionId } },
-        create: {
-          attemptId: id,
-          questionId,
-          userAnswer: userAnswer ?? "",
-          isCorrect,
-          timeSpentMs: timeSpentMs ?? null,
-        },
-        update: {
-          userAnswer: userAnswer ?? "",
-          isCorrect,
-          timeSpentMs: timeSpentMs ?? null,
-        },
-      });
-      return NextResponse.json({ answer, isCorrect });
+
+      const attempt = await getAttempt(id);
+      if (!attempt) {
+        return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
+      }
+      if (attempt.sessionId !== session.sessionId) {
+        return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
+      }
+
+      const existingIdx = attempt.answers.findIndex((a) => a.questionId === questionId);
+      const answerRecord: AnswerRecord = {
+        questionId,
+        userAnswer: userAnswer ?? "",
+        isCorrect,
+        timeSpentMs: timeSpentMs ?? null,
+        createdAt: new Date().toISOString(),
+      };
+
+      if (existingIdx >= 0) {
+        attempt.answers[existingIdx] = answerRecord;
+      } else {
+        attempt.answers.push(answerRecord);
+      }
+
+      await updateAttempt(id, { answers: attempt.answers });
+
+      return NextResponse.json({ answer: answerRecord, isCorrect });
     } catch (e) {
       console.error("[PATCH /api/attempt answer] 寫入失敗:", e);
       return NextResponse.json(
@@ -121,13 +131,16 @@ export async function PATCH(req: NextRequest) {
   }
 
   if (action === "finish") {
-    const answers = await prisma.answer.findMany({ where: { attemptId: id } });
-    const correct = answers.filter((a) => a.isCorrect).length;
-    const attempt = await prisma.attempt.update({
-      where: { id },
-      data: { finishedAt: new Date(), correct },
-    });
-    return NextResponse.json({ attempt, correct, total: answers.length });
+    const attempt = await getAttempt(id);
+    if (!attempt) {
+      return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
+    }
+    if (attempt.sessionId !== session.sessionId) {
+      return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
+    }
+    const correct = attempt.answers.filter((a) => a.isCorrect).length;
+    await updateAttempt(id, { finishedAt: new Date().toISOString(), correct });
+    return NextResponse.json({ attempt, correct, total: attempt.answers.length });
   }
 
   return NextResponse.json({ error: "Unknown action" }, { status: 400 });

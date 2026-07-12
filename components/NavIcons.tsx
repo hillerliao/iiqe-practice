@@ -1,0 +1,40 @@
+"use client";
+
+import {
+  BookOpen,
+  Home,
+  BarChart3,
+  Star,
+  Settings,
+  Monitor,
+} from "lucide-react";
+import { ReactNode } from "react";
+
+interface IconProps {
+  className?: string;
+}
+
+// Export individual icon components to maintain same import style
+export const NavBookOpen = ({ className }: IconProps) => (
+  <BookOpen className={className} />
+);
+
+export const NavHome = ({ className }: IconProps) => (
+  <Home className={className} />
+);
+
+export const NavBarChart3 = ({ className }: IconProps) => (
+  <BarChart3 className={className} />
+);
+
+export const NavStar = ({ className }: IconProps) => (
+  <Star className={className} />
+);
+
+export const NavSettings = ({ className }: IconProps) => (
+  <Settings className={className} />
+);
+
+export const NavMonitor = ({ className }: IconProps) => (
+  <Monitor className={className} />
+);

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Link from "next/link";
 import "./globals.css";
-import { Home, BarChart3, BookOpen, Star, Settings } from "lucide-react";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { SetupReminder } from "@/components/SetupReminder";
+import { Analytics } from "@/components/Analytics";
+import { GlobalHeader } from "@/components/GlobalHeader";
+import { listHandbookEntries } from "@/lib/handbook";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,8 +19,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "IIQE 刷題",
-    template: "%s · IIQE 刷題",
+    default: "IIQE 做题家",
+    template: "%s · IIQE 做题家",
   },
   description: "香港保險業監管局 IIQE 考試刷題應用",
 };
@@ -40,11 +41,20 @@ const themeInitScript = `
 })();
 `;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // 載入研習手冊列表,server-side 取出 title + version 以便下拉菜單顯示。
+  // 菜單項的 href 指向 Next 從 public/handbook/ 直接 serve 的靜態 HTML。
+  const handbookEntries = await listHandbookEntries();
+  // 預設指向「卷一」(P1),這是最常用的基礎手冊
+  const defaultSlug =
+    handbookEntries.find((h) => h.slug === "exam1-2024")?.slug ??
+    handbookEntries[0]?.slug ??
+    "";
+
   return (
     <html
       lang="zh-HK"
@@ -59,58 +69,15 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider>
-          <header className="border-b bg-background/80 backdrop-blur sticky top-0 z-10">
-            <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-4 sm:gap-6">
-              <Link
-                href="/"
-                className="font-semibold text-lg flex items-center gap-2 shrink-0 whitespace-nowrap"
-              >
-                <BookOpen className="w-5 h-5" />
-                IIQE 刷題
-              </Link>
-              <nav className="flex gap-1 text-sm overflow-x-auto items-center flex-1 min-w-0">
-                <Link
-                  href="/"
-                  className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
-                >
-                  <Home className="w-4 h-4" />
-                  首頁
-                </Link>
-                <Link
-                  href="/stats"
-                  className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
-                >
-                  <BarChart3 className="w-4 h-4" />
-                  統計
-                </Link>
-                <Link
-                  href="/wrongbook"
-                  className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
-                >
-                  <BookOpen className="w-4 h-4" />
-                  錯題本
-                </Link>
-                <Link
-                  href="/favorites"
-                  className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
-                >
-                  <Star className="w-4 h-4" />
-                  收藏
-                </Link>
-                <Link
-                  href="/settings"
-                  className="px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
-                >
-                  <Settings className="w-4 h-4" />
-                  設定
-                </Link>
-              </nav>
-              <ThemeToggle />
-            </div>
-          </header>
+          <GlobalHeader
+            defaultSlug={defaultSlug}
+            handbookEntries={handbookEntries}
+          />
+          <SetupReminder />
+          <Analytics />
           <main className="flex-1">{children}</main>
           <footer className="border-t py-3 text-center text-xs text-muted-foreground">
-            IIQE 刷題 · 個人複習用
+            IIQE 做題家· 讓刷題更簡單
           </footer>
         </ThemeProvider>
       </body>

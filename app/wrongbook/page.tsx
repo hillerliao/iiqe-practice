@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,8 +11,9 @@ import {
   Play,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getSessionId } from "@/lib/session";
+import { authedFetch } from "@/lib/session-client";
 import { QuestionActions } from "@/components/QuestionActions";
+import { QuestionStem } from "@/components/QuestionStem";
 import { NoteSection } from "@/components/NoteSection";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
 import { RedoPractice, type RedoItem } from "@/components/RedoPractice";
@@ -73,6 +74,7 @@ function WrongItemCard({ item }: { item: WrongItem }) {
               question={q.question}
               options={q.options}
               ref={q.ref || undefined}
+              paper={item.paperCode || undefined}
               size="xs"
             />
             {picked != null && (
@@ -105,7 +107,7 @@ function WrongItemCard({ item }: { item: WrongItem }) {
           </div>
         </div>
         <CardTitle className="text-base leading-relaxed mt-2">
-          {q.question}
+          <QuestionStem text={q.question} />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -183,8 +185,7 @@ export default function WrongbookPage() {
   const [practiceMode, setPracticeMode] = useState(false);
 
   useEffect(() => {
-    const sessionId = getSessionId();
-    fetch(`/api/wrongbook?sessionId=${sessionId}`)
+    authedFetch(`/api/wrongbook`)
       .then((r) => {
         if (!r.ok) throw new Error("載入錯題本失敗");
         return r.json();
@@ -198,6 +199,41 @@ export default function WrongbookPage() {
         setError(e.message);
         setLoading(false);
       });
+  }, []);
+
+  // 將重做練習的作答寫回後端(/api/wrongbook/record),讓「又錯了」累積進 wrongCount
+  // 注意:失敗時要拋出(而非吞掉),persistAnswers 的 .catch 才會重置 recordedRef 以便重試
+  const recordRedo = useCallback(
+    async (answers: Record<string, string>) => {
+      const payload = items
+        .map((it) => ({ questionId: it.questionId, userAnswer: answers[it.questionId] }))
+        .filter((a) => a.userAnswer != null && a.userAnswer !== "");
+      if (payload.length === 0) return;
+      const r = await authedFetch("/api/wrongbook/record", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers: payload }),
+      });
+      if (!r.ok) {
+        throw new Error(`記錄重做結果失敗: ${r.status}`);
+      }
+    },
+    [items]
+  );
+
+  // 退出重做模式:重新整理錯題本,使更新後的 wrongCount / 反覆錯標籤立即反映
+  const handleExit = useCallback(async () => {
+    try {
+      const r = await authedFetch(`/api/wrongbook`);
+      if (r.ok) {
+        const data = await r.json();
+        setItems(data.items);
+        setRepeatedCount(data.repeatedCount ?? 0);
+      }
+    } catch {
+      /* 重新整理失敗不阻斷退出 */
+    }
+    setPracticeMode(false);
   }, []);
 
   if (loading) {
@@ -216,12 +252,39 @@ export default function WrongbookPage() {
       question: it.question,
     }));
     const prevAnswerMap = new Map(items.map((it) => [it.questionId, it.userAnswer]));
+
+    async function recordRedo(answers: Record<string, string>) {
+      try {
+        await authedFetch("/api/wrongbook/record", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ answers }),
+        });
+      } catch (e) {
+        console.error("記錄重做結果失敗:", e);
+      }
+    }
+
+    async function handleExit() {
+      setPracticeMode(false);
+      // 重新載入錯題本列表以反映記錄結果
+      try {
+        const r = await authedFetch(`/api/wrongbook`);
+        if (r.ok) {
+          const data = await r.json();
+          setItems(data.items);
+          setRepeatedCount(data.repeatedCount ?? 0);
+        }
+      } catch {}
+    }
+
     return (
       <RedoPractice
         items={redoItems}
         title="錯題本 · 重做練習"
         prevUserAnswer={(id) => prevAnswerMap.get(id)}
-        onExit={() => setPracticeMode(false)}
+        recordAnswers={recordRedo}
+        onExit={handleExit}
       />
     );
   }

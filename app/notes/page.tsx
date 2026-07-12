@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { NotebookPen } from "lucide-react";
-import { getSessionId } from "@/lib/session";
+import { authedFetch } from "@/lib/session-client";
 import { NoteItemCard } from "@/components/NoteItemCard";
 
 type NoteItem = {
@@ -31,8 +31,7 @@ export default function NotesPage() {
   const [error, setError] = useState<string | null>(null);
 
   const load = () => {
-    const sessionId = getSessionId();
-    fetch(`/api/notes?sessionId=${sessionId}`)
+    authedFetch(`/api/notes`)
       .then((r) => {
         if (!r.ok) throw new Error("載入筆記失敗");
         return r.json();

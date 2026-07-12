@@ -10,6 +10,7 @@ type CopyQuestionButtonProps = {
   question: string;
   options: Record<string, string>;
   ref?: string;
+  paper?: string;
   className?: string;
   variant?: "ghost" | "outline";
   size?: "xs" | "sm" | "default";
@@ -17,30 +18,55 @@ type CopyQuestionButtonProps = {
 };
 
 /**
+ * 將 paperCode (例如 "P1" / "P3") 映射成中文卷別頭 ("卷一" / "卷三")。
+ * 若傳入已經是 "卷X" 開頭則原樣回傳;空字串 / undefined 回傳空字串。
+ */
+export function formatPaperLabel(paper: string | undefined | null): string {
+  if (!paper) return "";
+  const trimmed = paper.trim();
+  if (!trimmed) return "";
+  if (trimmed.startsWith("卷")) return trimmed;
+  const map: Record<string, string> = {
+    P1: "卷一",
+    P3: "卷三",
+  };
+  return map[trimmed.toUpperCase()] ?? trimmed;
+}
+
+/**
  * 將題幹與選項格式化為純文字,方便貼到其他地方使用。
  * 格式:
  *   （香港保險中介人資格考試相關題目,請答題並作通俗解釋，如果可能也介绍相关规则背后的根本原因）
- *   #1 [REF]
+ *   #1 [卷三 1.2.2(e)]
  *   題幹
  *   A. 選項A
  *   B. 選項B
  *   ...
+ *
+ * paper: 傳入 paperCode (如 "P1" / "P3") 或已映射的中文卷別 (如 "卷三")。
+ *        與 ref 同時存在時會拼成 [卷三 1.2.2(e)];若只傳 ref 則維持舊格式 [REF]。
  */
 export function formatQuestionText(opts: {
   number?: number;
   question: string;
   options: Record<string, string>;
   ref?: string;
+  paper?: string;
 }): string {
-  const { number, question, options, ref } = opts;
+  const { number, question, options, ref, paper } = opts;
   const lines: string[] = ["（香港保險中介人資格考試相關題目,請答題並作通俗解釋，如果可能也介绍相关规则背后的根本原因）"];
-  const header = [
-    number != null ? `#${number}` : "",
-    ref ? `[${ref}]` : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-  if (header) lines.push(header);
+  const paperLabel = formatPaperLabel(paper);
+  const refTag = ref ? `[${ref}]` : "";
+  const headerParts: string[] = [];
+  if (number != null) headerParts.push(`#${number}`);
+  if (paperLabel && refTag) {
+    headerParts.push(`[${paperLabel} ${ref}]`);
+  } else if (paperLabel) {
+    headerParts.push(`[${paperLabel}]`);
+  } else if (refTag) {
+    headerParts.push(refTag);
+  }
+  if (headerParts.length) lines.push(headerParts.join(" "));
   lines.push(question.trim());
   for (const letter of ["a", "b", "c", "d"] as const) {
     const text = options[letter];
@@ -56,6 +82,7 @@ export function CopyQuestionButton({
   question,
   options,
   ref,
+  paper,
   className,
   variant = "ghost",
   size = "xs",
@@ -64,7 +91,7 @@ export function CopyQuestionButton({
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
-    const text = formatQuestionText({ number, question, options, ref });
+    const text = formatQuestionText({ number, question, options, ref, paper });
     try {
       await navigator.clipboard.writeText(text);
     } catch {

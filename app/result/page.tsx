@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, Play } from "lucide-react";
 import { QuestionActions } from "@/components/QuestionActions";
+import { QuestionStem } from "@/components/QuestionStem";
 import { NoteSection } from "@/components/NoteSection";
+import { authedFetch } from "@/lib/session-client";
 
 type AnswerData = {
   id: string;
@@ -53,7 +55,7 @@ function ResultInner() {
 
   useEffect(() => {
     if (!attemptId) return;
-    fetch(`/api/attempt?id=${attemptId}`)
+    authedFetch(`/api/attempt?id=${attemptId}`)
       .then((r) => {
         if (!r.ok) throw new Error("載入結果失敗");
         return r.json();
@@ -169,12 +171,13 @@ function ResultInner() {
                       question={a.question.question}
                       options={a.question.options}
                       ref={a.question.ref || undefined}
+                      paper={attempt?.paper?.code || undefined}
                       size="xs"
                     />
                   </div>
                 </div>
                 <p className="text-sm text-foreground mb-2 leading-relaxed">
-                  {a.question.question}
+                  <QuestionStem text={a.question.question} />
                 </p>
                 <div className="text-sm space-y-1">
                   <p>

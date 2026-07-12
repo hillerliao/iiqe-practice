@@ -66,3 +66,50 @@ PDF 題庫的提取腳本見 `scripts/` 目錄下的 Python 檔。
 | 變數 | 說明 | 預設值 |
 |------|------|--------|
 | `DATABASE_URL` | SQLite 資料庫路徑 | `file:./prisma/dev.db` |
+| `ADMIN_ID` | 管理員 sessionId(完整值,需含 `user:` 前綴)。詳見下方「管理員認證」一節 | 空(關閉管理員功能) |
+
+## 管理員認證
+
+本應用沒有登入系統,管理員身份透過 `process.env.ADMIN_ID` 比對識別。**該值只在服務端存在,客戶端永遠拿不到**。
+
+啟用步驟:
+
+1. 在 `.env` / `.env.production` 設定:
+   ```
+   ADMIN_ID=user:your-secret-handle
+   ```
+2. 在 `/settings` 把識別碼自訂為同一個值(必須完全一致,含 `user:` 前綴)。
+3. 訪問 `/admin/questions`,管理員視圖生效。
+
+UI 不會告訴訪客如何成為管理員;普通使用者只會看到「無權限訪問,請聯繫系統管理員」。
+
+部署到 VPS 前,務必:
+- 在 `.env.production` 設定與本地不同的 `ADMIN_ID`(不要把開發環境的值復用上去)
+- 若曾以 `vercel env pull` 把 `EDGE_CONFIG` / `VERCEL_OIDC_TOKEN` 拉到本地 `.env.production`,請到 Vercel Dashboard 撤銷並重新生成
+
+## 部署
+
+生產環境以 Docker + nginx + certbot 部署到任意 Linux VPS,支援自動 HTTPS 與零停機升級。
+
+完整部署文檔見 [DEPLOY.md](./DEPLOY.md),涵蓋:
+- VPS 前置條件(Docker、DNS、防火牆)
+- 首次部署步驟
+- 升級流程
+- 數據備份與恢復
+- 故障排查
+
+快速一覽(完整步驟見 DEPLOY.md):
+```bash
+git clone <repo-url> iiqe-app && cd iiqe-app
+cp .env.production.example .env.production
+$EDITOR .env.production
+
+sed -i 's/your-domain.example.com/<your-domain>/g' nginx/iiqe.conf
+sudo cp nginx/iiqe.conf /etc/nginx/conf.d/iiqe.conf
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d <your-domain> --email <your-email> --agree-tos --no-eff-email
+
+docker compose up -d --build
+docker compose --profile init run --rm migrate
+curl -I https://<your-domain>
+```

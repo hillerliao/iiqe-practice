@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Play, Shuffle, History } from "lucide-react";
-import { getSessionId } from "@/lib/session";
+import { authedFetch, getLastSessionError } from "@/lib/session-client";
 
 type PaperInfo = {
   id: string;
@@ -68,9 +68,8 @@ function PaperSetupInner() {
 
         // 檢查是否有未完成的 attempt,並取得此 session 曾答過的最大題目序號
         if (p) {
-          const sessionId = getSessionId();
-          fetch(
-            `/api/attempts?sessionId=${sessionId}&unfinished=1&paperId=${p.id}&source=${source}`
+          authedFetch(
+            `/api/attempts?unfinished=1&paperId=${p.id}&source=${source}`
           )
             .then((r) => r.json())
             .then((d) => {
@@ -106,11 +105,10 @@ function PaperSetupInner() {
     if (!paper) return;
     setStarting(true);
     setError(null);
-    const sessionId = getSessionId();
 
     // 若有舊的未完成 attempt,先標記為已完成(放棄),避免下次還提示
     if (unfinished) {
-      await fetch("/api/attempt", {
+      await authedFetch("/api/attempt", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "finish", id: unfinished.id }),
@@ -121,18 +119,17 @@ function PaperSetupInner() {
 
     try {
       const offset = shuffle ? 0 : Math.max(0, startFrom - 1);
-      const qsRes = await fetch(
+      const qsRes = await authedFetch(
         `/api/questions?paperCode=${code}&source=${source}&shuffle=${shuffle ? 1 : 0}&limit=${limit}&offset=${offset}`
       );
       if (!qsRes.ok) throw new Error("載入題目失敗");
       const qsData = await qsRes.json();
       const questionIds: string[] = qsData.questions.map((q: { id: string }) => q.id);
 
-      const aRes = await fetch("/api/attempts", {
+      const aRes = await authedFetch("/api/attempts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          sessionId,
           paperId: paper.id,
           mode: "exam",
           source,
@@ -140,7 +137,35 @@ function PaperSetupInner() {
           questionIds,
         }),
       });
-      if (!aRes.ok) throw new Error("建立作答 session 失敗");
+      if (!aRes.ok) {
+        // 嘗試解析伺服器回傳的具體原因(503 AUTH_NOT_CONFIGURED、401、500 等),
+        // 讓使用者與管理員能區分「後端配置問題」與「業務錯誤」。
+        const statusCode = aRes.status;
+        let detail = "";
+        try {
+          const errBody = await aRes.clone().json();
+          if (errBody && typeof errBody.error === "string") {
+            detail = errBody.error;
+          }
+        } catch {
+          // 忽略解析失敗,維持通用訊息
+        }
+        // 若 detail 為空或僅是「未授權」,檢查 session 建立階段是否有已知錯誤
+        // (例如 AUTH_SECRET 未設定 → /api/session 503),補上根因資訊
+        if (!detail || detail === "未授權") {
+          const sessionErr = getLastSessionError();
+          if (sessionErr) {
+            detail = detail
+              ? `${detail} (根因: ${sessionErr})`
+              : `會話建立失敗: ${sessionErr} → 後續請求 ${statusCode}`;
+          } else if (!detail) {
+            detail = `HTTP ${statusCode}`;
+          }
+        }
+        throw new Error(
+          detail ? `建立作答 session 失敗：${detail}` : "建立作答 session 失敗"
+        );
+      }
       const aData = await aRes.json();
 
       sessionStorage.setItem(

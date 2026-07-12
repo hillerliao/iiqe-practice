@@ -1,0 +1,161 @@
+#!/usr/bin/env bash
+# VPS 运行时更新脚本:在生产主机上由 deploy-remote.ps1 通过 SSH 拉起。
+#
+# 设计目标:零停机、零数据丢失、零 schema 破坏。
+# 流程:
+#   1) 解压本地上传的 iiqe-runtime-update.tar.gz(.next / public / scripts / prisma / 配置)
+#   2) 备份现有 prisma/prod.db 到 backups/prod.<timestamp>.db
+#   3) 装配 iiqe-app-runtime-new(暂不替换 iiqe-app)
+#   4) 切到新目录 → npm ci --omit=dev → prisma generate
+#   5) prisma db push(若失败立即 abort 并回滚)
+#   6) tsx prisma/seed.ts(从 data/*.json 幂等 upsert Paper/Question)
+#   7) 跑 scripts/verify-storage.ts 作为健康检查,失败立即 abort
+#   8) 用 iiqe-app-runtime-new 替换 iiqe-app(旧的移到 iiqe-app-prev 留作回滚)
+#   9) pm2 restart iiqe-app + pm2 status
+#  10) 失败时打印 iiqe-app-prev 路径提示回滚
+
+set -euo pipefail
+
+ROOT="/home/ecs-user"
+APP="$ROOT/iiqe-app"
+BACKUP_DIR="$ROOT/backups"
+TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+
+cd "$ROOT"
+
+echo "---[1/9] unpack---"
+rm -rf iiqe-update-new
+mkdir -p iiqe-update-new
+tar -xzf iiqe-runtime-update.tar.gz -C iiqe-update-new
+ls -la iiqe-update-new
+
+echo "---[2/9] backup prod.db---"
+mkdir -p "$BACKUP_DIR"
+if [ -f "$APP/prisma/prod.db" ]; then
+  cp -a "$APP/prisma/prod.db" "$BACKUP_DIR/prod.${TIMESTAMP}.db"
+  echo "backup: $BACKUP_DIR/prod.${TIMESTAMP}.db"
+else
+  echo "no existing prod.db; skip backup"
+fi
+
+echo "---[3/9] stage runtime-new---"
+rm -rf iiqe-app-runtime-new
+mkdir -p iiqe-app-runtime-new
+# 复制所有必需运行时文件;.next 是构建产物,public 是静态资源,prisma 是 schema 源
+# 注意:Prisma 7 需要 prisma.config.ts(连接字符串配置,见该文件顶部注释),
+# 不 copy 会导致 db push 报 "datasource.url property is required"。
+for item in .next public scripts prisma data lib app components package.json package-lock.json next.config.ts tsconfig.json prisma.config.ts; do
+  if [ -e "iiqe-update-new/$item" ]; then
+    cp -a "iiqe-update-new/$item" "iiqe-app-runtime-new/"
+  fi
+done
+ls -la iiqe-app-runtime-new
+
+# 保留旧 prod.db(node_modules 会随 npm ci 重新装,prod.db 不在 tar 里)
+if [ -f "$APP/prisma/prod.db" ]; then
+  cp -a "$APP/prisma/prod.db" "iiqe-app-runtime-new/prisma/prod.db"
+fi
+# 保留 .env.production / .env(VPS 运行时配置)
+if [ -f "$APP/.env.production" ]; then
+  cp -a "$APP/.env.production" "iiqe-app-runtime-new/.env.production"
+fi
+if [ -f "$APP/.env" ]; then
+  cp -a "$APP/.env" "iiqe-app-runtime-new/.env"
+fi
+
+# 复用上一份 node_modules(避免 npm ci 在低 CPU VPS 上锁死 sshd / T5 突发型 OOM)
+# 仅当:lock 存在 + prev 存在 + prev 里有 node_modules 时复用
+# 升级 next/react/prisma 大版本时,prev 不匹配,会自动 fall back 走 npm ci
+SKIP_NPM_CI=0
+if [ -f iiqe-app-runtime-new/package-lock.json ] && [ -d "$APP-prev/node_modules" ]; then
+  echo "copying node_modules from $APP-prev (skip npm ci)..."
+  cp -a "$APP-prev/node_modules" iiqe-app-runtime-new/
+  SKIP_NPM_CI=1
+else
+  echo "no prev node_modules available, will run npm ci"
+fi
+
+cd iiqe-app-runtime-new
+
+echo "---[4/9] deps + prisma generate---"
+if [ "$SKIP_NPM_CI" = "1" ]; then
+  echo "(skipped npm ci, using copied node_modules from $APP-prev)"
+else
+  # --omit=dev 不装 devDeps;生产只需要 next + 运行时依赖
+  npm ci --omit=dev --no-audit --no-fund 2>&1 | tail -20
+fi
+npx prisma generate 2>&1 | tail -10
+
+echo "---[5/9] prisma db push (non-destructive)---"
+# 关键守门:db push 会先比对 schema 与 DB,如果检测到可能丢数据的破坏性变更,
+# 它会要求确认。我们传入 --accept-data-loss=false 让它在破坏性 diff 上失败,
+# 让人工介入而不是默认执行。
+# Prisma 7 已移除 --skip-generate(generate 已在 step 4 跑過,且 db push 會自動 reuse)。
+DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npx prisma db push --accept-data-loss=false 2>&1 | tail -30
+
+echo "---[6/9] prisma seed (idempotent)---"
+DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npx tsx prisma/seed.ts 2>&1 | tail -20
+
+echo "---[6.5/9] self-heal: drop legacy duplicate question rows---"
+# 历史双写残留(df8a225 重構後遺症):同一 (paperId,source,number) 可能同时存在
+# 旧式 ID(P1-exam-1,来自 JSON seed)与 cuid(cm...,旧版管理员新增默认生成)两行,
+# 导致 /admin/questions 每题显示两次。seed 按 id 幂等 upsert,不会删 cuid 行,
+# 故这里显式去重:保留旧式 ID、删 cuid,并迁移 Answer/Favorite/Note/Feedback 引用。
+# 幂等:无重复时脚本 exit 0(打印"没有重复项");遇到无法自动判定的组会 exit 2 并
+# 终止删除(安全,不误删)。本步设为非致命——即便去重异常也继续部署(避免阻塞发布),
+# 但会打印警告,运维需人工介入排查。
+DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npx tsx scripts/dedupe-questions.ts 2>&1 | tail -30 || \
+  echo "!!! [warn] dedupe-questions 返回非 0(可能无可自动判定的重复组)。prod.db 可能仍有重复,请人工核查。"
+
+echo "---[7/9] health check: verify-storage---"
+DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npx tsx scripts/verify-storage.ts 2>&1 | tail -40
+VERIFY_EXIT=$?
+if [ "$VERIFY_EXIT" -ne 0 ]; then
+  echo "!!! verify-storage FAILED (exit=$VERIFY_EXIT); aborting swap. iiqe-app-prev preserved for rollback."
+  exit 1
+fi
+
+cd "$ROOT"
+
+echo "---[8/9] atomic swap---"
+if [ -d "$APP" ]; then
+  if [ -d "$APP-prev" ]; then
+    rm -rf "$APP-prev"
+  fi
+  mv "$APP" "$APP-prev"
+fi
+mv iiqe-app-runtime-new "$APP"
+echo "swap done; previous app preserved at $APP-prev"
+
+# 修复 Next 16 Turbopack 的 external native module symlink。
+#
+# Turbopack 对 native module(如 better-sqlite3)生成带 hash 的 external 模块名
+# (如 better-sqlite3-79580e436acd1aa8),在 .next/node_modules/ 下放 symlink 指向
+# 真实包。但 build 机的 symlink 用絕對路徑(如 /d/Downloads/...),跨平台失效,
+# 且 tarball 排除了 .next/node_modules,所以 VPS 上根本沒有這層目錄。
+#
+# 修法:不依賴 tarball 帶過來的 symlink,而是掃描 .next/server/ 下的 .nft.json
+# 和 chunk 文件,提取所有 "pkgname-<16位hex>" 模式,在 .next/node_modules/ 重建
+# symlink 指向 $APP/node_modules/<pkgname>。這樣 hash 變了也能自適應。
+mkdir -p "$APP/.next/node_modules"
+grep -rohE '[a-z@][a-z0-9@/_.-]+-[a-f0-9]{16}' "$APP/.next/server/" 2>/dev/null \
+  | sort -u \
+  | while read -r mod; do
+      pkg="${mod%-*}"
+      if [ -d "$APP/node_modules/$pkg" ]; then
+        ln -sfn "$APP/node_modules/$pkg" "$APP/.next/node_modules/$mod"
+        echo "relinked: $mod -> $APP/node_modules/$pkg"
+      else
+        echo "!!! [warn] $mod: package $pkg not found in node_modules, skipping"
+      fi
+    done
+
+cd "$APP"
+
+echo "---[9/9] pm2 restart---"
+pm2 restart iiqe-app 2>&1 || pm2 start npm --name iiqe-app -- run start -- -p 3001 2>&1
+pm2 save
+sleep 2
+pm2 status iiqe-app
+
+echo "---ok---"
