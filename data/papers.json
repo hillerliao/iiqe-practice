@@ -5,9 +5,9 @@
     "name": "卷一:保險原理及實務",
     "bySource": {
       "exam": 400,
-      "mock": 900
+      "mock": 919
     },
-    "total": 1300
+    "total": 1319
   },
   {
     "id": "P3",
@@ -15,8 +15,8 @@
     "name": "卷三:長期保險",
     "bySource": {
       "exam": 400,
-      "mock": 779
+      "mock": 865
     },
-    "total": 1179
+    "total": 1265
   }
 ]
