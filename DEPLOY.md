@@ -1,348 +1,271 @@
-# 部署到 VPS
+# IIQE App 部署到 VPS
 
-本文檔介紹如何把 IIQE App 部署到任意 Linux VPS(Ubuntu 22.04+ 為例)。
+本项目保留两条**互斥**的生产部署路径：
 
-架構:
-- **宿主 nginx**(已預裝):反向代理 + HTTPS 終結 + certbot 證書管理
-- **next-app 容器**:Next.js 16 + Prisma 7 + SQLite,監聽 `127.0.0.1:3001`
-- **SQLite** 文件:Docker named volume `iiqe-data`,持久化在宿主
+- **Docker Compose**：宿主 Nginx 反向代理 Docker 容器，SQLite 位于 Docker named volume 的 `/data/prod.db`。
+- **PM2 + GitHub Actions**：GitHub 推送 `main` 后触发 VPS 拉取、构建和 PM2 重载，SQLite 位于 VPS 的共享目录。
 
----
-
-## 0. 前置條件
-
-### VPS 端
-- 系統:Ubuntu 22.04+ (推薦 24.04)
-- 用戶:具備 `sudo` 權限的登入帳號
-- 已裝:
-  - Docker Engine 24+
-  - Docker Compose plugin(`docker compose version` 可用)
-  - Git
-  - **nginx**(`/etc/nginx/conf.d/` 風格,已有其他站共存)
-  - **certbot + nginx 插件**(`apt install certbot python3-certbot-nginx`)
-
-### 網絡
-- 域名 A 記錄指向 VPS 公網 IP
-- VPS 防火牆(雲提供商安全組 / iptables / ufw)放行 **80 / 443** 端口
+同一台服务器同一套站点只能选择一条路径。不要让 Docker 和 PM2 同时监听 `127.0.0.1:3001`，也不要在未迁移数据库的情况下从一条路径直接切到另一条路径。
 
 ---
 
-## 1. 首次部署
+## A. PM2 + GitHub Actions（推荐的 Git 拉取式发布）
 
-### 1.1 SSH 登入 VPS 並確認環境
+发布链路如下：
+
+```text
+push main
+  → GitHub Actions
+  → SSH 调用 VPS 的 deploy-pm2-from-git.sh <commit-sha>
+  → VPS fetch 指定提交、npm ci、Prisma generate、Next.js build
+  → 备份 SQLite、同步 schema、seed、verify-storage
+  → PM2 重载 iiqe-app，并检查 /api/papers
+```
+
+GitHub Actions **不在 Runner 构建应用**。构建发生在 VPS，符合“VPS 拉取代码并 build，再由 PM2 重启”的部署方式。
+
+### A.1 重要前提
+
+- Ubuntu 22.04+，使用普通部署用户，例如 `deploy`。
+- Nginx 已将域名反代到 `127.0.0.1:3001`，并由 Certbot 管理 HTTPS。
+- VPS 使用 Node.js **22**，与项目的 Docker / Vercel 运行时一致。
+- 同一个 SQLite 应用只运行一个 PM2 fork 实例。不可横向扩展多个进程或多个主机。
+- 项目当前没有受版本控制的 `prisma/migrations`。发布脚本因此使用 `prisma db push --accept-data-loss=false`：可能丢失数据的 schema 变化会失败而不会自动执行。未来应单独建立、审查并提交 migrations，再改为 `prisma migrate deploy`。
+
+### A.2 VPS 首次初始化
+
+以下命令以部署用户 `deploy` 和目录 `/home/deploy` 为例。替换为你的实际用户名。
+
+```bash
+# 1. 安装运行时和原生依赖的构建工具
+sudo apt update
+sudo apt install -y git curl build-essential python3
+
+# 2. 安装 Node.js 22（也可改用 nvm；重点是 node --version 为 v22.x）
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs
+node --version
+npm --version
+
+# 3. 安装 PM2
+sudo npm install --global pm2
+pm2 --version
+
+# 4. 让 PM2 在服务器重启后恢复服务
+pm2 startup systemd -u deploy --hp /home/deploy
+# 按上一条命令输出的 sudo 命令执行一次。
+```
+
+为 VPS 创建一把**专用于从 GitHub 只读拉取此仓库**的 Deploy Key。不要复用 GitHub Actions 登录 VPS 的私钥。
+
+```bash
+sudo -u deploy ssh-keygen -t ed25519 -f /home/deploy/.ssh/iiqe_github_readonly -C "iiqe-vps-readonly"
+sudo -u deploy sh -c 'cat >> ~/.ssh/config <<"EOF"
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/iiqe_github_readonly
+  IdentitiesOnly yes
+EOF'
+sudo -u deploy ssh-keyscan -H github.com >> /home/deploy/.ssh/known_hosts
+```
+
+将 `/home/deploy/.ssh/iiqe_github_readonly.pub` 的内容添加到 GitHub 仓库：
+
+`Settings → Deploy keys → Add deploy key`
+
+保持 **Allow write access 未勾选**。随后测试连接并克隆仓库：
+
+```bash
+sudo -u deploy ssh -T git@github.com
+sudo -u deploy git clone git@github.com:<owner>/<repo>.git /home/deploy/iiqe-app
+sudo -u deploy git -C /home/deploy/iiqe-app checkout main
+```
+
+创建不受 Git 管理的数据目录。脚本的默认目录与代码同级，分别保存私密环境变量、SQLite 文件、备份与 PM2 日志。
+
+```bash
+sudo -u deploy install -d -m 700 \
+  /home/deploy/iiqe-shared \
+  /home/deploy/iiqe-shared/data \
+  /home/deploy/iiqe-shared/backups \
+  /home/deploy/iiqe-shared/logs
+
+sudo -u deploy cp /home/deploy/iiqe-app/.env.production.example \
+  /home/deploy/iiqe-shared/.env.production
+sudo -u deploy chmod 600 /home/deploy/iiqe-shared/.env.production
+sudo -u deploy editor /home/deploy/iiqe-shared/.env.production
+```
+
+`.env.production` 至少应填入高熵的 `AUTH_SECRET` 和 `ADMIN_TOKEN`。`DATABASE_URL` 在 PM2 发布脚本中会被强制指向 `/home/deploy/iiqe-shared/data/prod.db`，因此不需要也不应将数据库放回仓库的 `prisma/` 目录。
+
+生成密钥示例：
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
+```
+
+首次构建与启动可在 VPS 手动执行。请把 `<main-commit-sha>` 改为 `main` 当前的完整 40 位提交 SHA：
+
+```bash
+cd /home/deploy/iiqe-app
+git fetch origin main
+git rev-parse origin/main
+bash scripts/deploy-pm2-from-git.sh <main-commit-sha>
+pm2 status iiqe-app
+curl -fsS http://127.0.0.1:3001/api/papers > /dev/null && echo healthy
+```
+
+首次启动后，如需导入题库，发布脚本会执行幂等的 `prisma/seed.ts`。确保依赖的题库 JSON 已被纳入仓库或按该 seed 脚本的读取方式放置；不要把用户数据库存入 Git 工作目录。
+
+### A.3 将已有 PM2 部署切换到此路径
+
+你当前已有 PM2 服务时，先确定它实际使用的端口、工作目录、环境文件和数据库位置：
+
+```bash
+pm2 describe iiqe-app
+pm2 env 0
+pm2 logs iiqe-app --lines 100
+```
+
+在切换前停写并备份现有 SQLite 文件。**不要直接复制正在写入的 `.db` 文件**；优先在短暂维护窗口中停止该服务后复制：
+
+```bash
+pm2 stop iiqe-app
+cp -a /现有/数据库/prod.db /home/deploy/iiqe-shared/data/prod.db
+pm2 delete iiqe-app
+```
+
+确认新共享数据库路径的拥有者是部署用户，然后运行 A.2 的首次发布命令。Nginx 仍可继续代理 `127.0.0.1:3001`。
+
+> 如果现有服务实际上是 Docker，请不要执行上述步骤。Docker 的命名卷需要先按 Docker 的备份/恢复方式导出，再在维护窗口显式导入 PM2 的共享目录。两种路径数据库位置不同。
+
+### A.4 GitHub Actions 配置
+
+提交的 `.github/workflows/deploy-vps.yml` 会在 `main` 有 push 时自动运行，也可在 `Actions → Deploy VPS → Run workflow` 手动运行。工作流有并发控制：新的 main 发布会取消尚未完成的旧发布。
+
+在仓库 `Settings → Secrets and variables → Actions` 中配置：
+
+| 类型 | 名称 | 内容 |
+| --- | --- | --- |
+| Secret | `VPS_HOST` | VPS 域名或 IP 地址 |
+| Secret | `VPS_USER` | 部署用户名，例如 `deploy` |
+| Secret | `VPS_SSH_PRIVATE_KEY` | GitHub Actions 登录 VPS 的完整私钥 |
+| Secret | `VPS_SSH_KNOWN_HOSTS` | VPS 主机公钥行，例如 `ssh-keyscan -H <host>` 的输出 |
+| Secret | `VPS_SSH_PORT` | SSH 端口；默认 22 时可留空 |
+| Variable（可选） | `VPS_APP_DIR` | VPS Git 工作目录；默认 `/home/<VPS_USER>/iiqe-app` |
+
+为 Actions 单独创建 SSH 密钥，并把其公钥加入 VPS 部署用户的 `~/.ssh/authorized_keys`。建议使用受限 key，仅允许运行发布脚本，例如：
+
+```text
+command="/home/deploy/iiqe-app/scripts/deploy-pm2-from-git.sh",no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty ssh-ed25519 AAAA... github-actions-deploy
+```
+
+如果使用这个严格的 `command=` 限制，需要将工作流改成不传远程命令，或在 VPS 上包装一个仅接受 SHA 的受限命令。默认工作流会显式调用发布脚本，因此更简单的初始配置是仅限制 SSH 用户与密钥权限，并将该私钥仅用于此仓库的 Actions Secret。
+
+GitHub Actions 到 VPS 的密钥仅负责 SSH 登录；VPS 从 GitHub `git fetch` 使用 A.2 配置的只读 Deploy Key。这两个凭证必须分离。
+
+### A.5 运行机制与安全边界
+
+`scripts/deploy-pm2-from-git.sh` 会：
+
+1. 使用 `flock` 防止并发部署。
+2. `git fetch origin main`，验证收到的 SHA 是 `origin/main` 可达提交，再精确 reset 到该 SHA。
+3. 执行 `npm ci`、显式 `prisma generate` 和 `npm run build`。任何一步失败，当前 PM2 服务不会被重启。
+4. 构建成功后，通过 SQLite 的在线 backup API 备份现有数据库到 `~/iiqe-shared/backups/`，默认保留最近 14 份。
+5. 使用不接受数据丢失的 `prisma db push` 同步 schema，随后执行 seed 和 `verify-storage`。
+6. 使用 `ecosystem.config.cjs` 的单进程 fork 模式 `pm2 startOrReload --update-env`，并检查本机 `/api/papers`。
+
+这不是严格的零停机发布：单个 Next.js/SQLite 进程重载会有极短暂的请求切换。其优先保证是：构建或 schema 校验失败不会中断旧进程；数据不随 Git 代码目录被清理。
+
+### A.6 日常操作、回滚与排障
+
+```bash
+# 查看应用和日志
+pm2 status iiqe-app
+pm2 logs iiqe-app --lines 200
+journalctl --user -u pm2-deploy -n 100 --no-pager  # 若系统实际 unit 名称不同，以 pm2 startup 输出为准
+
+# 手动重试部署某个 main 上的提交
+cd /home/deploy/iiqe-app
+bash scripts/deploy-pm2-from-git.sh <40-character-main-commit-sha>
+
+# 查看当前线上代码提交
+cd /home/deploy/iiqe-app
+git rev-parse HEAD
+
+# 查看数据库备份
+ls -lht /home/deploy/iiqe-shared/backups/
+```
+
+回滚应在维护窗口进行：从 GitHub 找到一个仍属于 `main` 历史的已知良好提交，手动用该 SHA 调用发布脚本。脚本拒绝部署不属于当前 `origin/main` 历史的提交。若 schema 或数据已变化，先保留当前数据库备份，再评估是否恢复对应的 SQLite 备份；代码回滚本身不自动回滚数据库 schema。
+
+常见问题：
+
+- **`Permission denied (publickey)`，发生在 `git fetch`**：检查 VPS 上 `/home/deploy/.ssh/config`、Deploy Key、`known_hosts` 和 `sudo -u deploy ssh -T git@github.com`。
+- **构建时 native module 失败**：确认 Node 22、`build-essential`、`python3` 和可访问的 npm registry。
+- **`database is locked`**：确认只运行一个 `iiqe-app` PM2 实例，且没有同时运行旧 Docker 容器或另一个维护脚本。
+- **Nginx 返回 502**：先运行 `pm2 status iiqe-app`、`pm2 logs iiqe-app --lines 200`，然后检查 `curl http://127.0.0.1:3001/api/papers`。
+- **工作流 SSH 失败**：重新生成并更新 `VPS_SSH_KNOWN_HOSTS`，不要为了通过部署而关闭 `StrictHostKeyChecking`。
+
+---
+
+## B. Docker Compose（既有容器路径）
+
+若选择 Docker 路径，请遵循本节，且不要配置或运行 A 节的 PM2 服务。
+
+### B.1 前置条件
+
+VPS 需要 Docker Engine 24+、Docker Compose plugin、Git、Nginx、Certbot 和 nginx 插件。域名 A 记录指向 VPS，云安全组/防火墙仅公开 80 和 443。
+
+### B.2 首次部署
 
 ```bash
 ssh <your-username>@<your-vps-ip>
-
-id <your-username>       # 確認 uid(預期 1000)
-docker --version
-docker compose version
-nginx -v                 # 確認 nginx 已裝
-certbot --version        # 確認 certbot 已裝
-```
-
-### 1.2 拉取代碼
-
-```bash
 cd /home/<your-username>
 git clone <your-repo-url> iiqe-app
 cd iiqe-app
-```
-
-### 1.3 配置 `.env.production`
-
-```bash
 cp .env.production.example .env.production
 $EDITOR .env.production
 ```
 
-填入:
+填入至少：
+
 ```ini
 DATABASE_URL=file:/data/prod.db
 UID=1000
 GID=1000
-AUTH_SECRET=<隨機 32 字元以上字符串>
+AUTH_SECRET=<随机 32 字节以上字符串>
+ADMIN_TOKEN=<高熵随机值>
 ```
 
-`DOMAIN` / `LETSENCRYPT_EMAIL` 僅作記錄用,**容器內不讀取**。
-
-### 1.4 安裝 nginx 站點 + 申請證書
+编辑 `nginx/iiqe.conf`，将 `your-domain.example.com` 改为真实域名，然后：
 
 ```bash
-# 1. 把 nginx/iiqe.conf 裡的 your-domain.example.com 改成真實域名
-sed -i 's/your-domain.example.com/你的真實域名/g' nginx/iiqe.conf
-
-# 2. 安裝站點(此時只有 HTTP 段,先 reload nginx)
-#    連同 snippets/ 一起拷貝,include 才能找到 header 片段
 sudo cp nginx/iiqe.conf /etc/nginx/conf.d/iiqe.conf
 sudo cp -r nginx/snippets /etc/nginx/
 sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d <your-domain> --email <your-email> --agree-tos --no-eff-email
 
-# 3. 一鍵申請證書 + 自動補上 HTTPS 段 + 80→443 跳轉
-sudo certbot --nginx -d 你的真實域名 --email 你的郵箱 --agree-tos --no-eff-email
-```
-
-`certbot --nginx` 會自動:
-- 申請並部署 Let's Encrypt 證書
-- 在 `iiqe.conf` 裡加一個 `server { listen 443 ssl; ... }` 塊(連同 `include snippets/iiqe-headers.conf;` 一起複製)
-- 把 80 端口的 `location /` 改成 `301 https://$host$request_uri`
-
-執行後檢查:
-```bash
-sudo nginx -t
-sudo cat /etc/nginx/conf.d/iiqe.conf    # 應該看到 HTTPS 段和 snippets include
-```
-
-### 1.5 配置自動續期
-
-certbot 安裝時會自動創建 systemd timer。確認:
-
-```bash
-sudo systemctl list-timers | grep certbot
-# 應看到 certbot.timer,下次執行時間 < 90 天
-
-# 手動測試續期(不會真的續)
-sudo certbot renew --dry-run
-```
-
----
-
-## 1.6 構建並啟動容器
-
-```bash
 docker compose up -d --build
-```
-
-> 首次構建耗時較長(~5-10 分鐘),因 `better-sqlite3` 需要下載 prebuild 或源碼編譯。後續構建會利用 Docker layer cache,只需數十秒。
-
-### 1.7 執行首次數據庫遷移
-
-```bash
-docker compose --profile init run --rm migrate
-```
-
-看到類似輸出即成功:
-```
-3 migrations found in prisma/migrations
-Applying migration 20260703082945_init
-Applying migration 20260706111741_add_note
-All migrations applied successfully.
-```
-
-### 1.8 (可選)導入題庫
-
-若首次部署且 SQLite 為空,需導入初始題目。
-
-**模擬題**(`scripts/mock_p1.json`、`scripts/mock_p3.json`)已在鏡像內,可直接導入。
-**真題**(`../.cache_paper1.json`、`../_p3_clean.json`)位於專案父目錄,
-不在 Docker build context 內,**需手動 cp 進容器**:
-
-```bash
-# 1. 把真題 JSON 上傳到 VPS(若尚未上傳)
-scp .cache_paper1.json <your-username>@<vps>:/home/<your-username>/iiqe-app/
-scp _p3_clean.json <your-username>@<vps>:/home/<your-username>/iiqe-app/
-
-# 2. 複製到容器內(seed.ts 從 /app/../ 即 /app/ 讀取)
-docker cp .cache_paper1.json iiqe-app:/app/.cache_paper1.json
-docker cp _p3_clean.json iiqe-app:/app/_p3_clean.json
-
-# 3. 執行 seed
-docker compose exec next-app npx tsx prisma/seed.ts
-```
-
-> seed.ts 找不到檔案時會自動跳過,不影響已有數據。若只導入模擬題,直接執行第 3 步即可。
-
-### 1.9 驗證
-
-```bash
-# 查看容器狀態(應為 Up / healthy)
 docker compose ps
-
-# 健康檢查(從宿主測容器端口)
-curl -s http://127.0.0.1:3001/api/papers | head
-
-# 外部訪問
-curl -I https://your-domain.com
+curl -fsS http://127.0.0.1:3001/api/papers > /dev/null && echo healthy
 ```
 
----
+> 当前 Dockerfile 需要显式执行 `prisma generate` 才能从干净 checkout 生成被 Git 忽略的 Prisma client。Docker 路径投入使用前，应先修复并验证该构建步骤；不要因 `DEPLOY.md` 的旧文档而假定 `npm ci` 有 Prisma postinstall。
 
-## 2. 升級
+Docker 的数据在 `iiqe-data` named volume 中。更新代码时：
 
 ```bash
 cd /home/<your-username>/iiqe-app
 git pull
 docker compose up -d --build
-# 僅在 schema 變更時:
-docker compose --profile init run --rm migrate
 ```
 
-`iiqe-data` volume 不會被刪除,SQLite 數據保留。
+不要因为更新镜像而删除 `iiqe-data` volume；删除前必须完成可恢复备份。
 
 ---
 
-## 3. 數據備份與恢復
+## C. 旧的上传构建产物脚本
 
-### 備份
-
-```bash
-docker compose exec next-app cp /data/prod.db /data/prod.db.bak
-docker cp iiqe-app:/data/prod.db.bak ./prod-$(date +%F).db
-docker compose exec next-app rm /data/prod.db.bak
-```
-
-### 恢復
-
-```bash
-docker compose stop next-app
-docker cp ./prod-2026-07-07.db iiqe-app:/data/prod.db
-docker compose start next-app
-```
-
-### 建議:自動化備份
-
-在 VPS 上加 cron job,每天凌晨把 SQLite 拷貝到對象存儲(OSS / S3)。本文檔不展開。
-
----
-
-## 4. 故障排查
-
-### 4.1 502 Bad Gateway
-
-**症狀**:訪問 https://your-domain.com 返回 502。
-
-**原因**:nginx 反代的 `127.0.0.1:3001` 沒人接 — `next-app` 容器沒在跑。
-
-**排查**:
-```bash
-docker compose ps
-docker compose logs --tail=200 next-app
-
-# 直接測容器是否監聽
-curl -I http://127.0.0.1:3001/api/papers
-```
-
-### 4.2 next-app 容器反覆重啟
-
-**症狀**:`docker compose ps` 顯示 `iiqe-app` 狀態為 `Restarting`。
-
-**排查**:
-```bash
-docker compose logs --tail=200 next-app
-```
-
-常見原因:
-- `Error: P1001 Can't reach database server`:`/data` volume 未掛載或 DATABASE_URL 路徑錯
-- `Error: P3009 migrate found failed migrations`:跳過了 migrate 步驟。執行:
-  ```bash
-  docker compose --profile init run --rm migrate
-  ```
-
-### 4.3 證書過期 / HTTPS 失效
-
-**症狀**:瀏覽器提示證書過期。
-
-**排查**:
-```bash
-# 證書有效期
-sudo certbot certificates
-
-# 手動續期
-sudo certbot renew
-
-# 確認 systemd timer 正常
-sudo systemctl status certbot.timer
-```
-
-### 4.4 certbot 申請失敗
-
-**症狀**:`sudo certbot --nginx -d your-domain.com` 報錯(常見:`Challenge failed for domain`、`Timeout during connect`)。
-
-**排查**:
-```bash
-# 確認 DNS 解析正確
-dig +short your-domain.com
-
-# 確認 80 端口從公網可達,且返回的是這台 nginx(而非默認站)
-curl -I http://your-domain.com/
-
-# 看 nginx 錯誤日誌
-sudo tail -50 /var/log/nginx/iiqe.error.log
-
-# 手動乾跑,看詳細錯誤
-sudo certbot --nginx -d your-domain.com --email your-email --agree-tos --no-eff-email --dry-run
-```
-
-常見原因:
-- DNS A 記錄尚未生效
-- VPS 防火牆(雲安全組 / iptables / ufw)未放行 80
-- `nginx -t` 之後忘記 `systemctl reload nginx`,nginx 還在用舊站點
-
-### 4.5 SQLite "database is locked"
-
-**症狀**:API 返回 500,日誌含 `database is locked`。
-
-**原因**:多個進程同時寫 SQLite。當前 docker-compose 設計只跑單個 `next-app` 進程,理論上不會發生。若發生:
-- 確認沒有意外啟動了 `migrate` 容器仍在運行(`docker ps`)
-- 重啟 `next-app`:`docker compose restart next-app`
-
-### 4.6 volume 權限錯誤
-
-**症狀**:`next-app` 啟動日誌含 `EACCES` 或 `permission denied` 涉及 `/data/prod.db`。
-
-**修復**:
-```bash
-id <your-username>
-# 編輯 .env.production 設 UID/GID 為該值
-
-# 重建容器,並重建 volume(會丟失現有數據,請先備份!)
-docker compose down
-docker volume rm iiqe-data
-docker compose up -d --build
-docker compose --profile init run --rm migrate
-docker compose exec next-app npx tsx prisma/seed.ts   # 若需要重新導入題庫
-```
-
----
-
-## 5. 卸載
-
-```bash
-cd /home/<your-username>/iiqe-app
-docker compose down --remove-orphans
-docker image rm iiqe-app:latest
-
-# 刪除 SQLite(會丟失數據,請先備份)
-docker volume rm iiqe-data
-
-# 刪除 nginx 配置(可選)
-sudo rm /etc/nginx/conf.d/iiqe.conf
-sudo systemctl reload nginx
-
-# 刪除證書(可選)
-sudo certbot delete --cert-name your-domain.example.com
-
-# 刪除代碼
-cd /home/<your-username>
-rm -rf iiqe-app
-```
-
----
-
-## 6. 安全建議
-
-1. **SSH**:VPS 關閉密碼登錄,僅允許密鑰;必要時改 SSH 端口
-2. **防火牆**:雲提供商安全組僅放行 80/443;VPS 本地用 ufw 進一步收緊
-3. **自動更新**:Ubuntu 啟用 `unattended-upgrades`
-4. **密鑰輪換**:定期更換 `AUTH_SECRET`(目前應用未使用,留作日後)
-5. **HTTPS 強制**:已通過 80 → 301 HTTPS 跳轉實現
-6. **密鑰管理**:`.env.production` 不進 git;若曾部署到其他平台,清理對應 token
-
----
-
-## 7. 進階(可選,本文檔不展開)
-
-- CI/CD:GitHub Actions 推送觸發自動部署
-- 監控:Prometheus + Grafana + cAdvisor,或 UptimeRobot 外網探活
-- 數據庫遷移到 PostgreSQL(若用戶量上升,SQLite 寫入性能成為瓶頸)
-- 加 WAF(如 Cloudflare 代理)
+仓库根目录的 `deploy-remote.sh` 与 `deploy-remote.ps1` 是早期“本机 build → 打包 `.next` → SCP 到 VPS → PM2 restart”的流程。它们保留以便追溯，但不要与 A 节的 Git 拉取式发布交替使用：两者使用不同的代码替换方式和数据库目录约定。
