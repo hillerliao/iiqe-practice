@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAttempt, type AttemptRecord, type AnswerRecord } from "@/lib/kv";
 import { getQuestionById } from "@/lib/data";
+import { gradeAnswer, normalizeAnswer } from "@/lib/grading";
 import { requireSession } from "@/lib/auth";
 
 const REDO_SOURCE = "wrongbook-redo";
@@ -43,13 +44,13 @@ export async function POST(req: NextRequest) {
   for (const a of valid) {
     const q = getQuestionById(a.questionId);
     if (!q) continue; // 題目不存在則跳過
-    const paperId = a.questionId.split("-")[0];
-    const isCorrect =
-      (a.userAnswer ?? "").toUpperCase() === (q.answer ?? "").toUpperCase();
+    const paperId = q.id.split("-")[0];
+    const normalizedAnswer = normalizeAnswer(a.userAnswer);
+    if (!normalizedAnswer) continue;
     const rec: AnswerRecord = {
       questionId: a.questionId,
-      userAnswer: a.userAnswer as string,
-      isCorrect,
+      userAnswer: normalizedAnswer,
+      isCorrect: gradeAnswer(q, normalizedAnswer),
       timeSpentMs: null,
       createdAt: new Date().toISOString(),
     };
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
       finishedAt: now,
       durationSec: null,
       totalQ: list.length,
+      questionIds: list.map((answer) => answer.questionId),
       correct: correctCount,
       answers: list,
     };

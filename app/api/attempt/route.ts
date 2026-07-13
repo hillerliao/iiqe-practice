@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAttempt, updateAttempt, getNote, listNotes, AnswerRecord } from "@/lib/kv";
+import { getAttempt, getNote, listNotes } from "@/lib/kv";
+import { finishAttempt, submitAnswer, DomainError } from "@/lib/attempt-service";
 import { getQuestionById, getQuestions, getPapers } from "@/lib/data";
 import { requireSession } from "@/lib/auth";
 
@@ -31,7 +32,9 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  const allQuestions = getQuestions(attempt.paperId, attempt.source ?? "exam");
+  const allQuestions = (attempt.questionIds.length > 0
+    ? attempt.questionIds.map((qid) => getQuestionById(qid)).filter((q): q is NonNullable<typeof q> => q != null)
+    : getQuestions(attempt.paperId, attempt.source ?? "exam"));
   const paperInfo = getPapers().find((p) => p.id === attempt.paperId);
 
   return NextResponse.json({
@@ -89,40 +92,17 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "questionId 必填" }, { status: 400 });
     }
     try {
-      const question = getQuestionById(questionId);
-      if (!question) {
-        return NextResponse.json({ error: "Question not found" }, { status: 404 });
-      }
-      const isCorrect = (userAnswer ?? "").toUpperCase() === question.answer.toUpperCase();
-
-      const attempt = await getAttempt(id);
-      if (!attempt) {
-        return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
-      }
-      if (attempt.sessionId !== session.sessionId) {
-        return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
-      }
-
-      const existingIdx = attempt.answers.findIndex((a) => a.questionId === questionId);
-      const answerRecord: AnswerRecord = {
+      const answerRecord = await submitAnswer({
+        sessionId: session.sessionId,
+        attemptId: id,
         questionId,
         userAnswer: userAnswer ?? "",
-        isCorrect,
         timeSpentMs: timeSpentMs ?? null,
-        createdAt: new Date().toISOString(),
-      };
-
-      if (existingIdx >= 0) {
-        attempt.answers[existingIdx] = answerRecord;
-      } else {
-        attempt.answers.push(answerRecord);
-      }
-
-      await updateAttempt(id, { answers: attempt.answers });
-
-      return NextResponse.json({ answer: answerRecord, isCorrect });
+      });
+      return NextResponse.json({ answer: answerRecord, isCorrect: answerRecord.isCorrect });
     } catch (e) {
       console.error("[PATCH /api/attempt answer] 寫入失敗:", e);
+      if (e instanceof DomainError) return NextResponse.json({ error: e.message, code: e.code }, { status: e.status });
       return NextResponse.json(
         { error: e instanceof Error ? e.message : "寫入答案失敗" },
         { status: 500 }
@@ -131,16 +111,13 @@ export async function PATCH(req: NextRequest) {
   }
 
   if (action === "finish") {
-    const attempt = await getAttempt(id);
-    if (!attempt) {
-      return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
+    try {
+      const attempt = await finishAttempt(session.sessionId, id);
+      return NextResponse.json({ attempt, correct: attempt.correct, total: attempt.answers.length });
+    } catch (e) {
+      if (e instanceof DomainError) return NextResponse.json({ error: e.message, code: e.code }, { status: e.status });
+      throw e;
     }
-    if (attempt.sessionId !== session.sessionId) {
-      return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
-    }
-    const correct = attempt.answers.filter((a) => a.isCorrect).length;
-    await updateAttempt(id, { finishedAt: new Date().toISOString(), correct });
-    return NextResponse.json({ attempt, correct, total: attempt.answers.length });
   }
 
   return NextResponse.json({ error: "Unknown action" }, { status: 400 });

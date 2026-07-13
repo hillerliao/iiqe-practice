@@ -54,13 +54,14 @@ $tarList = $tarItems | Where-Object { Test-Path -LiteralPath $_ }
 # PowerShell 5.1 没有原生 tar(Win10 1803+ 有 tar.exe),用 Compress-Archive 走 zip 改走 tar
 # 这里假设环境有 tar.exe(Git for Windows / Windows 10+ 自带)
 #
-# 排除 .next/node_modules/:Next 16 Turbopack 在 build 时把 native module 的
-# 绝对路径 symlink(如 /d/Downloads/...)写进这里,跨平台会失效。next start
-# 启动时如果找不到会自己从 $APP/node_modules/require,不依赖这层 symlink。
+# 排除只在本机构建/开发时使用的目录：
+# - .next/node_modules/:Next 16 Turbopack 的跨平台 native module 绝对路径 symlink
+# - .next/cache/:webpack/Turbopack 构建缓存，next start 不读取
+# - .next/dev/:next dev 的开发产物，生产运行不需要
 $paths = ($tarList | ForEach-Object { '"' + $_ + '"' }) -join ' '
-$tarCmd = "tar -czf $tarball --exclude=.next/node_modules $paths"
+$tarCmd = "tar -czf $tarball --exclude=.next/node_modules --exclude=.next/cache --exclude=.next/dev $paths"
 Write-Output "[1/4] packing: $tarCmd"
-& 'D:\apps\Git\usr\bin\tar.exe' -czf $tarball '--exclude=.next/node_modules' @tarList
+& 'D:\apps\Git\usr\bin\tar.exe' -czf $tarball '--exclude=.next/node_modules' '--exclude=.next/cache' '--exclude=.next/dev' @tarList
 if ($LASTEXITCODE -ne 0) {
   Write-Output "ERROR: tar failed (exit=$LASTEXITCODE)"
   exit 1

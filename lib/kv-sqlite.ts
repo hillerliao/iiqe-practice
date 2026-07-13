@@ -5,11 +5,20 @@
 // 表与字段由 prisma/schema.prisma 决定;这里用 Prisma client 操作,避免写裸 SQL。
 
 import { getPrisma } from "@/lib/db";
-import type { AttemptRecord, AnswerRecord, FavoriteRecord, NoteRecord, FeedbackRecord } from "@/lib/kv";
+import type { AttemptRecord, AnswerRecord, FavoriteRecord, NoteRecord, FeedbackRecord, ToolCallRecord } from "@/lib/kv";
 import type { QuestionData } from "@/lib/data";
 import type { Prisma } from "@/lib/generated/prisma";
 
 type TransactionClient = Prisma.TransactionClient;
+
+function parseQuestionIds(value: string): string[] {
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : [];
+  } catch {
+    return [];
+  }
+}
 
 type FeedbackRow = {
   id: string;
@@ -53,6 +62,7 @@ function toAttemptRecord(a: {
   finishedAt: Date | null;
   durationSec: number | null;
   totalQ: number;
+  questionIds: string;
   correct: number;
   answers: Array<{
     questionId: string;
@@ -72,6 +82,7 @@ function toAttemptRecord(a: {
     finishedAt: a.finishedAt instanceof Date ? a.finishedAt.toISOString() : a.finishedAt,
     durationSec: a.durationSec,
     totalQ: a.totalQ,
+    questionIds: parseQuestionIds(a.questionIds),
     correct: a.correct,
     answers: a.answers.map(toAnswerRecord),
   };
@@ -254,6 +265,7 @@ export async function createAttemptSqlite(record: AttemptRecord): Promise<void> 
         finishedAt: record.finishedAt ? new Date(record.finishedAt) : null,
         durationSec: record.durationSec,
         totalQ: record.totalQ,
+        questionIds: JSON.stringify(record.questionIds),
         correct: record.correct,
       },
       update: {},
@@ -313,6 +325,7 @@ export async function updateAttemptSqlite(
           : null,
         durationSec: data.durationSec === undefined ? existing.durationSec : data.durationSec,
         totalQ: data.totalQ ?? existing.totalQ,
+        questionIds: data.questionIds === undefined ? existing.questionIds : JSON.stringify(data.questionIds),
         correct: data.correct ?? existing.correct,
       },
     });
@@ -365,6 +378,31 @@ export async function listAttemptsSqlite(sessionId: string): Promise<AttemptReco
     include: { answers: { orderBy: { createdAt: "asc" } } },
   });
   return rows.map(toAttemptRecord);
+}
+
+export async function getToolCallSqlite(sessionId: string, id: string): Promise<ToolCallRecord | null> {
+  const row = await getPrisma().toolCall.findUnique({ where: { id: `${sessionId}::${id}` } });
+  if (!row || row.sessionId !== sessionId) return null;
+  return { ...row, id, createdAt: row.createdAt.toISOString() };
+}
+
+export async function createToolCallSqlite(record: ToolCallRecord): Promise<boolean> {
+  try {
+    await getPrisma().toolCall.create({
+      data: {
+        id: `${record.sessionId}::${record.id}`,
+        sessionId: record.sessionId,
+        toolName: record.toolName,
+        requestHash: record.requestHash,
+        responseJson: record.responseJson,
+        createdAt: new Date(record.createdAt),
+      },
+    });
+    return true;
+  } catch (error) {
+    if (error instanceof Error && /unique constraint/i.test(error.message)) return false;
+    throw error;
+  }
 }
 
 export async function addFavoriteSqlite(

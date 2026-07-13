@@ -72,7 +72,7 @@ async function main() {
 
   console.log("\n=== 测试 6: ref 格式校验 ===");
   check("空 ref → null",     getHandbookHref("exam3-2022", "") === null);
-  check("单段 ref '1' → null", getHandbookHref("exam3-2022", "1") === null);
+  check("单段 ref '1' → ch-1", getHandbookHref("exam3-2022", "1") === "/studynotes/exam3-2022#ch-1");
   check("ref 'foo' → null", getHandbookHref("exam3-2022", "abc") === null);
   check("ref 含字母后缀 '3.4a' → ch-3-4", getHandbookHref("exam3-2022", "3.4a") === "/studynotes/exam3-2022#ch-3-4");
 

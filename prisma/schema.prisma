@@ -53,6 +53,7 @@ model Attempt {
   finishedAt  DateTime?
   durationSec Int?
   totalQ      Int
+  questionIds String    @default("[]")
   correct     Int       @default(0)
   answers     Answer[]
 
@@ -76,6 +77,18 @@ model Answer {
   @@index([attemptId])
   @@index([questionId])
   @@map("Answer")
+}
+
+model ToolCall {
+  id           String   @id
+  sessionId    String
+  toolName     String
+  requestHash  String
+  responseJson String
+  createdAt    DateTime @default(now())
+
+  @@index([sessionId])
+  @@map("ToolCall")
 }
 
 model Favorite {

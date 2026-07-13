@@ -3,15 +3,31 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
+  BookOpen,
   Copy,
   Check,
   Search,
   MessageCircle,
   MoreHorizontal,
+  Sparkles,
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
 import { buildSearchQuery } from "@/components/QuestionSearchButtons";
+import { writeTextToClipboard } from "@/lib/clipboard";
+import {
+  QUESTION_SEARCH_PROVIDER_BY_ID,
+  QUESTION_SEARCH_PROVIDERS,
+  type QuestionSearchIconKind,
+} from "@/lib/question-search";
+
+const SEARCH_PROVIDER_ICONS: Record<QuestionSearchIconKind, LucideIcon> = {
+  search: Search,
+  chat: MessageCircle,
+  sparkles: Sparkles,
+  "book-open": BookOpen,
+};
 
 type QuestionActionsProps = {
   number?: number;
@@ -34,14 +50,14 @@ export function QuestionActions({
 }: QuestionActionsProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const query = buildSearchQuery({ number, question, options, ref, paper });
-  const encoded = encodeURIComponent(query);
-  const googleUrl = `https://www.google.com/search?q=${encoded}`;
-  const baiduUrl = `https://chat.baidu.com/search?word=${encoded}`;
-  const chatgptUrl = `https://chatgpt.com/?q=${encoded}&hints=search&ref=ext`;
-  const kimiUrl = `https://www.kimi.com/?prefill_prompt=${encoded}&send_immediately=true`;
+  const googleProvider = QUESTION_SEARCH_PROVIDER_BY_ID.google;
+  const otherProviders = QUESTION_SEARCH_PROVIDERS.filter(
+    (provider) => provider.id !== "google"
+  );
 
   const iconSize = size === "xs" ? "w-3 h-3" : "w-3.5 h-3.5";
   const itemIconSize = size === "xs" ? "w-3.5 h-3.5" : "w-4 h-4";
@@ -59,23 +75,15 @@ export function QuestionActions({
   }, [open]);
 
   async function handleCopy() {
+    setCopyFailed(false);
     const text = formatQuestionText({ number, question, options, ref, paper });
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      try {
-        document.execCommand("copy");
-      } catch {
-        /* ignore */
-      }
-      document.body.removeChild(ta);
+    const succeeded = await writeTextToClipboard(text);
+    if (!succeeded) {
+      setCopyFailed(true);
+      setTimeout(() => setCopyFailed(false), 1600);
+      return;
     }
+
     setCopied(true);
     setTimeout(() => {
       setCopied(false);
@@ -89,12 +97,16 @@ export function QuestionActions({
         asChild
         variant="ghost"
         size={size}
-        title="用 Google 搜尋這題"
-        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/30"
+        title={`用 ${googleProvider.label} 搜尋這題`}
+        className={googleProvider.className}
       >
-        <a href={googleUrl} target="_blank" rel="noopener noreferrer">
+        <a
+          href={googleProvider.buildUrl(query)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <Search className={cn(iconSize, "mr-1")} />
-          Google
+          {googleProvider.label}
         </a>
       </Button>
 
@@ -120,40 +132,30 @@ export function QuestionActions({
             {copied ? (
               <Check className={cn(itemIconSize, "text-green-600 dark:text-green-400")} />
             ) : (
-              <Copy className={itemIconSize} />
+              <Copy className={cn(itemIconSize, copyFailed && "text-red-600 dark:text-red-400")} />
             )}
-            {copied ? "已複製" : "複製題目"}
+            {copied ? "已複製" : copyFailed ? "複製失敗" : "複製題目"}
           </button>
-          <a
-            href={baiduUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
-          >
-            <Search className={itemIconSize} />
-            百度搜尋
-          </a>
-          <a
-            href={chatgptUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-          >
-            <MessageCircle className={itemIconSize} />
-            ChatGPT
-          </a>
-          <a
-            href={kimiUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30"
-          >
-            <MessageCircle className={itemIconSize} />
-            Kimi
-          </a>
+          {otherProviders.map((provider) => {
+            const ProviderIcon = SEARCH_PROVIDER_ICONS[provider.iconKind];
+
+            return (
+              <a
+                key={provider.id}
+                href={provider.buildUrl(query)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className={cn(
+                  "flex items-center gap-2 w-full px-3 py-1.5 text-sm",
+                  provider.className
+                )}
+              >
+                <ProviderIcon className={itemIconSize} />
+                {provider.label}
+              </a>
+            );
+          })}
         </div>
       )}
     </div>

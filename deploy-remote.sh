@@ -153,25 +153,15 @@ echo "swap done; previous app preserved at $APP-prev"
 
 # 修复 Next 16 Turbopack 的 external native module symlink。
 #
-# Turbopack 对 native module(如 better-sqlite3)生成带 hash 的 external 模块名
-# (如 better-sqlite3-79580e436acd1aa8),在 .next/node_modules/ 下放 symlink 指向
-# 真实包。但 build 机的 symlink 用絕對路徑(如 /d/Downloads/...),跨平台失效,
-# 且 tarball 排除了 .next/node_modules,所以 VPS 上根本沒有這層目錄。
-#
-# 修法:不依賴 tarball 帶過來的 symlink,而是掃描 .next/server/ 下的 .nft.json
-# 和 chunk 文件,提取所有 "pkgname-<16位hex>" 模式,在 .next/node_modules/ 重建
-# symlink 指向 $APP/node_modules/<pkgname>。這樣 hash 變了也能自適應。
+# Turbopack 某些版本会生成带 hash 的 external 模块名(如
+# better-sqlite3-79580e436acd1aa8)。只重建 .next/server 当前产物实际引用的别名，
+# 避免把普通 chunk 文件名误判成 npm package。
 mkdir -p "$APP/.next/node_modules"
-grep -rohE '[a-z@][a-z0-9@/_.-]+-[a-f0-9]{16}' "$APP/.next/server/" 2>/dev/null \
+grep -rhoE 'better-sqlite3-[a-f0-9]{16}' "$APP/.next/server/" 2>/dev/null \
   | sort -u \
   | while read -r mod; do
-      pkg="${mod%-*}"
-      if [ -d "$APP/node_modules/$pkg" ]; then
-        ln -sfn "$APP/node_modules/$pkg" "$APP/.next/node_modules/$mod"
-        echo "relinked: $mod -> $APP/node_modules/$pkg"
-      else
-        echo "!!! [warn] $mod: package $pkg not found in node_modules, skipping"
-      fi
+      ln -sfn "$APP/node_modules/better-sqlite3" "$APP/.next/node_modules/$mod"
+      echo "relinked: $mod -> $APP/node_modules/better-sqlite3"
     done
 
 cd "$APP"

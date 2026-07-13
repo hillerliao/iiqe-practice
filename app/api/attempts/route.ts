@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  createAttempt, getAttempt, findUnfinishedAttempt, listAttempts,
-  attemptKey, AnswerRecord, AttemptRecord,
+  getAttempt, findUnfinishedAttempt, listAttempts,
 } from "@/lib/kv";
-import { getQuestions, getQuestionById } from "@/lib/data";
+import { getQuestionById } from "@/lib/data";
+import { DomainError, startAttempt } from "@/lib/attempt-service";
 import { requireSession } from "@/lib/auth";
-
-let idCounter = Date.now();
-function genId(): string {
-  return `at_${(idCounter++).toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-}
 
 export async function POST(req: NextRequest) {
   const session = requireSession(req);
@@ -27,10 +22,10 @@ export async function POST(req: NextRequest) {
 
   if (fromAttemptId && typeof fromAttemptId === "string") {
     const src = await getAttempt(fromAttemptId);
-    if (!src) {
+    if (!src || src.sessionId !== sessionId) {
       return NextResponse.json({ error: "來源 attempt 找不到" }, { status: 404 });
     }
-    finalQuestionIds = src.answers.map((a) => a.questionId);
+    finalQuestionIds = src.questionIds.length > 0 ? src.questionIds : src.answers.map((a) => a.questionId);
     finalPaperId = src.paperId;
     finalMode = src.mode;
     finalSource = src.source;
@@ -44,38 +39,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const id = genId();
-  const now = new Date().toISOString();
-
-  const record: AttemptRecord = {
-    id,
-    sessionId,
-    paperId: finalPaperId as string,
-    mode: (finalMode as string) ?? "exam",
-    source: (finalSource as string) ?? "exam",
-    durationSec: (finalDurationSec as number) ?? null,
-    totalQ: finalQuestionIds.length,
-    startedAt: now,
-    finishedAt: null,
-    correct: 0,
-    answers: [],
-  };
-
   try {
-    await createAttempt(record);
-  } catch (e) {
-    const message = e instanceof Error ? e.message : String(e);
-    console.error("[api/attempts] createAttempt 失敗:", message);
-    return NextResponse.json(
-      {
-        error: "資料庫寫入失敗,請稍後重試",
-        detail: process.env.NODE_ENV !== "production" ? message : undefined,
-      },
-      { status: 500 }
-    );
-  }
+    const record = await startAttempt({
+      sessionId,
+      paperId: finalPaperId as string,
+      mode: (finalMode as string) ?? "exam",
+      source: (finalSource as string) ?? "exam",
+      durationSec: (finalDurationSec as number) ?? null,
+      questionIds: finalQuestionIds,
+    });
 
-  let questions: any[] | undefined;
+    let questions: any[] | undefined;
   if (fromAttemptId) {
     questions = finalQuestionIds
       .map((qid) => getQuestionById(qid))
@@ -92,7 +66,13 @@ export async function POST(req: NextRequest) {
       }));
   }
 
-  return NextResponse.json({ attempt: record, questions });
+    return NextResponse.json({ attempt: record, questions });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.error("[api/attempts] createAttempt 失敗:", message);
+    if (e instanceof DomainError) return NextResponse.json({ error: e.message, code: e.code }, { status: e.status });
+    return NextResponse.json({ error: "資料庫寫入失敗,請稍後重試", detail: process.env.NODE_ENV !== "production" ? message : undefined }, { status: 500 });
+  }
 }
 
 export async function GET(req: NextRequest) {

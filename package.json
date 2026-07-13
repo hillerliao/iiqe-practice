@@ -12,7 +12,8 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "verify:storage": "tsx scripts/verify-storage.ts",
-    "verify:question-text": "tsx scripts/verify-question-text.ts"
+    "verify:question-text": "tsx scripts/verify-question-text.ts",
+    "verify:keyboard-search": "tsx scripts/verify-keyboard-search.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

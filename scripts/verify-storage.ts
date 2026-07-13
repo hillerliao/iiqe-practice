@@ -97,6 +97,7 @@ async function checkAttemptLifecycle(): Promise<void> {
     finishedAt: null,
     durationSec: null,
     totalQ: 1,
+    questionIds: ["P1-exam-1"],
     correct: 0,
     answers: [ans1],
   };
@@ -190,6 +191,7 @@ async function checkPersistence(): Promise<void> {
     finishedAt: now,
     durationSec: 10,
     totalQ: 1,
+    questionIds: ["P1-exam-1"],
     correct: 1,
     answers: [
       {

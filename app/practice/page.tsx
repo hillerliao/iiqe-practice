@@ -15,7 +15,6 @@ import {
   ChevronRight,
   List,
   Search,
-  MessageCircle,
   Copy,
   Check,
 } from "lucide-react";
@@ -23,13 +22,24 @@ import { cn } from "@/lib/utils";
 import { authedFetch } from "@/lib/session-client";
 import { NoteButton, type NoteButtonHandle } from "@/components/NoteButton";
 import { ReportButton } from "@/components/ReportButton";
-import { QuestionActions } from "@/components/QuestionActions";
 import { QuestionStem } from "@/components/QuestionStem";
+import { ShortcutHints } from "@/components/ShortcutHints";
 import { buildSearchQuery } from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
 import { useToast, ToastContainer } from "@/components/useToast";
+import { useWindowKeydown } from "@/hooks/use-window-keydown";
+import { writeTextToClipboard } from "@/lib/clipboard";
 import { getChapterInfo } from "@/lib/chapters";
-import { getHandbookHref, getHandbookSlugByPaper } from "@/lib/handbook-refs";
+import { getHandbookHrefForQuestion } from "@/lib/handbook-refs";
+import {
+  noModifiers,
+  normalizeKey,
+  parseAnswerKey,
+} from "@/lib/practice-shortcuts";
+import {
+  matchQuestionSearchProvider,
+  QUESTION_SEARCH_PROVIDERS,
+} from "@/lib/question-search";
 
 type Question = {
   id: string;
@@ -85,7 +95,11 @@ function PracticeInner() {
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const questionStartRef = useRef<number>(0);
+  const currentIdxRef = useRef(0);
+  const navigationVersionRef = useRef(0);
   const finishRef = useRef<() => void>(() => {});
+  const answerRequestsRef = useRef<Set<string>>(new Set());
+  const favoriteRequestsRef = useRef<Set<string>>(new Set());
   const autoNextTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -146,6 +160,7 @@ function PracticeInner() {
           firstUnanswered = qs.length - 1;
         }
         if (firstUnanswered > 0) {
+          currentIdxRef.current = firstUnanswered;
           setCurrentIdx(firstUnanswered);
           setShowFeedback(false);
         }
@@ -201,8 +216,16 @@ function PracticeInner() {
   const userAnswer = currentQ ? answers[currentQ.id] : undefined;
   const isAnswered = !!userAnswer;
   const isCorrect = currentQ && userAnswer === currentQ.answer;
+  const handbookHref = currentQ
+    ? getHandbookHrefForQuestion(attempt?.paperCode, currentQ.ref)
+    : null;
 
-  function clearAutoNext() {
+  useEffect(() => {
+    currentIdxRef.current = currentIdx;
+  }, [currentIdx]);
+
+  function clearAutoNext(invalidatePending = false) {
+    if (invalidatePending) navigationVersionRef.current += 1;
     if (autoNextTimerRef.current) {
       clearTimeout(autoNextTimerRef.current);
       autoNextTimerRef.current = null;
@@ -211,51 +234,109 @@ function PracticeInner() {
   }
 
   async function submitAnswer(qId: string, ans: string) {
+    if (answerRequestsRef.current.has(qId)) return;
+    answerRequestsRef.current.add(qId);
+
     const timeSpentMs = Date.now() - questionStartRef.current;
+    const submittedIdx = questions.findIndex((question) => question.id === qId);
+    const navigationVersion = navigationVersionRef.current;
     setAnswers((prev) => ({ ...prev, [qId]: ans }));
     setShowFeedback(true);
-    const res = await authedFetch("/api/attempt", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "answer",
-        id: attemptId,
-        questionId: qId,
-        userAnswer: ans,
-        timeSpentMs,
-      }),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: "未知錯誤" }));
-      console.error("[submitAnswer] 儲存失敗:", err);
-      setLoadError(`答案儲存失敗: ${err.error ?? res.status}`);
+
+    try {
+      const res = await authedFetch("/api/attempt", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "answer",
+          id: attemptId,
+          questionId: qId,
+          userAnswer: ans,
+          timeSpentMs,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "未知錯誤" }));
+        throw new Error(err.error ?? `HTTP ${res.status}`);
+      }
+    } catch (error) {
+      console.error("[submitAnswer] 儲存失敗:", error);
+      setAnswers((prev) => {
+        if (prev[qId] !== ans) return prev;
+        const next = { ...prev };
+        delete next[qId];
+        return next;
+      });
+      if (currentIdxRef.current === submittedIdx) setShowFeedback(false);
+      answerRequestsRef.current.delete(qId);
+      toast("答案儲存失敗，請重試");
+      return;
     }
-    // 答對且非最後一題 → 延遲自動跳下一題
-    // 用傳入的 qId 查表,避免依賴渲染期 currentQ 閉包(currentQ 在 await 期間可能過期, L6)
-    const q = questions.find((x) => x.id === qId);
-    const correct = q ? ans === q.answer : false;
-    const qIdx = q ? questions.indexOf(q) : -1;
-    if (correct && qIdx >= 0 && qIdx < questions.length - 1) {
+
+    answerRequestsRef.current.delete(qId);
+
+    // 只有使用者仍停在本題時才安排自動跳題,避免遲到的請求拉回舊位置。
+    const q = questions[submittedIdx];
+    if (
+      q &&
+      ans === q.answer &&
+      submittedIdx < questions.length - 1 &&
+      currentIdxRef.current === submittedIdx &&
+      navigationVersionRef.current === navigationVersion
+    ) {
       setAutoNextCountdown(Math.ceil(AUTO_NEXT_DELAY / 1000));
       autoNextTimerRef.current = setTimeout(() => {
         autoNextTimerRef.current = null;
         setAutoNextCountdown(null);
-        goNext();
+        if (
+          currentIdxRef.current !== submittedIdx ||
+          navigationVersionRef.current !== navigationVersion
+        ) {
+          return;
+        }
+        const nextIdx = submittedIdx + 1;
+        navigationVersionRef.current += 1;
+        currentIdxRef.current = nextIdx;
+        setCurrentIdx(nextIdx);
+        setShowFeedback(!!answers[questions[nextIdx].id]);
+        questionStartRef.current = Date.now();
       }, AUTO_NEXT_DELAY);
     }
   }
 
   async function toggleFavorite(qId: string) {
+    if (favoriteRequestsRef.current.has(qId)) return;
+    favoriteRequestsRef.current.add(qId);
     const next = !favorites.has(qId);
     const newFav = new Set(favorites);
     if (next) newFav.add(qId);
     else newFav.delete(qId);
     setFavorites(newFav);
-    await authedFetch("/api/favorites", {
-      method: next ? "POST" : "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ questionId: qId }),
-    });
+    try {
+      const res = await authedFetch(
+        next
+          ? "/api/favorites"
+          : `/api/favorites?questionId=${encodeURIComponent(qId)}`,
+        next
+          ? {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ questionId: qId }),
+            }
+          : { method: "DELETE" }
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    } catch {
+      setFavorites((prev) => {
+        const rollback = new Set(prev);
+        if (next) rollback.delete(qId);
+        else rollback.add(qId);
+        return rollback;
+      });
+      toast("收藏操作失敗");
+    } finally {
+      favoriteRequestsRef.current.delete(qId);
+    }
   }
 
   async function handleFinish() {
@@ -270,24 +351,26 @@ function PracticeInner() {
   }
 
   function goPrev() {
-    clearAutoNext();
+    clearAutoNext(true);
     if (currentIdx === 0) return;
     const prevIdx = currentIdx - 1;
+    currentIdxRef.current = prevIdx;
     setCurrentIdx(prevIdx);
     setShowFeedback(!!answers[questions[prevIdx].id]);
     questionStartRef.current = Date.now();
   }
 
   function goNext() {
-    clearAutoNext();
+    clearAutoNext(true);
     if (currentIdx >= questions.length - 1) return;
     const nextIdx = currentIdx + 1;
+    currentIdxRef.current = nextIdx;
     setCurrentIdx(nextIdx);
     setShowFeedback(!!answers[questions[nextIdx].id]);
     questionStartRef.current = Date.now();
   }
 
-  async function handleCopy() {
+  async function handleCopy(showToast = false) {
     if (!currentQ) return;
     const text = formatQuestionText({
       number: currentQ.number,
@@ -296,20 +379,14 @@ function PracticeInner() {
       ref: currentQ.ref || undefined,
       paper: attempt?.paperCode || undefined,
     });
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand("copy"); } catch { /* ignore */ }
-      document.body.removeChild(ta);
+    const didCopy = await writeTextToClipboard(text);
+    if (!didCopy) {
+      toast("複製失敗");
+      return;
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 1200);
+    if (showToast) toast("已複製題目");
   }
 
   // 保持 finishRef 指向最新 handleFinish,供 timer 到期呼叫
@@ -346,113 +423,72 @@ function PracticeInner() {
     return () => document.removeEventListener("mousedown", onClick);
   }, [searchOpen]);
 
-  // 鍵盤快捷鍵
-  useEffect(() => {
-    if (!currentQ) return;
-    function onKey(e: KeyboardEvent) {
-      // 在輸入框中不觸發
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
+  useWindowKeydown(
+    (event) => {
+      if (!currentQ) return;
 
-      const key = e.key;
+      const searchProvider = matchQuestionSearchProvider(event);
+      if (searchProvider) {
+        event.preventDefault();
+        const query = buildSearchQuery({
+          number: currentQ.number,
+          question: currentQ.question,
+          options: currentQ.options,
+          ref: currentQ.ref || undefined,
+          paper: attempt?.paperCode || undefined,
+        });
+        window.open(searchProvider.buildUrl(query), "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      if (!noModifiers(event)) return;
+      const key = normalizeKey(event.key);
+
       if (key === "ArrowLeft") {
-        e.preventDefault();
+        event.preventDefault();
         goPrev();
-      } else if (key === "ArrowRight") {
-        e.preventDefault();
-        // 最後一題時右箭頭 = 交卷
-        if (currentIdx >= questions.length - 1) {
-          handleFinish();
-        } else {
-          goNext();
+        return;
+      }
+      if (key === "ArrowRight") {
+        event.preventDefault();
+        if (currentIdx >= questions.length - 1) handleFinish();
+        else goNext();
+        return;
+      }
+      if (key === "h" && handbookHref) {
+        event.preventDefault();
+        window.open(handbookHref, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      if (!isAnswered) {
+        const answer = parseAnswerKey(key);
+        if (answer && currentQ.options[answer]) {
+          event.preventDefault();
+          submitAnswer(currentQ.id, answer);
+          return;
         }
-      } else if (
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey &&
-        !e.shiftKey &&
-        ["1", "2", "3", "4", "a", "b", "c", "d"].includes(key) &&
-        !isAnswered
-      ) {
-        const letter =
-          ["1", "2", "3", "4"].includes(key)
-            ? ["a", "b", "c", "d"][parseInt(key, 10) - 1]
-            : key.toLowerCase();
-        if (currentQ.options[letter]) {
-          e.preventDefault();
-          submitAnswer(currentQ.id, letter);
-        }
-      } else if (key === "f" || key === "F") {
-        e.preventDefault();
+      }
+
+      if (key === "f") {
+        event.preventDefault();
         toggleFavorite(currentQ.id);
-      } else if (
-        (key === "n" || key === "N") &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey
-      ) {
-        e.preventDefault();
+      } else if (key === "n") {
+        event.preventDefault();
         noteButtonRef.current?.toggleEditor();
-      } else if (
-        e.shiftKey &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey &&
-        ["KeyG", "KeyB", "KeyC", "KeyK"].includes(e.code)
-      ) {
-        e.preventDefault();
-        const q = buildSearchQuery({
-          number: currentQ.number,
-          question: currentQ.question,
-          options: currentQ.options,
-          ref: currentQ.ref || undefined,
-          paper: attempt?.paperCode || undefined,
-        });
-        const encoded = encodeURIComponent(q);
-        const searchUrls: Record<string, string> = {
-          KeyG: `https://www.google.com/search?q=${encoded}`,
-          KeyB: `https://chat.baidu.com/search?word=${encoded}`,
-          KeyC: `https://chatgpt.com/?q=${encoded}&hints=search&ref=ext`,
-          KeyK: `https://www.kimi.com/?prefill_prompt=${encoded}&send_immediately=true`,
-        };
-        window.open(searchUrls[e.code], "_blank", "noopener,noreferrer");
-      } else if (
-        e.code === "KeyG" &&
-        !e.shiftKey &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey
-      ) {
-        e.preventDefault();
-        setShowJumpPanel((v) => !v);
-      } else if (
-        (key === "x" || key === "X") &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey
-      ) {
-        e.preventDefault();
-        const text = formatQuestionText({
-          number: currentQ.number,
-          question: currentQ.question,
-          options: currentQ.options,
-          ref: currentQ.ref || undefined,
-          paper: attempt?.paperCode || undefined,
-        });
-        navigator.clipboard
-          ?.writeText(text)
-          .then(() => toast("已複製題目"))
-          .catch(() => {});
+      } else if (key === "g") {
+        event.preventDefault();
+        setShowJumpPanel((value) => !value);
+      } else if (key === "x") {
+        event.preventDefault();
+        void handleCopy(true);
       } else if (key === "Enter" && currentIdx >= questions.length - 1) {
-        e.preventDefault();
+        event.preventDefault();
         handleFinish();
       }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIdx, questions, answers, isAnswered, currentQ, favorites]);
-
+    },
+    { enabled: Boolean(currentQ) }
+  );
   if (!currentQ || !attempt) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-8 text-muted-foreground">
@@ -486,27 +522,8 @@ function PracticeInner() {
             <span className="font-medium">
               第 {currentIdx + 1} / {questions.length} 題
             </span>
-            {currentQ.ref && (() => {
-              const handbookSlug = getHandbookSlugByPaper(attempt?.paperCode);
-              const handbookHref = handbookSlug
-                ? getHandbookHref(handbookSlug, currentQ.ref)
-                : null;
-              if (!handbookHref) {
-                return (
-                  <Badge
-                    variant="outline"
-                    className="text-xs"
-                    title={
-                      attempt?.paperCode
-                        ? getChapterInfo(attempt.paperCode, currentQ.ref)?.path
-                        : undefined
-                    }
-                  >
-                    {currentQ.ref}
-                  </Badge>
-                );
-              }
-              return (
+            {currentQ.ref && (
+              handbookHref ? (
                 <a
                   href={handbookHref}
                   target="_blank"
@@ -516,8 +533,20 @@ function PracticeInner() {
                 >
                   {currentQ.ref}
                 </a>
-              );
-            })()}
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="text-xs"
+                  title={
+                    attempt?.paperCode
+                      ? getChapterInfo(attempt.paperCode, currentQ.ref)?.path
+                      : undefined
+                  }
+                >
+                  {currentQ.ref}
+                </Badge>
+              )
+            )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {timeLeft != null && (
@@ -558,7 +587,8 @@ function PracticeInner() {
                   <button
                     key={q.id}
                     onClick={() => {
-                      clearAutoNext();
+                      clearAutoNext(true);
+                      currentIdxRef.current = i;
                       setCurrentIdx(i);
                       setShowFeedback(!!answers[q.id]);
                       setShowJumpPanel(false);
@@ -702,25 +732,26 @@ function PracticeInner() {
               <span className="hidden md:inline">搜尋</span>
             </Button>
             {searchOpen && (() => {
-              const q = buildSearchQuery({ number: currentQ.number, question: currentQ.question, options: currentQ.options, ref: currentQ.ref || undefined, paper: attempt?.paperCode || undefined });
-              const enc = encodeURIComponent(q);
-              const urls = {
-                google: `https://www.google.com/search?q=${enc}`,
-                baidu: `https://chat.baidu.com/search?word=${enc}`,
-                chatgpt: `https://chatgpt.com/?q=${enc}&hints=search&ref=ext`,
-                kimi: `https://www.kimi.com/?prefill_prompt=${enc}&send_immediately=true`,
-              };
+              const query = buildSearchQuery({ number: currentQ.number, question: currentQ.question, options: currentQ.options, ref: currentQ.ref || undefined, paper: attempt?.paperCode || undefined });
               return (
                 <div className="absolute bottom-full right-0 mb-1 z-50 min-w-[130px] rounded-lg border border-border bg-popover shadow-lg py-1">
-                  <a href={urls.google} target="_blank" rel="noopener noreferrer" onClick={() => setSearchOpen(false)} className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30">Google</a>
-                  <a href={urls.baidu} target="_blank" rel="noopener noreferrer" onClick={() => setSearchOpen(false)} className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30">百度</a>
-                  <a href={urls.chatgpt} target="_blank" rel="noopener noreferrer" onClick={() => setSearchOpen(false)} className="flex items-center gap-2 px-3 py-1.5 text-sm text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">ChatGPT</a>
-                  <a href={urls.kimi} target="_blank" rel="noopener noreferrer" onClick={() => setSearchOpen(false)} className="flex items-center gap-2 px-3 py-1.5 text-sm text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30">Kimi</a>
+                  {QUESTION_SEARCH_PROVIDERS.map((provider) => (
+                    <a
+                      key={provider.id}
+                      href={provider.buildUrl(query)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setSearchOpen(false)}
+                      className={cn("flex items-center gap-2 px-3 py-1.5 text-sm", provider.className)}
+                    >
+                      {provider.label}
+                    </a>
+                  ))}
                 </div>
               );
             })()}
           </div>
-          <Button variant="ghost" onClick={handleCopy} title="複製題目">
+          <Button variant="ghost" onClick={() => void handleCopy()} title="複製題目">
             {copied ? (
               <Check className="w-4 h-4 md:mr-1 text-green-600 dark:text-green-400" />
             ) : (
@@ -763,19 +794,22 @@ function PracticeInner() {
         )}
       </div>
 
-      <div className="hidden md:flex mt-3 flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground justify-center">
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">←</kbd> 上一題</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">→</kbd> 下一題</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">1-4 / A-D</kbd> 選答</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">F</kbd> 收藏</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">N</kbd> 筆記</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">G</kbd> 跳題</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">X</kbd> 複製</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">⇧G</kbd> Google</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">⇧B</kbd> 百度</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">⇧C</kbd> ChatGPT</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">⇧K</kbd> Kimi</span>
-      </div>
+      <ShortcutHints
+        className="hidden md:flex mt-3"
+        hints={[
+          { id: "previous", key: "←", label: "上一題" },
+          { id: "next", key: "→", label: "下一題" },
+          { id: "answer", key: "1-4 / A-D", label: "選答" },
+          { id: "favorite", key: "F", label: "收藏" },
+          { id: "note", key: "N", label: "筆記" },
+          { id: "jump", key: "G", label: "跳題" },
+          { id: "copy", key: "X", label: "複製" },
+          ...(handbookHref
+            ? [{ id: "handbook", key: "H", label: "研習手冊" }]
+            : []),
+        ]}
+        includeSearchProviders
+      />
 
       <ToastContainer toasts={toasts} />
     </div>
@@ -805,7 +839,14 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
   const [picked, setPicked] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [note, setNote] = useState<string>("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
   const noteButtonRef = useRef<NoteButtonHandle>(null);
+  const favoriteRequestRef = useRef(false);
+  const handbookHref = question
+    ? getHandbookHrefForQuestion(paperCode, question.ref)
+    : null;
 
   // 載入題目
   useEffect(() => {
@@ -855,17 +896,29 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
   }, [questionId]);
 
   async function toggleFavorite() {
-    if (!question) return;
+    if (!question || favoriteRequestRef.current) return;
+    favoriteRequestRef.current = true;
     const next = !isFavorite;
     setIsFavorite(next);
-    const res = await authedFetch("/api/favorites", {
-      method: next ? "POST" : "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ questionId: question.id }),
-    });
-    if (!res.ok) {
+    try {
+      const res = await authedFetch(
+        next
+          ? "/api/favorites"
+          : `/api/favorites?questionId=${encodeURIComponent(question.id)}`,
+        next
+          ? {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ questionId: question.id }),
+            }
+          : { method: "DELETE" }
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    } catch {
       setIsFavorite(!next);
       toast("收藏操作失敗");
+    } finally {
+      favoriteRequestRef.current = false;
     }
   }
 
@@ -874,71 +927,76 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
     setPicked(letter);
   }
 
-  // 鍵盤快捷鍵(僅答題、收藏、筆記、複製、搜尋;無導航類)
-  useEffect(() => {
+  async function handleCopy(showToast = false) {
     if (!question) return;
-    function onKey(e: KeyboardEvent) {
-      const q = question;
-      if (!q) return;
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
-      const key = e.key;
-      if (
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey &&
-        !e.shiftKey &&
-        ["1", "2", "3", "4", "a", "b", "c", "d"].includes(key) &&
-        !picked
-      ) {
-        const letter =
-          ["1", "2", "3", "4"].includes(key)
-            ? ["a", "b", "c", "d"][parseInt(key, 10) - 1]
-            : key.toLowerCase();
-        if (q.options[letter]) {
-          e.preventDefault();
-          pickAnswer(letter);
-        }
-      } else if (key === "f" || key === "F") {
-        e.preventDefault();
-        toggleFavorite();
-      } else if (
-        (key === "n" || key === "N") &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey
-      ) {
-        e.preventDefault();
-        noteButtonRef.current?.toggleEditor();
-      } else if (
-        e.shiftKey &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey &&
-        ["KeyG", "KeyB", "KeyC", "KeyK"].includes(e.code)
-      ) {
-        e.preventDefault();
-        const query = buildSearchQuery({
-          number: q.number,
-          question: q.question,
-          options: q.options,
-          ref: q.ref || undefined,
-          paper: paperCode || undefined,
-        });
-        const encoded = encodeURIComponent(query);
-        const searchUrls: Record<string, string> = {
-          KeyG: `https://www.google.com/search?q=${encoded}`,
-          KeyB: `https://chat.baidu.com/search?word=${encoded}`,
-          KeyC: `https://chatgpt.com/?q=${encoded}&hints=search&ref=ext`,
-          KeyK: `https://www.kimi.com/?prefill_prompt=${encoded}&send_immediately=true`,
-        };
-        window.open(searchUrls[e.code], "_blank", "noopener,noreferrer");
+    const text = formatQuestionText({
+      number: question.number,
+      question: question.question,
+      options: question.options,
+      ref: question.ref || undefined,
+      paper: paperCode || undefined,
+    });
+    const didCopy = await writeTextToClipboard(text);
+    if (!didCopy) {
+      toast("複製失敗");
+      return;
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
+    if (showToast) toast("已複製題目");
+  }
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    function onClick(event: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setSearchOpen(false);
       }
     }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [question, picked, isFavorite]);
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [searchOpen]);
+
+  useWindowKeydown(
+    (event) => {
+      if (!question) return;
+
+      const searchProvider = matchQuestionSearchProvider(event);
+      if (searchProvider) {
+        event.preventDefault();
+        const query = buildSearchQuery({
+          number: question.number,
+          question: question.question,
+          options: question.options,
+          ref: question.ref || undefined,
+          paper: paperCode || undefined,
+        });
+        window.open(searchProvider.buildUrl(query), "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      if (!noModifiers(event)) return;
+      const key = normalizeKey(event.key);
+      const answer = !picked ? parseAnswerKey(key) : undefined;
+      if (answer && question.options[answer]) {
+        event.preventDefault();
+        pickAnswer(answer);
+      } else if (key === "f") {
+        event.preventDefault();
+        toggleFavorite();
+      } else if (key === "n") {
+        event.preventDefault();
+        noteButtonRef.current?.toggleEditor();
+      } else if (key === "h" && handbookHref) {
+        event.preventDefault();
+        window.open(handbookHref, "_blank", "noopener,noreferrer");
+      } else if (key === "x") {
+        event.preventDefault();
+        void handleCopy(true);
+      }
+    },
+    { enabled: Boolean(question) }
+  );
 
   if (loadError) {
     return (
@@ -971,15 +1029,27 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
           {paperCode && <Badge variant="secondary">{paperCode}</Badge>}
           <span className="font-medium">#{question.number}</span>
           {question.ref && (
-            <Badge
-              variant="outline"
-              className="text-xs"
-              title={
-                paperCode ? getChapterInfo(paperCode, question.ref)?.path : undefined
-              }
-            >
-              {question.ref}
-            </Badge>
+            handbookHref ? (
+              <a
+                href={handbookHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="在新分頁開啟研習手冊對應章節"
+                className="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium text-foreground/80 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
+              >
+                {question.ref}
+              </a>
+            ) : (
+              <Badge
+                variant="outline"
+                className="text-xs"
+                title={
+                  paperCode ? getChapterInfo(paperCode, question.ref)?.path : undefined
+                }
+              >
+                {question.ref}
+              </Badge>
+            )
           )}
           {question.sourceLabel && (
             <span className="text-xs text-muted-foreground">
@@ -999,14 +1069,44 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
             <CardTitle className="text-base leading-relaxed flex-1 min-w-0">
               <QuestionStem text={question.question} />
             </CardTitle>
-            <QuestionActions
-              number={question.number}
-              question={question.question}
-              options={question.options}
-              ref={question.ref || undefined}
-              paper={paperCode || undefined}
-              size="xs"
-            />
+            <div ref={searchRef} className="relative shrink-0">
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                onClick={() => setSearchOpen((value) => !value)}
+                title="搜尋"
+                aria-expanded={searchOpen}
+              >
+                <Search className="w-3 h-3 mr-1" />
+                搜尋
+              </Button>
+              {searchOpen && (() => {
+                const query = buildSearchQuery({
+                  number: question.number,
+                  question: question.question,
+                  options: question.options,
+                  ref: question.ref || undefined,
+                  paper: paperCode || undefined,
+                });
+                return (
+                  <div className="absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-lg border border-border bg-popover shadow-lg py-1">
+                    {QUESTION_SEARCH_PROVIDERS.map((provider) => (
+                      <a
+                        key={provider.id}
+                        href={provider.buildUrl(query)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setSearchOpen(false)}
+                        className={cn("flex items-center gap-2 w-full px-3 py-1.5 text-sm", provider.className)}
+                      >
+                        {provider.label}
+                      </a>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -1095,6 +1195,14 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
             {isFavorite ? "已收藏" : "收藏"}
           </span>
         </Button>
+        <Button variant="ghost" onClick={() => void handleCopy()} title="複製題目">
+          {copied ? (
+            <Check className="w-4 h-4 md:mr-1 text-green-600 dark:text-green-400" />
+          ) : (
+            <Copy className="w-4 h-4 md:mr-1" />
+          )}
+          <span className="hidden md:inline">{copied ? "已複製" : "複製"}</span>
+        </Button>
         <NoteButton
           ref={noteButtonRef}
           questionId={question.id}
@@ -1111,26 +1219,18 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
         />
       </div>
 
-      <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground justify-center">
-        <span>
-          <kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">
-            1-4 / A-D
-          </kbd>{" "}
-          選答
-        </span>
-        <span>
-          <kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">
-            F
-          </kbd>{" "}
-          收藏
-        </span>
-        <span>
-          <kbd className="px-1 py-0.5 rounded border border-border bg-muted font-mono">
-            N
-          </kbd>{" "}
-          筆記
-        </span>
-      </div>
+      <ShortcutHints
+        hints={[
+          { id: "answer", key: "1-4 / A-D", label: "選答" },
+          { id: "favorite", key: "F", label: "收藏" },
+          { id: "note", key: "N", label: "筆記" },
+          { id: "copy", key: "X", label: "複製" },
+          ...(handbookHref
+            ? [{ id: "handbook", key: "H", label: "研習手冊" }]
+            : []),
+        ]}
+        includeSearchProviders
+      />
 
       <ToastContainer toasts={toasts} />
     </div>

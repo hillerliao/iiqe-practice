@@ -1,0 +1,14 @@
+[
+  {
+    "prompt": "从 P1 随机出 10 道题，一题一题问我，不要提前告诉答案。",
+    "expected": ["list_questions", "start_attempt", "submit_answer", "finish_attempt", "get_attempt_result"]
+  },
+  {
+    "prompt": "找出我错误最多的题，安排一组复习，做完后统一讲解。",
+    "expected": ["list_wrong_questions", "start_attempt", "submit_answer", "finish_attempt", "get_attempt_result"]
+  },
+  {
+    "prompt": "直接解释这道题并给出教材依据，不要把推测写成官方解析。",
+    "expected": ["explain_question"]
+  }
+]

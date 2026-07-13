@@ -46,7 +46,7 @@ export const ReportButton = forwardRef<ReportButtonHandle, ReportButtonProps>(
     ref
   ) {
     const [open, setOpen] = useState(false);
-    const [category, setCategory] = useState<Category | "">("");
+    const [category, setCategory] = useState<Category>("question_error");
     const [description, setDescription] = useState("");
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -62,7 +62,7 @@ export const ReportButton = forwardRef<ReportButtonHandle, ReportButtonProps>(
 
     useEffect(() => {
       if (!open) return;
-      setCategory("");
+      setCategory("question_error");
       setDescription("");
       setError(null);
     }, [open, questionId]);
@@ -147,7 +147,7 @@ export const ReportButton = forwardRef<ReportButtonHandle, ReportButtonProps>(
         </Button>
 
         {open && (
-          <div className="absolute bottom-full right-0 mb-2 w-96 max-w-[calc(100vw-2rem)] p-3 rounded-lg border border-border bg-popover shadow-lg text-left space-y-2 z-20">
+          <div className="fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-96 -translate-x-1/2 -translate-y-1/2 space-y-2 rounded-lg border border-border bg-popover p-3 text-left shadow-lg md:absolute md:bottom-full md:left-auto md:right-0 md:top-auto md:z-20 md:mb-2 md:w-96 md:translate-x-0 md:translate-y-0">
             <div className="text-xs text-muted-foreground">
               {paperCode}
               {sourceLabel ? ` · ${sourceLabel}` : ""}

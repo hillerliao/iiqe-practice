@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import { QuestionStem } from "@/components/QuestionStem";
 import { NoteSection } from "@/components/NoteSection";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
 import { RedoPractice, type RedoItem } from "@/components/RedoPractice";
+import { ToastContainer, useToast } from "@/components/useToast";
 
 type WrongItem = {
   questionId: string;
@@ -183,16 +184,28 @@ export default function WrongbookPage() {
   const [error, setError] = useState<string | null>(null);
   const [repeatedCount, setRepeatedCount] = useState(0);
   const [practiceMode, setPracticeMode] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState<ReadonlySet<string>>(new Set());
+  const favoriteRequestsRef = useRef<Set<string>>(new Set());
+  const { toast, toasts } = useToast();
 
   useEffect(() => {
-    authedFetch(`/api/wrongbook`)
-      .then((r) => {
-        if (!r.ok) throw new Error("載入錯題本失敗");
-        return r.json();
-      })
-      .then((data) => {
-        setItems(data.items);
-        setRepeatedCount(data.repeatedCount ?? 0);
+    Promise.all([
+      authedFetch(`/api/wrongbook`).then(async (response) => {
+        if (!response.ok) throw new Error("載入錯題本失敗");
+        return response.json();
+      }),
+      authedFetch(`/api/favorites`)
+        .then((response) => (response.ok ? response.json() : { items: [] }))
+        .catch(() => ({ items: [] })),
+    ])
+      .then(([wrongbookData, favoritesData]) => {
+        setItems(wrongbookData.items);
+        setRepeatedCount(wrongbookData.repeatedCount ?? 0);
+        setFavoriteIds(
+          new Set<string>(
+            favoritesData.items.map((item: { questionId: string }) => item.questionId)
+          )
+        );
         setLoading(false);
       })
       .catch((e) => {
@@ -200,6 +213,45 @@ export default function WrongbookPage() {
         setLoading(false);
       });
   }, []);
+
+  const toggleFavorite = useCallback(
+    async (questionId: string) => {
+      if (favoriteRequestsRef.current.has(questionId)) return;
+      favoriteRequestsRef.current.add(questionId);
+      const wasFavorite = favoriteIds.has(questionId);
+      setFavoriteIds((current) => {
+        const next = new Set(current);
+        if (wasFavorite) next.delete(questionId);
+        else next.add(questionId);
+        return next;
+      });
+
+      try {
+        const response = wasFavorite
+          ? await authedFetch(
+              `/api/favorites?questionId=${encodeURIComponent(questionId)}`,
+              { method: "DELETE" }
+            )
+          : await authedFetch("/api/favorites", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ questionId }),
+            });
+        if (!response.ok) throw new Error("收藏操作失敗");
+      } catch {
+        setFavoriteIds((current) => {
+          const next = new Set(current);
+          if (wasFavorite) next.add(questionId);
+          else next.delete(questionId);
+          return next;
+        });
+        toast("收藏操作失敗");
+      } finally {
+        favoriteRequestsRef.current.delete(questionId);
+      }
+    },
+    [favoriteIds, toast]
+  );
 
   // 將重做練習的作答寫回後端(/api/wrongbook/record),讓「又錯了」累積進 wrongCount
   // 注意:失敗時要拋出(而非吞掉),persistAnswers 的 .catch 才會重置 recordedRef 以便重試
@@ -253,39 +305,19 @@ export default function WrongbookPage() {
     }));
     const prevAnswerMap = new Map(items.map((it) => [it.questionId, it.userAnswer]));
 
-    async function recordRedo(answers: Record<string, string>) {
-      try {
-        await authedFetch("/api/wrongbook/record", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ answers }),
-        });
-      } catch (e) {
-        console.error("記錄重做結果失敗:", e);
-      }
-    }
-
-    async function handleExit() {
-      setPracticeMode(false);
-      // 重新載入錯題本列表以反映記錄結果
-      try {
-        const r = await authedFetch(`/api/wrongbook`);
-        if (r.ok) {
-          const data = await r.json();
-          setItems(data.items);
-          setRepeatedCount(data.repeatedCount ?? 0);
-        }
-      } catch {}
-    }
-
     return (
-      <RedoPractice
-        items={redoItems}
-        title="錯題本 · 重做練習"
-        prevUserAnswer={(id) => prevAnswerMap.get(id)}
-        recordAnswers={recordRedo}
-        onExit={handleExit}
-      />
+      <>
+        <RedoPractice
+          items={redoItems}
+          title="錯題本 · 重做練習"
+          prevUserAnswer={(id) => prevAnswerMap.get(id)}
+          recordAnswers={recordRedo}
+          favoriteIds={favoriteIds}
+          onToggleFavorite={toggleFavorite}
+          onExit={handleExit}
+        />
+        <ToastContainer toasts={toasts} />
+      </>
     );
   }
 
@@ -324,6 +356,7 @@ export default function WrongbookPage() {
           ))}
         </div>
       )}
+      <ToastContainer toasts={toasts} />
     </div>
   );
 }

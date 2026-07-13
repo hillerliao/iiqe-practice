@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { authedFetch } from "@/lib/session-client";
 import { getChapterInfo } from "@/lib/chapters";
-import { RecentAttemptsCard } from "@/components/RecentAttemptsCard";
 
 type Stats = {
   total: number;
@@ -244,8 +243,6 @@ export default function StatsPage() {
           </CardContent>
         </Card>
       </div>
-
-      <RecentAttemptsCard showHeaderBadge />
     </div>
   );
 }

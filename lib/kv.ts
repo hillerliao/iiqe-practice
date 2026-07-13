@@ -264,8 +264,18 @@ export type AttemptRecord = {
   finishedAt: string | null;
   durationSec: number | null;
   totalQ: number;
+  questionIds: string[];
   correct: number;
   answers: AnswerRecord[];
+};
+
+export type ToolCallRecord = {
+  id: string;
+  sessionId: string;
+  toolName: string;
+  requestHash: string;
+  responseJson: string;
+  createdAt: string;
 };
 
 export type FavoriteRecord = {
@@ -306,6 +316,7 @@ const SESS_AT = "session:attempts:";
 const SESS_FAV = "session:favs:";
 const SESS_FAV_META = "session:favs-meta:";
 const SESS_NOTES = "session:notes:";
+const TOOL_CALL = "tool-call:";
 const FB = "feedback:";
 const SESS_FB = "feedback:session:";
 
@@ -314,6 +325,7 @@ function sessAttemptsKey(sid: string) { return `${SESS_AT}${sid}`; }
 function sessFavsKey(sid: string) { return `${SESS_FAV}${sid}`; }
 function sessFavMetaKey(sid: string) { return `${SESS_FAV_META}${sid}`; }
 function sessNotesKey(sid: string) { return `${SESS_NOTES}${sid}`; }
+function toolCallKey(sid: string, id: string) { return `${TOOL_CALL}${sid}:${id}`; }
 function feedbackKey(id: string) { return `${FB}${id}`; }
 function sessFeedbackKey(sid: string) { return `${SESS_FB}${sid}`; }
 
@@ -358,6 +370,19 @@ export async function listAttempts(sessionId: string): Promise<AttemptRecord[]> 
     if (at) results.push(at);
   }
   return results;
+}
+
+export async function getToolCall(sessionId: string, id: string): Promise<ToolCallRecord | null> {
+  if (backend() === "sqlite") return sqlite.getToolCallSqlite(sessionId, id);
+  return kv.get<ToolCallRecord>(toolCallKey(sessionId, id));
+}
+
+export async function createToolCall(record: ToolCallRecord): Promise<boolean> {
+  if (backend() === "sqlite") return sqlite.createToolCallSqlite(record);
+  const key = toolCallKey(record.sessionId, record.id);
+  if (await kv.exists(key)) return false;
+  await kv.set(key, record);
+  return true;
 }
 
 export async function addFavorite(sessionId: string, questionId: string): Promise<void> {

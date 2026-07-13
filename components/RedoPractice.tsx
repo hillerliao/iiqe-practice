@@ -13,15 +13,28 @@ import {
   X,
   ListChecks,
   Check,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getChapterInfo } from "@/lib/chapters";
 import { QuestionActions } from "@/components/QuestionActions";
+import { NoteButton, type NoteButtonHandle } from "@/components/NoteButton";
 import { QuestionStem } from "@/components/QuestionStem";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
 import { buildSearchQuery } from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
+import { ShortcutHints } from "@/components/ShortcutHints";
 import { useToast, ToastContainer } from "@/components/useToast";
+import { authedFetch } from "@/lib/session-client";
+import { writeTextToClipboard } from "@/lib/clipboard";
+import {
+  noModifiers,
+  normalizeKey,
+  parseAnswerKey,
+} from "@/lib/practice-shortcuts";
+import { matchQuestionSearchProvider } from "@/lib/question-search";
+import { getHandbookHrefForQuestion } from "@/lib/handbook-refs";
+import { useWindowKeydown } from "@/hooks/use-window-keydown";
 
 export type RedoQuestion = {
   id: string;
@@ -47,17 +60,22 @@ type RedoPracticeProps = {
   /** 上一題的作答結果,僅用於錯題本場景顯示對照 */
   prevUserAnswer?: (id: string) => string | undefined;
   /** 退出練習模式 */
-  onExit: () => void;
+  onExit: () => void | Promise<void>;
   /** 重做結束/退出時回傳作答結果,供上層做持久化(可選);只在有提供時才記錄 */
   recordAnswers?: (answers: AnswerMap) => void | Promise<void>;
   /** 列表頁標題(顯示在頂部) */
   title?: string;
+  /** 受控收藏狀態 */
+  favoriteIds?: ReadonlySet<string>;
+  /** 切換收藏,由列表頁負責持久化 */
+  onToggleFavorite?: (questionId: string) => void | Promise<void>;
 };
 
 type AnswerMap = Record<string, string>;
 
 /** 答對後自動跳下一題的延遲(毫秒) */
 const AUTO_NEXT_DELAY = 1200;
+const EMPTY_FAVORITE_IDS: ReadonlySet<string> = new Set();
 
 export function RedoPractice({
   items,
@@ -65,13 +83,18 @@ export function RedoPractice({
   onExit,
   recordAnswers,
   title = "重做練習",
+  favoriteIds = EMPTY_FAVORITE_IDS,
+  onToggleFavorite,
 }: RedoPracticeProps) {
   const { toast, toasts } = useToast();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [finished, setFinished] = useState(false);
+  const [isPersisting, setIsPersisting] = useState(false);
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
+  const [notes, setNotes] = useState<Record<string, string>>({});
   const autoNextTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const noteButtonRef = useRef<NoteButtonHandle>(null);
 
   // —— 重做結果持久化 ——
   // answersRef 避免鍵盤 handler / 非同步閉包拿到過期的 answers
@@ -79,6 +102,7 @@ export function RedoPractice({
   answersRef.current = answers;
   const recordedRef = useRef(false);
   const recordPromiseRef = useRef<Promise<void> | null>(null);
+  const persistenceActionRef = useRef(false);
   const recordAnswersRef = useRef(recordAnswers);
   recordAnswersRef.current = recordAnswers;
 
@@ -94,29 +118,48 @@ export function RedoPractice({
       return Promise.resolve();
     }
     recordedRef.current = true;
-    const p = Promise.resolve(fn({ ...answersRef.current })).catch((e) => {
-      console.error("[RedoPractice] 記錄重做結果失敗:", e);
+    const p = Promise.resolve(fn({ ...answersRef.current })).catch((error) => {
+      console.error("[RedoPractice] 記錄重做結果失敗:", error);
       recordedRef.current = false;
       recordPromiseRef.current = null;
+      throw error;
     });
     recordPromiseRef.current = p;
     return p;
   }
 
-  // 結束重做:記錄結果並進入總結頁
-  const finishPractice = useCallback(() => {
-    persistAnswers();
-    setFinished(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
-
-  // 退出重做:等待記錄完成後,再交給上層退出(上層會重新整理錯題本)
-  const handleExit = useCallback(async () => {
+  // 結束重做:先記錄結果,成功後才進入總結頁。
+  const finishPractice = useCallback(async () => {
+    if (persistenceActionRef.current) return;
+    persistenceActionRef.current = true;
+    setIsPersisting(true);
     try {
       await persistAnswers();
-    } catch {}
-    onExit();
-  }, [onExit]);
+      setFinished(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      toast("重做結果儲存失敗，請重試");
+    } finally {
+      persistenceActionRef.current = false;
+      setIsPersisting(false);
+    }
+  }, [toast]);
+
+  // 退出重做:儲存失敗時留在目前畫面,避免靜默遺失作答結果。
+  const handleExit = useCallback(async () => {
+    if (persistenceActionRef.current) return;
+    persistenceActionRef.current = true;
+    setIsPersisting(true);
+    try {
+      await persistAnswers();
+      onExit();
+    } catch {
+      toast("重做結果儲存失敗，請重試");
+    } finally {
+      persistenceActionRef.current = false;
+      setIsPersisting(false);
+    }
+  }, [onExit, toast]);
 
   const total = items.length;
   const current = items[currentIdx];
@@ -124,6 +167,36 @@ export function RedoPractice({
   const isAnswered = userAnswer != null;
   const correctLetter = current ? current.question.answer.toLowerCase() : "";
   const isCorrect = current && isAnswered && userAnswer === correctLetter;
+  const isFavorite = current ? favoriteIds.has(current.questionId) : false;
+  const currentNote = current ? notes[current.questionId] ?? "" : "";
+  const handbookHref = current
+    ? getHandbookHrefForQuestion(current.paperCode, current.question.ref)
+    : null;
+
+  useEffect(() => {
+    const questionIds = items.map((item) => item.questionId).join(",");
+    if (!questionIds) {
+      setNotes({});
+      return;
+    }
+
+    let cancelled = false;
+    authedFetch(`/api/notes?questionIds=${encodeURIComponent(questionIds)}`)
+      .then((response) => (response.ok ? response.json() : { items: [] }))
+      .then((data: { items: { questionId: string; content: string }[] }) => {
+        if (cancelled) return;
+        const next: Record<string, string> = {};
+        for (const item of data.items) next[item.questionId] = item.content;
+        setNotes(next);
+      })
+      .catch(() => {
+        // 筆記載入失敗不阻斷重做流程。
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [items]);
 
   function clearAutoNext() {
     if (autoNextTimerRef.current) {
@@ -208,99 +281,112 @@ export function RedoPractice({
     current,
     isAnswered,
     finished,
+    isPersisting,
+    handbookHref,
   });
-  stateRef.current = { currentIdx, total, current, isAnswered, finished };
+  stateRef.current = {
+    currentIdx,
+    total,
+    current,
+    isAnswered,
+    finished,
+    isPersisting,
+    handbookHref,
+  };
 
   // pickAnswer 透過 ref 暴露,鍵盤 handler 復用同一份邏輯(包含自動跳題)
   const pickAnswerRef = useRef<(letter: string) => void>(() => {});
   pickAnswerRef.current = pickAnswer;
 
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
-      const s = stateRef.current;
-      if (s.finished) return;
+  useWindowKeydown(
+    (event) => {
+      const state = stateRef.current;
+      if (state.finished || state.isPersisting) return;
 
-      const key = e.key;
-      if (key === "ArrowLeft") {
-        e.preventDefault();
-        if (s.currentIdx === 0) return;
+      const key = normalizeKey(event.key);
+      if (noModifiers(event) && key === "ArrowLeft") {
+        event.preventDefault();
+        if (state.currentIdx === 0) return;
         clearAutoNext();
-        setCurrentIdx((i) => i - 1);
-      } else if (key === "ArrowRight" || key === "Enter") {
-        e.preventDefault();
-        if (s.currentIdx >= s.total - 1) {
+        setCurrentIdx((index) => index - 1);
+        return;
+      }
+
+      if (
+        noModifiers(event) &&
+        (key === "ArrowRight" || key === "Enter")
+      ) {
+        event.preventDefault();
+        if (state.currentIdx >= state.total - 1) {
           clearAutoNext();
           finishPractice();
         } else {
           clearAutoNext();
-          setCurrentIdx((i) => i + 1);
+          setCurrentIdx((index) => index + 1);
         }
-      } else if (
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey &&
-        !e.shiftKey &&
-        ["1", "2", "3", "4", "a", "b", "c", "d"].includes(key) &&
-        !s.isAnswered &&
-        s.current
-      ) {
-        const letter = ["1", "2", "3", "4"].includes(key)
-          ? (["a", "b", "c", "d"] as const)[parseInt(key, 10) - 1]
-          : (key.toLowerCase() as "a" | "b" | "c" | "d");
-        if (s.current.question.options[letter]) {
-          e.preventDefault();
-          pickAnswerRef.current(letter);
-        }
-      } else if (
-        e.shiftKey &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey &&
-        ["KeyG", "KeyB", "KeyC", "KeyK"].includes(e.code) &&
-        s.current
-      ) {
-        e.preventDefault();
-        const q = buildSearchQuery({
-          number: s.current.question.number,
-          question: s.current.question.question,
-          options: s.current.question.options,
-          ref: s.current.question.ref || undefined,
-          paper: s.current.paperCode || undefined,
-        });
-        const encoded = encodeURIComponent(q);
-        const searchUrls: Record<string, string> = {
-          KeyG: `https://www.google.com/search?q=${encoded}`,
-          KeyB: `https://chat.baidu.com/search?word=${encoded}`,
-          KeyC: `https://chatgpt.com/?q=${encoded}&hints=search&ref=ext`,
-          KeyK: `https://www.kimi.com/?prefill_prompt=${encoded}&send_immediately=true`,
-        };
-        window.open(searchUrls[e.code], "_blank", "noopener,noreferrer");
-      } else if (
-        (key === "x" || key === "X") &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey &&
-        s.current
-      ) {
-        e.preventDefault();
-        const text = formatQuestionText({
-          number: s.current.question.number,
-          question: s.current.question.question,
-          options: s.current.question.options,
-          ref: s.current.question.ref || undefined,
-          paper: s.current.paperCode || undefined,
-        });
-        navigator.clipboard
-          ?.writeText(text)
-          .then(() => toast("已複製題目"))
-          .catch(() => {});
+        return;
       }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+
+      const answer = noModifiers(event) ? parseAnswerKey(key) : undefined;
+      if (answer && !state.isAnswered && state.current) {
+        if (state.current.question.options[answer]) {
+          event.preventDefault();
+          pickAnswerRef.current(answer);
+        }
+        return;
+      }
+
+      const provider = matchQuestionSearchProvider(event);
+      if (provider && state.current) {
+        event.preventDefault();
+        const query = buildSearchQuery({
+          number: state.current.question.number,
+          question: state.current.question.question,
+          options: state.current.question.options,
+          ref: state.current.question.ref || undefined,
+          paper: state.current.paperCode || undefined,
+        });
+        window.open(provider.buildUrl(query), "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      if (!noModifiers(event) || !state.current) return;
+
+      if (key === "h" && state.handbookHref) {
+        event.preventDefault();
+        window.open(state.handbookHref, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      if (key === "f") {
+        if (!onToggleFavorite) return;
+        event.preventDefault();
+        void onToggleFavorite(state.current.questionId);
+        return;
+      }
+
+      if (key === "n") {
+        event.preventDefault();
+        noteButtonRef.current?.toggleEditor();
+        return;
+      }
+
+      if (key === "x") {
+        event.preventDefault();
+        const text = formatQuestionText({
+          number: state.current.question.number,
+          question: state.current.question.question,
+          options: state.current.question.options,
+          ref: state.current.question.ref || undefined,
+          paper: state.current.paperCode || undefined,
+        });
+        void writeTextToClipboard(text).then((copied) => {
+          toast(copied ? "已複製題目" : "複製失敗");
+        });
+      }
+    },
+    { enabled: !finished }
+  );
 
   // 統計 — 題量小於 memo 比對成本,直接算
   let correctCount = 0;
@@ -330,9 +416,9 @@ export function RedoPractice({
                 <ListChecks className="w-5 h-5" />
                 {title} · 完成
               </CardTitle>
-              <Button variant="ghost" size="sm" onClick={handleExit}>
+              <Button variant="ghost" size="sm" onClick={handleExit} disabled={isPersisting}>
                 <X className="w-4 h-4 mr-1" />
-                退出
+                {isPersisting ? "儲存中..." : "退出"}
               </Button>
             </div>
           </CardHeader>
@@ -367,8 +453,8 @@ export function RedoPractice({
                 <RotateCcw className="w-4 h-4 mr-1" />
                 再做一次
               </Button>
-              <Button variant="outline" onClick={handleExit} className="flex-1">
-                返回列表
+              <Button variant="outline" onClick={handleExit} className="flex-1" disabled={isPersisting}>
+                {isPersisting ? "儲存中..." : "返回列表"}
               </Button>
             </div>
           </CardContent>
@@ -435,9 +521,9 @@ export function RedoPractice({
           <span className="font-medium">
             第 {currentIdx + 1} / {total} 題
           </span>
-          <Button variant="ghost" size="sm" onClick={handleExit}>
+          <Button variant="ghost" size="sm" onClick={handleExit} disabled={isPersisting}>
             <X className="w-4 h-4 mr-1" />
-            退出練習
+            {isPersisting ? "儲存中..." : "退出練習"}
           </Button>
         </div>
         <Progress value={progress} />
@@ -449,17 +535,33 @@ export function RedoPractice({
             <Badge variant="secondary">{current.paperCode}</Badge>
             <span className="font-medium">#{current.question.number}</span>
             {current.question.ref && (
-              <Badge
-                variant="outline"
-                className="text-xs"
-                title={
-                  current.paperCode
-                    ? getChapterInfo(current.paperCode, current.question.ref)?.path
-                    : undefined
-                }
-              >
-                {current.question.ref}
-              </Badge>
+              handbookHref ? (
+                <a
+                  href={handbookHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="在新分頁開啟研習手冊對應章節"
+                >
+                  <Badge
+                    variant="outline"
+                    className="text-xs hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
+                  >
+                    {current.question.ref}
+                  </Badge>
+                </a>
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="text-xs"
+                  title={
+                    current.paperCode
+                      ? getChapterInfo(current.paperCode, current.question.ref)?.path
+                      : undefined
+                  }
+                >
+                  {current.question.ref}
+                </Badge>
+              )
             )}
             <span className="text-xs text-muted-foreground">
               {current.question.sourceLabel}
@@ -551,84 +653,82 @@ export function RedoPractice({
         </CardContent>
       </Card>
 
+      <div className="mt-4 flex items-center justify-center gap-1 md:gap-2 flex-wrap">
+        <Button
+          variant="ghost"
+          onClick={() => void onToggleFavorite?.(current.questionId)}
+          disabled={!onToggleFavorite || isPersisting}
+          title={isFavorite ? "取消收藏 (F)" : "收藏 (F)"}
+        >
+          <Star
+            className={cn(
+              "w-4 h-4 md:mr-1",
+              isFavorite && "fill-yellow-400 text-yellow-400"
+            )}
+          />
+          <span className="hidden md:inline">{isFavorite ? "已收藏" : "收藏"}</span>
+        </Button>
+        <NoteButton
+          ref={noteButtonRef}
+          questionId={current.questionId}
+          content={currentNote}
+          onChange={(newContent) => {
+            setNotes((previous) => {
+              const next = { ...previous };
+              if (newContent === null) delete next[current.questionId];
+              else next[current.questionId] = newContent;
+              return next;
+            });
+            toast(newContent === null ? "筆記已刪除" : "筆記已儲存");
+          }}
+          size="sm"
+        />
+      </div>
+
       <div className="mt-4 flex items-center justify-between">
-        <Button variant="outline" onClick={goPrev} disabled={currentIdx === 0}>
+        <Button variant="outline" onClick={goPrev} disabled={currentIdx === 0 || isPersisting}>
           <ChevronLeft className="w-4 h-4 mr-1" />
           上一題
         </Button>
-        <Button variant="ghost" size="sm" onClick={restart} title="重置所有作答">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={restart}
+          disabled={isPersisting}
+          title="重置所有作答"
+        >
           <RotateCcw className="w-3.5 h-3.5 mr-1" />
           重置
         </Button>
         {currentIdx < total - 1 ? (
-          <Button onClick={goNext}>
+          <Button onClick={goNext} disabled={isPersisting}>
             下一題
             <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         ) : (
-          <Button onClick={goNext} variant="default">
-            完成
+          <Button onClick={goNext} variant="default" disabled={isPersisting}>
+            {isPersisting ? "儲存中..." : "完成"}
             <Check className="w-4 h-4 ml-1" />
           </Button>
         )}
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground justify-center">
-        <span>
-          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
-            ←
-          </kbd>{" "}
-          上一題
-        </span>
-        <span>
-          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
-            →
-          </kbd>{" "}
-          下一題
-        </span>
-        <span>
-          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
-            1-4 / A-D
-          </kbd>{" "}
-          選答
-        </span>
-        <span>
-          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
-            Enter
-          </kbd>{" "}
-          下一題
-        </span>
-        <span>
-          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
-            ⇧G
-          </kbd>{" "}
-          Google
-        </span>
-        <span>
-          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
-            ⇧B
-          </kbd>{" "}
-          百度
-        </span>
-        <span>
-          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
-            ⇧C
-          </kbd>{" "}
-          ChatGPT
-        </span>
-        <span>
-          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
-            ⇧K
-          </kbd>{" "}
-          Kimi
-        </span>
-        <span>
-          <kbd className="px-1 py-0.5 rounded border border-border bg-muted/50 font-mono">
-            X
-          </kbd>{" "}
-          複製題目
-        </span>
-      </div>
+      <ShortcutHints
+        className="mt-3"
+        hints={[
+          { id: "previous", key: "←", label: "上一題" },
+          { id: "next", key: "→", label: currentIdx < total - 1 ? "下一題" : "完成" },
+          { id: "answer", key: "1-4 / A-D", label: "選答" },
+          { id: "enter", key: "Enter", label: currentIdx < total - 1 ? "下一題" : "完成" },
+          { id: "favorite", key: "F", label: "收藏" },
+          { id: "note", key: "N", label: "筆記" },
+          { id: "copy", key: "X", label: "複製題目" },
+          ...(handbookHref
+            ? [{ id: "handbook", key: "H", label: "研習手冊" }]
+            : []),
+        ]}
+        includeSearchProviders
+      />
 
       <ToastContainer toasts={toasts} />
     </div>

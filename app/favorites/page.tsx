@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import { QuestionStem } from "@/components/QuestionStem";
 import { NoteSection } from "@/components/NoteSection";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
 import { RedoPractice, type RedoItem } from "@/components/RedoPractice";
+import { ToastContainer, useToast } from "@/components/useToast";
 
 type FavItem = {
   questionId: string;
@@ -177,6 +178,9 @@ export default function FavoritesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [practiceMode, setPracticeMode] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState<ReadonlySet<string>>(new Set());
+  const favoriteRequestsRef = useRef<Set<string>>(new Set());
+  const { toast, toasts } = useToast();
 
   const load = () => {
     authedFetch(`/api/favorites`)
@@ -186,6 +190,7 @@ export default function FavoritesPage() {
       })
       .then((data) => {
         setItems(data.items);
+        setFavoriteIds(new Set<string>(data.items.map((item: FavItem) => item.questionId)));
         setLoading(false);
       })
       .catch((e) => {
@@ -199,7 +204,54 @@ export default function FavoritesPage() {
   }, []);
 
   async function remove(qId: string) {
-    await authedFetch(`/api/favorites?questionId=${qId}`, { method: "DELETE" });
+    const response = await authedFetch(
+      `/api/favorites?questionId=${encodeURIComponent(qId)}`,
+      { method: "DELETE" }
+    );
+    if (!response.ok) {
+      toast("移除收藏失敗");
+      return;
+    }
+    load();
+  }
+
+  async function toggleFavorite(questionId: string) {
+    if (favoriteRequestsRef.current.has(questionId)) return;
+    favoriteRequestsRef.current.add(questionId);
+    const wasFavorite = favoriteIds.has(questionId);
+    setFavoriteIds((current) => {
+      const next = new Set(current);
+      if (wasFavorite) next.delete(questionId);
+      else next.add(questionId);
+      return next;
+    });
+
+    try {
+      const response = wasFavorite
+        ? await authedFetch(`/api/favorites?questionId=${encodeURIComponent(questionId)}`, {
+            method: "DELETE",
+          })
+        : await authedFetch("/api/favorites", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ questionId }),
+          });
+      if (!response.ok) throw new Error("收藏操作失敗");
+    } catch {
+      setFavoriteIds((current) => {
+        const next = new Set(current);
+        if (wasFavorite) next.add(questionId);
+        else next.delete(questionId);
+        return next;
+      });
+      toast("收藏操作失敗");
+    } finally {
+      favoriteRequestsRef.current.delete(questionId);
+    }
+  }
+
+  async function exitPractice() {
+    setPracticeMode(false);
     load();
   }
 
@@ -219,11 +271,16 @@ export default function FavoritesPage() {
       question: it.question,
     }));
     return (
-      <RedoPractice
-        items={redoItems}
-        title="收藏題 · 重做練習"
-        onExit={() => setPracticeMode(false)}
-      />
+      <>
+        <RedoPractice
+          items={redoItems}
+          title="收藏題 · 重做練習"
+          favoriteIds={favoriteIds}
+          onToggleFavorite={toggleFavorite}
+          onExit={exitPractice}
+        />
+        <ToastContainer toasts={toasts} />
+      </>
     );
   }
 
@@ -263,6 +320,7 @@ export default function FavoritesPage() {
           ))}
         </div>
       )}
+      <ToastContainer toasts={toasts} />
     </div>
   );
 }
