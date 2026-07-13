@@ -59,7 +59,7 @@ export function ThemeToggle() {
           return (
             <DropdownMenuItem
               key={m}
-              onSelect={() => setMode(m)}
+              onClick={() => setMode(m)}
               className={cn(
                 "flex items-start gap-2.5",
                 "hover:bg-muted hover:text-foreground",

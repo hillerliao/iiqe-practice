@@ -45,7 +45,7 @@ export function formatPaperLabel(paper: string | undefined | null): string {
 /**
  * 將題幹與選項格式化為純文字,方便貼到其他地方使用。
  * 格式:
- *   （香港保險中介人資格考試相關題目,請答題並作通俗解釋，如果可能也介绍相关规则背后的根本原因）
+ *   （香港保險中介人資格考試相關題目,請答題並作通俗、简约、可视化解釋，如果可能也介绍相关规则背后的根本原因）
  *   #1 [卷三 1.2.2(e)]
  *   題幹
  *   A. 選項A
@@ -57,7 +57,7 @@ export function formatPaperLabel(paper: string | undefined | null): string {
  */
 export function buildQuestionTextLines(opts: QuestionTextOptions): string[] {
   const { number, question, options, ref, paper } = opts;
-  const lines: string[] = ["（香港保險中介人資格考試相關題目,請答題並作通俗解釋，如果可能也介绍相关规则背后的根本原因）"];
+  const lines: string[] = ["（香港保險中介人資格考試相關題目,請答題並作通俗、简约、可视化解釋，如果可能也介绍相关规则背后的根本原因）"];
   const handbookUrl = getPublicHandbookUrlForQuestion(paper, ref);
   if (handbookUrl) {
     lines.push(`答题依据请不要胡编乱造，要依据研习手册 ${handbookUrl} 对应章节的内容。`);
