@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { listAttempts } from "@/lib/kv";
 import { getQuestionByIdAsync, getPapersAsync } from "@/lib/data";
 import { requireSession } from "@/lib/auth";
+import { aggregateChapterStats } from "@/lib/stats-aggregation";
 
 export async function GET(req: NextRequest) {
   const session = requireSession(req);
@@ -27,37 +28,21 @@ export async function GET(req: NextRequest) {
   const correct = allAnswers.filter((a) => a.isCorrect).length;
   const accuracy = total > 0 ? correct / total : 0;
 
-  const refGroups: Record<string, { paperCode: string; total: number; correct: number }> = {};
-  for (const a of allAnswers) {
-    const q = await getQuestionByIdAsync(a.questionId);
-    if (!q) continue;
-    const ref = q.ref || "其他";
-    const prefix = ref.split(".").slice(0, 2).join(".");
-    const paperCode = q.id.split("-")[0];
-    const key = `${paperCode}::${prefix}`;
-    if (!refGroups[key]) refGroups[key] = { paperCode, total: 0, correct: 0 };
-    refGroups[key].total++;
-    if (a.isCorrect) refGroups[key].correct++;
-  }
-
-  const refStats = Object.entries(refGroups)
-    .map(([key, v]) => ({
-      ref: key.split("::")[1],
-      paperCode: v.paperCode,
-      total: v.total,
-      correct: v.correct,
-      accuracy: v.total > 0 ? v.correct / v.total : 0,
-    }))
-    .sort((a, b) => {
-      if (a.paperCode !== b.paperCode) return a.paperCode.localeCompare(b.paperCode);
-      const aParts = a.ref.split(".").map(Number);
-      const bParts = b.ref.split(".").map(Number);
-      for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
-        const diff = (aParts[i] || 0) - (bParts[i] || 0);
-        if (diff !== 0) return diff;
-      }
-      return 0;
-    });
+  const refStats = aggregateChapterStats(
+    (
+      await Promise.all(
+        allAnswers.map(async (answer) => {
+          const question = await getQuestionByIdAsync(answer.questionId);
+          if (!question) return null;
+          return {
+            paperCode: question.id.split("-")[0],
+            ref: question.ref,
+            isCorrect: answer.isCorrect,
+          };
+        })
+      )
+    ).filter((answer) => answer !== null)
+  );
 
   const paperGroups: Record<string, { name: string; total: number; correct: number }> = {};
   for (const a of allAnswers) {

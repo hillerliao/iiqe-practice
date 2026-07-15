@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Play, Shuffle, History } from "lucide-react";
 import { authedFetch, getLastSessionError } from "@/lib/session-client";
+import { getQuestionSourceDisplayName } from "@/lib/question-source-display";
 
 type PaperInfo = {
   id: string;
@@ -56,7 +57,7 @@ function PaperSetupInner() {
   useEffect(() => {
     fetch("/api/papers")
       .then((r) => {
-        if (!r.ok) throw new Error("載入卷別失敗");
+        if (!r.ok) throw new Error("載入試卷失敗");
         return r.json();
       })
       .then((data) => {
@@ -163,7 +164,7 @@ function PaperSetupInner() {
           }
         }
         throw new Error(
-          detail ? `建立作答 session 失敗：${detail}` : "建立作答 session 失敗"
+          detail ? `建立練習失敗：${detail}` : "建立練習失敗"
         );
       }
       const aData = await aRes.json();
@@ -193,7 +194,7 @@ function PaperSetupInner() {
   if (!paper) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <p>{error ?? "找不到此卷別"}</p>
+        <p>{error ?? "找不到此試卷"}</p>
         <Button asChild variant="link">
           <Link href="/">返回首頁</Link>
         </Button>
@@ -218,7 +219,7 @@ function PaperSetupInner() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>{paper.name}</span>
-            <Badge variant="secondary">{source === "exam" ? "真題" : "模擬題"}</Badge>
+            <Badge variant="secondary">{getQuestionSourceDisplayName(source)}</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -242,7 +243,7 @@ function PaperSetupInner() {
                 size="lg"
               >
                 <History className="w-4 h-4 mr-2" />
-                繼續上次進度
+                繼續作答
               </Button>
             </div>
           )}

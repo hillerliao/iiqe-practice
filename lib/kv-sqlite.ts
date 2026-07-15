@@ -302,6 +302,14 @@ export async function getAttemptSqlite(id: string): Promise<AttemptRecord | null
   return a ? toAttemptRecord(a) : null;
 }
 
+export async function getPaperCodeSqlite(paperId: string): Promise<string | null> {
+  const paper = await getPrisma().paper.findFirst({
+    where: { OR: [{ id: paperId }, { code: paperId }] },
+    select: { code: true },
+  });
+  return paper?.code ?? null;
+}
+
 export async function updateAttemptSqlite(
   id: string,
   data: Partial<AttemptRecord>
@@ -331,6 +339,8 @@ export async function updateAttemptSqlite(
     });
     if (data.answers) {
       // 简化策略:删除旧 answer,重写;Answer 主键是 attemptId::questionId
+      // 注意:此分支只在外部以整卷重写方式传入时使用。日常答题请走 upsertAnswerSqlite,
+      // 避免同 attempt 不同题目并发提交时的 last-write-wins 丢答案问题。
       await tx.answer.deleteMany({ where: { attemptId: id } });
       for (const ans of data.answers) {
         const answerId = `${id}::${ans.questionId}`;
@@ -347,6 +357,116 @@ export async function updateAttemptSqlite(
         });
       }
     }
+  });
+}
+
+/**
+ * 单题原子 upsert:把同 attemptId+questionId 的答案替换为最新一条,
+ * 不影响其它题目的答案。历史 Answer 可能使用非确定性主键或存在重复行,
+ * 因此保留最新一行的既有 ID，并在同一事务中清理该题其余重复记录。
+ *
+ * 为什么需要:之前 updateAttemptSqlite 用 deleteMany + 重写全部 answers,
+ * 当用户同时打开多题切换时,并发两个 PATCH 会按 commit 顺序互相覆盖,
+ * 表现为"刚保存的另一题答案消失"。此函数把写锁范围缩到一条 Answer。
+ */
+export async function upsertAnswerSqlite(
+  attemptId: string,
+  answer: AnswerRecord
+): Promise<void> {
+  const result = await upsertAnswerIfUnfinishedSqlite(attemptId, answer);
+  if (result === "missing") throw new Error(`Attempt 不存在: ${attemptId}`);
+}
+
+/**
+ * 在同一事务中确认 Attempt 尚未交卷并写入答案。conditional update 是写入锁的一部分，
+ * 因此交卷一旦先完成，迟到的答题请求不会再留下 Answer 行。
+ */
+export async function upsertAnswerIfUnfinishedSqlite(
+  attemptId: string,
+  answer: AnswerRecord
+): Promise<"written" | "finished" | "missing"> {
+  const prisma = getPrisma();
+  return prisma.$transaction(async (tx: TransactionClient) => {
+    // increment 0 让 unfinished 条件成为原子写操作，同时不改变最终成绩。
+    const gate = await tx.attempt.updateMany({
+      where: { id: attemptId, finishedAt: null },
+      data: { correct: { increment: 0 } },
+    });
+    if (gate.count === 0) {
+      const existing = await tx.attempt.findUnique({
+        where: { id: attemptId },
+        select: { finishedAt: true },
+      });
+      return existing ? "finished" : "missing";
+    }
+
+    const existingAnswers = await tx.answer.findMany({
+      where: { attemptId, questionId: answer.questionId },
+      orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+      select: { id: true },
+    });
+    const answerId = existingAnswers[0]?.id ?? `${attemptId}::${answer.questionId}`;
+    await tx.answer.upsert({
+      where: { id: answerId },
+      create: {
+        id: answerId,
+        attemptId,
+        questionId: answer.questionId,
+        userAnswer: answer.userAnswer,
+        isCorrect: answer.isCorrect,
+        timeSpentMs: answer.timeSpentMs,
+        createdAt: new Date(answer.createdAt),
+      },
+      update: {
+        userAnswer: answer.userAnswer,
+        isCorrect: answer.isCorrect,
+        timeSpentMs: answer.timeSpentMs,
+        createdAt: new Date(answer.createdAt),
+      },
+    });
+    if (existingAnswers.length > 1) {
+      await tx.answer.deleteMany({
+        where: {
+          attemptId,
+          questionId: answer.questionId,
+          id: { not: answerId },
+        },
+      });
+    }
+    return "written";
+  });
+}
+
+/**
+ * 先原子地取得交卷权，再读取已冻结的答案计算成绩，避免答题与交卷并发时的旧快照分数。
+ */
+export async function finishAttemptAtomicallySqlite(
+  attemptId: string,
+  finishedAt: string,
+): Promise<AttemptRecord | null> {
+  const prisma = getPrisma();
+  return prisma.$transaction(async (tx: TransactionClient) => {
+    const finish = await tx.attempt.updateMany({
+      where: { id: attemptId, finishedAt: null },
+      data: { finishedAt: new Date(finishedAt) },
+    });
+
+    if (finish.count === 0) {
+      const existing = await tx.attempt.findUnique({
+        where: { id: attemptId },
+        include: { answers: { orderBy: { createdAt: "asc" } } },
+      });
+      return existing ? toAttemptRecord(existing) : null;
+    }
+
+    const answers = await tx.answer.findMany({ where: { attemptId } });
+    const correct = answers.filter((answer) => answer.isCorrect).length;
+    await tx.attempt.update({ where: { id: attemptId }, data: { correct } });
+    const finalized = await tx.attempt.findUnique({
+      where: { id: attemptId },
+      include: { answers: { orderBy: { createdAt: "asc" } } },
+    });
+    return finalized ? toAttemptRecord(finalized) : null;
   });
 }
 

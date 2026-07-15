@@ -337,7 +337,18 @@ export async function createAttempt(record: AttemptRecord): Promise<void> {
 
 export async function getAttempt(id: string): Promise<AttemptRecord | null> {
   if (backend() === "sqlite") return sqlite.getAttemptSqlite(id);
-  return kv.get<AttemptRecord>(attemptKey(id));
+  const attempt = await kv.get<AttemptRecord>(attemptKey(id));
+  if (!attempt) return null;
+  return {
+    ...attempt,
+    questionIds: Array.isArray(attempt.questionIds) ? attempt.questionIds : [],
+    answers: Array.isArray(attempt.answers) ? attempt.answers : [],
+  };
+}
+
+export async function getPaperCode(paperId: string): Promise<string | null> {
+  if (backend() === "sqlite") return sqlite.getPaperCodeSqlite(paperId);
+  return paperId || null;
 }
 
 export async function updateAttempt(id: string, data: Partial<AttemptRecord>): Promise<void> {
@@ -345,6 +356,46 @@ export async function updateAttempt(id: string, data: Partial<AttemptRecord>): P
   const existing = await getAttempt(id);
   if (!existing) return;
   await kv.set(attemptKey(id), { ...existing, ...data });
+}
+
+/**
+ * 单题 upsert:SQLite 后端只更新对应 Answer 行,不影响其它题目。
+ * KV/memory 仍以 attempt JSON 文档读改写,仅用于这些后端的兼容实现；
+ * 跨请求并发一致性需要后续以 Redis Lua / 进程内锁单独加固。
+ */
+export async function upsertAnswerIfUnfinished(
+  attemptId: string,
+  answer: AnswerRecord
+): Promise<"written" | "finished" | "missing"> {
+  if (backend() === "sqlite") return sqlite.upsertAnswerIfUnfinishedSqlite(attemptId, answer);
+  const existing = await getAttempt(attemptId);
+  if (!existing) return "missing";
+  if (existing.finishedAt) return "finished";
+  const nextAnswers = existing.answers.filter((a) => a.questionId !== answer.questionId);
+  nextAnswers.push(answer);
+  await kv.set(attemptKey(attemptId), { ...existing, answers: nextAnswers });
+  return "written";
+}
+
+export async function finishAttemptAtomically(
+  attemptId: string,
+  finishedAt: string,
+): Promise<AttemptRecord | null> {
+  if (backend() === "sqlite") return sqlite.finishAttemptAtomicallySqlite(attemptId, finishedAt);
+  const existing = await getAttempt(attemptId);
+  if (!existing || existing.finishedAt) return existing;
+  const correct = existing.answers.filter((answer) => answer.isCorrect).length;
+  const finalized = { ...existing, finishedAt, correct };
+  await kv.set(attemptKey(attemptId), finalized);
+  return finalized;
+}
+
+export async function upsertAnswer(
+  attemptId: string,
+  answer: AnswerRecord
+): Promise<void> {
+  const result = await upsertAnswerIfUnfinished(attemptId, answer);
+  if (result === "missing") throw new Error(`Attempt 不存在: ${attemptId}`);
 }
 
 export async function findUnfinishedAttempt(sessionId: string, paperId?: string, source?: string): Promise<AttemptRecord | null> {

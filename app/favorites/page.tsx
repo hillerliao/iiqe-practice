@@ -117,7 +117,7 @@ function FavItemCard({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <p className="text-xs text-muted-foreground">點選選項復習作答</p>
+        <p className="text-xs text-muted-foreground">選擇答案以複習作答</p>
         <div className="space-y-2">
           {(["a", "b", "c", "d"] as const).map((letter) => {
             const optText = q.options[letter];
@@ -146,15 +146,15 @@ function FavItemCard({
             )}
           >
             {pickedCorrect
-              ? "✓ 復習答對了"
-              : `✗ 答錯 · 正確答案:${correctLetter.toUpperCase()}`}
+              ? "✓ 複習時答對了"
+              : `✗ 答錯。正確答案：${correctLetter.toUpperCase()}`}
           </div>
         )}
 
         {revealed && (
           <div className="p-3 rounded-lg border border-border bg-muted/50 text-sm space-y-1">
             <p>
-              <span className="text-muted-foreground">正確答案:</span>{" "}
+              <span className="text-muted-foreground">正確答案：</span>{" "}
               <span className="text-green-700 dark:text-green-400 font-medium">
                 {correctLetter.toUpperCase()} — {q.options[correctLetter]}
               </span>
@@ -293,7 +293,7 @@ export default function FavoritesPage() {
             <span className="text-sm text-muted-foreground">共 {items.length} 題</span>
             <Button onClick={() => setPracticeMode(true)}>
               <Play className="w-4 h-4 mr-1" />
-              做題模式
+              練習模式
             </Button>
           </div>
         )}

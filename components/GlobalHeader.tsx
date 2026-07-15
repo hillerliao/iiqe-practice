@@ -41,7 +41,7 @@ export function GlobalHeader({
           className="font-semibold text-base sm:text-lg flex items-center gap-1.5 sm:gap-2 shrink-0 whitespace-nowrap"
         >
           <NavBookOpen className="w-5 h-5 shrink-0" />
-          <span className="hidden min-[380px]:inline">IIQE 做题家</span>
+          <span className="hidden min-[380px]:inline">IIQE 做題家</span>
           <span className="min-[380px]:hidden">IIQE</span>
         </Link>
         <nav className="flex gap-0.5 sm:gap-1 text-sm items-center flex-1 min-w-0 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

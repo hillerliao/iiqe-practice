@@ -54,23 +54,41 @@ async function main() {
     check(`ref="${ref}" → ${href}`, ok);
   }
 
-  console.log("\n=== 测试 4: P3 章节对照表(新加的 30 条) ===");
-  const p3Chapters = ["1.1", "1.2", "1.3", "2.1", "2.2", "2.3", "2.4",
-                      "3.1", "3.2", "3.3", "3.4", "3.5", "3.6",
-                      "4.1", "4.10", "4.12", "5.1", "5.2", "5.3", "5.4", "5.5", "5.6"];
+  console.log("\n=== 測試 4: P3 完整 31 個二級章節對照表 ===");
+  const p3Chapters = [
+    "1.1", "1.2", "1.3",
+    "2.1", "2.2", "2.3", "2.4",
+    "3.1", "3.2", "3.3", "3.4", "3.5", "3.6",
+    "4.1", "4.2", "4.3", "4.4", "4.5", "4.6", "4.7",
+    "4.8", "4.9", "4.10", "4.11", "4.12",
+    "5.1", "5.2", "5.3", "5.4", "5.5", "5.6",
+  ];
   for (const ref of p3Chapters) {
     const info = getChapterInfo("P3", ref);
-    check(`"P3" ref "${ref}" → ${info?.path ?? "null"}`, info !== null);
+    const chapter = p3.chapters.find((entry: { number?: string; title?: string }) => entry.number === ref);
+    const expectedSub = chapter?.title?.replace(/\s*\([^)]*[A-Za-z][^)]*\)\s*$/, "");
+    check(
+      `"P3" ref "${ref}" → ${info?.path ?? "null"}`,
+      info !== null && info.sub === expectedSub,
+      `expected subchapter ${expectedSub ?? "missing from handbook"}`,
+    );
   }
 
-  console.log("\n=== 测试 5: P1 章节对照表(原有,未误伤) ===");
+  console.log("\n=== 測試 5: P3 真實後綴 ref 可識別章節 ===");
+  const p3VariantRefs = ["1.2(h)(ii)", "2.4(e)", "4.10註", "4.11(e )", "5.1(a)"];
+  for (const ref of p3VariantRefs) {
+    const info = getChapterInfo("P3", ref);
+    check(`"P3" variant ref "${ref}" → ${info?.path ?? "null"}`, info !== null);
+  }
+
+  console.log("\n=== 測試 6: P1 章節對照表(原有,未誤傷) ===");
   const p1Chapters = ["1.1", "2.1", "3.4", "5.5", "7.6"];
   for (const ref of p1Chapters) {
     const info = getChapterInfo("P1", ref);
     check(`"P1" ref "${ref}" → ${info?.path ?? "null"}`, info !== null);
   }
 
-  console.log("\n=== 测试 6: ref 格式校验 ===");
+  console.log("\n=== 測試 7: ref 格式校驗 ===");
   check("空 ref → null",     getHandbookHref("exam3-2022", "") === null);
   check("单段 ref '1' → ch-1", getHandbookHref("exam3-2022", "1") === "/studynotes/exam3-2022#ch-1");
   check("ref 'foo' → null", getHandbookHref("exam3-2022", "abc") === null);

@@ -131,7 +131,7 @@ function ResultInner() {
                 href={`/papers?code=${attempt.paper.code}&source=${attempt.source ?? "exam"}`}
               >
                 <Play className="w-4 h-4 mr-1.5" />
-                繼續做題
+                繼續練習
               </Link>
             </Button>
             <Button asChild variant="outline">
@@ -181,7 +181,7 @@ function ResultInner() {
                 </p>
                 <div className="text-sm space-y-1">
                   <p>
-                    <span className="text-muted-foreground">你的答案:</span>{" "}
+                    <span className="text-muted-foreground">你的答案：</span>{" "}
                     <span className="text-red-600 dark:text-red-400 font-medium">
                       {a.userAnswer || "(未作答)"}{" "}
                       {a.userAnswer &&
@@ -190,7 +190,7 @@ function ResultInner() {
                     </span>
                   </p>
                   <p>
-                    <span className="text-muted-foreground">正確答案:</span>{" "}
+                    <span className="text-muted-foreground">正確答案：</span>{" "}
                     <span className="text-green-700 dark:text-green-400 font-medium">
                       {a.question.answer} — {a.question.options[a.question.answer]}
                     </span>

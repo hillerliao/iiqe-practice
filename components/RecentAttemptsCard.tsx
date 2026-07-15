@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Play, FileText, RotateCcw } from "lucide-react";
 import { authedFetch } from "@/lib/session-client";
+import { getQuestionSourceDisplayName } from "@/lib/question-source-display";
 
 // 把題目序號陣列壓縮成區段字串,例如 [110,111,118,119,120,126] → "110~111, 118~120, 126"
 function formatQuestionRanges(nums: number[]): string {
@@ -45,6 +46,7 @@ type RecentAttempt = {
   id: string;
   paperName: string;
   paperCode: string;
+  source: string | null;
   totalQ: number;
   answeredCount: number;
   correct: number;
@@ -132,7 +134,7 @@ export function RecentAttemptsCard({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>最近的作答 session</span>
+          <span>最近作答紀錄</span>
           {showHeaderBadge && unfinishedCount > 0 && (
             <Badge
               variant="outline"
@@ -147,6 +149,7 @@ export function RecentAttemptsCard({
         <div className="space-y-2">
           {recent.map((a) => {
             const isUnfinished = a.finishedAt == null;
+            const sourceLabel = getQuestionSourceDisplayName(a.source);
             // 已交卷:用 correct/totalQ;未交卷:用 correct/answeredCount(已答中的正確率)
             const denom = isUnfinished
               ? Math.max(a.answeredCount, 1)
@@ -162,6 +165,9 @@ export function RecentAttemptsCard({
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-medium">{a.paperName}</p>
+                    <Badge variant="secondary" className="text-[10px]">
+                      {sourceLabel}
+                    </Badge>
                     {isUnfinished && (
                       <Badge
                         variant="outline"

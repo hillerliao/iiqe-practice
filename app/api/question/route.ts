@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getQuestionByIdAsync, getPapersAsync } from "@/lib/data";
+import { getQuestionByIdAsync, getPapersAsync, isGradeableQuestion } from "@/lib/data";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   }
 
   const q = await getQuestionByIdAsync(id);
-  if (!q) {
+  if (!q || !isGradeableQuestion(q)) {
     return NextResponse.json({ error: "Question not found" }, { status: 404 });
   }
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getPapersAsync } from "@/lib/data";
+import { getQuestionSourceDisplayName } from "@/lib/question-source-display";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,9 +18,9 @@ export default async function HomePage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">選擇卷別開始刷題</h1>
+        <h1 className="text-3xl font-bold tracking-tight">選擇卷別開始練習</h1>
         <p className="text-muted-foreground mt-2">
-          香港保險業監管局 IIQE 考試考古題與模擬題練習
+          香港保險業監管局 IIQE 考試必讀題與模擬題練習
         </p>
       </div>
 
@@ -34,14 +35,14 @@ export default async function HomePage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                共 {p.total} 題,涵蓋真題與模擬題
+                共 {p.total} 題，涵蓋{getQuestionSourceDisplayName("exam")}與{getQuestionSourceDisplayName("mock")}
               </p>
               <div className="flex flex-col gap-2">
                 <Button asChild variant="default" className="w-full justify-between">
                   <Link href={`/papers?code=${p.code}&source=exam`}>
                     <span className="flex items-center gap-2">
                       <HomeFileText className="w-4 h-4" />
-                      真題 ({p.bySource.exam ?? 0} 題)
+                      {getQuestionSourceDisplayName("exam")} ({p.bySource.exam ?? 0} 題)
                     </span>
                     <HomeArrowRight className="w-4 h-4" />
                   </Link>
@@ -50,7 +51,7 @@ export default async function HomePage() {
                   <Link href={`/papers?code=${p.code}&source=mock`}>
                     <span className="flex items-center gap-2">
                       <HomeFileQuestion className="w-4 h-4" />
-                      模擬題 ({p.bySource.mock ?? 0} 題)
+                      {getQuestionSourceDisplayName("mock")} ({p.bySource.mock ?? 0} 題)
                     </span>
                     <HomeArrowRight className="w-4 h-4" />
                   </Link>

@@ -32,7 +32,7 @@ export default function AdminQuestionsPage() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            從下方選擇試卷與來源,搜索題面 / 選項 / ref。點擊「編輯」修改題目,點擊「新增題目」追加新題。
+            從下方選擇試卷與來源，搜尋題幹／選項／參考編號。點擊「編輯」修改題目，點擊「新增題目」追加新題。
           </p>
         </CardContent>
       </Card>

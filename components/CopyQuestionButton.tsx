@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getPublicHandbookUrlForQuestion } from "@/lib/handbook-refs";
+import { splitQuestionStatements } from "@/lib/questionText";
 
 type CopyQuestionButtonProps = {
   number?: number;
@@ -45,7 +46,7 @@ export function formatPaperLabel(paper: string | undefined | null): string {
 /**
  * 將題幹與選項格式化為純文字,方便貼到其他地方使用。
  * 格式:
- *   （香港保險中介人資格考試相關題目,請答題並作通俗、简约、可视化解釋，如果可能也介绍相关规则背后的根本原因）
+ *   （香港保險中介人資格考試相關題目,請答題並作通俗、視覺化解釋，並介紹相關規則的底層邏輯。答題時禁止胡編亂造，要依據研習手冊 https://iiqe.liaozh.top/studynotes/exam3-2022#ch-1-2-2 對應章節的內容。）
  *   #1 [卷三 1.2.2(e)]
  *   題幹
  *   A. 選項A
@@ -57,11 +58,13 @@ export function formatPaperLabel(paper: string | undefined | null): string {
  */
 export function buildQuestionTextLines(opts: QuestionTextOptions): string[] {
   const { number, question, options, ref, paper } = opts;
-  const lines: string[] = ["（香港保險中介人資格考試相關題目,請答題並作通俗、简约、可视化解釋，如果可能也介绍相关规则背后的根本原因）"];
   const handbookUrl = getPublicHandbookUrlForQuestion(paper, ref);
-  if (handbookUrl) {
-    lines.push(`答题依据请不要胡编乱造，要依据研习手册 ${handbookUrl} 对应章节的内容。`);
-  }
+  const tail = handbookUrl
+    ? `答題時禁止胡編亂造，要依據研習手冊 ${handbookUrl} 對應章節的內容。`
+    : "";
+  const lines: string[] = [
+    `（香港保險中介人資格考試相關題目,請答題並作通俗、視覺化解釋，並介紹相關規則的底層邏輯。${tail}）`,
+  ];
   const paperLabel = formatPaperLabel(paper);
   const refTag = ref ? `[${ref}]` : "";
   const headerParts: string[] = [];
@@ -74,7 +77,13 @@ export function buildQuestionTextLines(opts: QuestionTextOptions): string[] {
     headerParts.push(refTag);
   }
   if (headerParts.length) lines.push(headerParts.join(" "));
-  lines.push(question.trim());
+  const { lead, items } = splitQuestionStatements(question.trim());
+  if (items.length > 0) {
+    if (lead) lines.push(lead);
+    lines.push(...items);
+  } else {
+    lines.push(question.trim());
+  }
   for (const letter of ["a", "b", "c", "d"] as const) {
     const text = options[letter];
     if (text) {

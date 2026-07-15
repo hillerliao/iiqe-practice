@@ -16,6 +16,8 @@ type PracticeOptionProps = {
   onPick: (letter: OptionLetter) => void;
   /** 額外禁用,例如外部流程鎖定時 */
   disabled?: boolean;
+  /** 僅在所在頁面已啟用選答快捷鍵時提供 */
+  title?: string;
 };
 
 /**
@@ -30,6 +32,7 @@ export function PracticeOption({
   showResult,
   onPick,
   disabled,
+  title,
 }: PracticeOptionProps) {
   const isThisCorrect = correctLetter === letter;
   const isDisabled = disabled || showResult;
@@ -39,6 +42,7 @@ export function PracticeOption({
       type="button"
       disabled={isDisabled}
       onClick={() => onPick(letter)}
+      title={title}
       className={cn(
         "w-full text-left p-3 rounded-lg border-2 transition-colors flex items-start gap-3",
         !showResult &&

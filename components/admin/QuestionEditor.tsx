@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { adminFetch, AdminApiError } from "@/lib/admin-fetch";
+import { getQuestionSourceDisplayName } from "@/lib/question-source-display";
 import type { QuestionData } from "@/lib/data";
 
 type OptionKey = "a" | "b" | "c" | "d";
@@ -203,7 +204,7 @@ export function QuestionEditor({
               )}
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">source</Label>
+              <Label className="text-xs">題目來源</Label>
               {mode === "edit" ? (
                 <Input value={source} disabled className="font-mono text-xs" />
               ) : (
@@ -212,8 +213,8 @@ export function QuestionEditor({
                   onChange={(e) => setSource(e.target.value as "exam" | "mock")}
                   className="h-8 w-full rounded-md border border-input bg-transparent px-2 text-sm"
                 >
-                  <option value="exam">真題 (exam)</option>
-                  <option value="mock">模擬題 (mock)</option>
+                  <option value="exam">{getQuestionSourceDisplayName("exam")} (exam)</option>
+                  <option value="mock">{getQuestionSourceDisplayName("mock")} (mock)</option>
                 </select>
               )}
             </div>
@@ -246,7 +247,7 @@ export function QuestionEditor({
           {/* ref + page + sourceLabel */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs">ref</Label>
+              <Label className="text-xs">參考編號</Label>
               <Input
                 value={ref}
                 onChange={(e) => setRef(e.target.value)}

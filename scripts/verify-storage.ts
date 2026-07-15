@@ -29,11 +29,13 @@ import {
   listFeedback,
   listAllFeedback,
   deleteFeedback,
+  upsertAnswer,
   type AttemptRecord,
   type AnswerRecord,
   type FeedbackRecord,
 } from "@/lib/kv";
 import { getPrisma, resetPrisma } from "@/lib/db";
+import { DomainError, finishAttempt, submitAnswer } from "@/lib/attempt-service";
 
 const FAKE_SESSION = `verify-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 
@@ -130,6 +132,272 @@ async function checkAttemptLifecycle(): Promise<void> {
   const finished = await getAttempt(id);
   check("attempt.finish.finishedAt!=null", finished?.finishedAt != null);
   check("attempt.finish.correct=2", finished?.correct === 2, `correct=${finished?.correct}`);
+}
+
+async function checkFinishAnswerAtomicity(): Promise<void> {
+  if (describeBackend().backend !== "sqlite") {
+    log("attempt-finish-atomicity.sqlite-skipped", true, "non-sqlite backend");
+    return;
+  }
+
+  const createRecord = (id: string): AttemptRecord => ({
+    id,
+    sessionId: FAKE_SESSION,
+    paperId: "P1",
+    mode: "exam",
+    source: "exam",
+    startedAt: new Date().toISOString(),
+    finishedAt: null,
+    durationSec: null,
+    totalQ: 1,
+    questionIds: ["P1-exam-1"],
+    correct: 0,
+    answers: [],
+  });
+
+  const finishedId = `at_finished_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+  await createAttempt(createRecord(finishedId));
+  await finishAttempt(FAKE_SESSION, finishedId);
+  let finishedCode = "";
+  try {
+    await submitAnswer({
+      sessionId: FAKE_SESSION,
+      attemptId: finishedId,
+      questionId: "P1-exam-1",
+      userAnswer: "c",
+    });
+  } catch (error) {
+    if (error instanceof DomainError) finishedCode = error.code;
+  }
+  const finished = await getAttempt(finishedId);
+  check("attempt.finished.rejects-answer", finishedCode === "ATTEMPT_FINISHED", `code=${finishedCode || "none"}`);
+  check("attempt.finished.has-no-late-answer", finished?.answers.length === 0, `answers=${finished?.answers.length ?? -1}`);
+
+  const concurrentId = `at_finish_race_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+  await createAttempt(createRecord(concurrentId));
+  const [finishResult, answerResult] = await Promise.allSettled([
+    finishAttempt(FAKE_SESSION, concurrentId),
+    submitAnswer({
+      sessionId: FAKE_SESSION,
+      attemptId: concurrentId,
+      questionId: "P1-exam-1",
+      userAnswer: "c",
+    }),
+  ]);
+  const concurrent = await getAttempt(concurrentId);
+  const persistedCorrect = concurrent?.answers.filter((answer) => answer.isCorrect).length;
+  check("attempt.finish-race.finish-succeeds", finishResult.status === "fulfilled");
+  check(
+    "attempt.finish-race.answer-outcome",
+    answerResult.status === "fulfilled" ||
+      (answerResult.status === "rejected" &&
+        answerResult.reason instanceof DomainError &&
+        answerResult.reason.code === "ATTEMPT_FINISHED"),
+    answerResult.status === "rejected" ? String(answerResult.reason) : undefined,
+  );
+  check("attempt.finish-race.finished", concurrent?.finishedAt != null);
+  check(
+    "attempt.finish-race.score-matches-answers",
+    concurrent?.correct === persistedCorrect,
+    `correct=${concurrent?.correct ?? -1} persisted=${persistedCorrect ?? -1}`,
+  );
+}
+
+async function checkLegacyAttemptAnswer(): Promise<void> {
+  const id = `at_legacy_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+  const now = new Date().toISOString();
+  const rec: AttemptRecord = {
+    id,
+    sessionId: FAKE_SESSION,
+    paperId: "P3",
+    mode: "exam",
+    source: "exam",
+    startedAt: now,
+    finishedAt: null,
+    durationSec: null,
+    totalQ: 10,
+    questionIds: [],
+    correct: 0,
+    answers: [],
+  };
+  await createAttempt(rec);
+
+  const answer = await submitAnswer({
+    sessionId: FAKE_SESSION,
+    attemptId: id,
+    questionId: "P3-exam-321",
+    userAnswer: "c",
+    timeSpentMs: 321,
+  });
+  check("legacy-attempt.answer.graded", answer.isCorrect);
+
+  const got = await getAttempt(id);
+  check(
+    "legacy-attempt.answer.persisted",
+    got?.answers.some((item) => item.questionId === "P3-exam-321") === true,
+  );
+  check(
+    "legacy-attempt.questionIds.stays-sentinel",
+    got?.questionIds.length === 0,
+    `len=${got?.questionIds.length ?? -1}`,
+  );
+
+  let crossPaperCode = "";
+  try {
+    await submitAnswer({
+      sessionId: FAKE_SESSION,
+      attemptId: id,
+      questionId: "P1-exam-1",
+      userAnswer: "c",
+    });
+  } catch (error) {
+    if (error instanceof DomainError) crossPaperCode = error.code;
+  }
+  check(
+    "legacy-attempt.cross-paper.rejected",
+    crossPaperCode === "QUESTION_NOT_IN_ATTEMPT",
+    `code=${crossPaperCode || "none"}`,
+  );
+
+  const strictId = `${id}_strict`;
+  await createAttempt({
+    ...rec,
+    id: strictId,
+    totalQ: 1,
+    questionIds: ["P3-exam-321"],
+  });
+  let strictCode = "";
+  try {
+    await submitAnswer({
+      sessionId: FAKE_SESSION,
+      attemptId: strictId,
+      questionId: "P3-exam-320",
+      userAnswer: "a",
+    });
+  } catch (error) {
+    if (error instanceof DomainError) strictCode = error.code;
+  }
+  check(
+    "new-attempt.exact-roster.enforced",
+    strictCode === "QUESTION_NOT_IN_ATTEMPT",
+    `code=${strictCode || "none"}`,
+  );
+
+  const p3Mock106AttemptId = `${id}_p3_mock_106`;
+  await createAttempt({
+    ...rec,
+    id: p3Mock106AttemptId,
+    source: "mock",
+    totalQ: 1,
+    questionIds: ["P3-mock-106"],
+  });
+  const p3Mock106Answer = await submitAnswer({
+    sessionId: FAKE_SESSION,
+    attemptId: p3Mock106AttemptId,
+    questionId: "P3-mock-106",
+    userAnswer: "b",
+  });
+  check("p3-mock-106.answer.graded", p3Mock106Answer.isCorrect);
+
+  let ownershipCode = "";
+  try {
+    await submitAnswer({
+      sessionId: `${FAKE_SESSION}-other`,
+      attemptId: id,
+      questionId: "P3-exam-321",
+      userAnswer: "c",
+    });
+  } catch (error) {
+    if (error instanceof DomainError) ownershipCode = error.code;
+  }
+  check(
+    "legacy-attempt.ownership.enforced",
+    ownershipCode === "ATTEMPT_NOT_FOUND",
+    `code=${ownershipCode || "none"}`,
+  );
+}
+
+async function checkHistoricalAnswerUpsert(): Promise<void> {
+  if (describeBackend().backend !== "sqlite") {
+    log("historical-answer.sqlite-skipped", true, "non-sqlite backend");
+    return;
+  }
+
+  const id = `at_history_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+  const historicalAnswerId = `legacy-answer-${crypto.randomUUID()}`;
+  const duplicateAnswerId = `duplicate-answer-${crypto.randomUUID()}`;
+  const now = new Date().toISOString();
+  await createAttempt({
+    id,
+    sessionId: FAKE_SESSION,
+    paperId: "P3",
+    mode: "exam",
+    source: "exam",
+    startedAt: now,
+    finishedAt: null,
+    durationSec: null,
+    totalQ: 2,
+    questionIds: ["P3-exam-320", "P3-exam-321"],
+    correct: 0,
+    answers: [],
+  });
+
+  const prisma = getPrisma();
+  await prisma.answer.createMany({
+    data: [
+      {
+        id: historicalAnswerId,
+        attemptId: id,
+        questionId: "P3-exam-321",
+        userAnswer: "a",
+        isCorrect: false,
+        timeSpentMs: 100,
+        createdAt: new Date(now),
+      },
+      {
+        id: duplicateAnswerId,
+        attemptId: id,
+        questionId: "P3-exam-321",
+        userAnswer: "d",
+        isCorrect: false,
+        timeSpentMs: 150,
+        createdAt: new Date(Date.now() - 1_000),
+      },
+      {
+        id: `${id}::P3-exam-320`,
+        attemptId: id,
+        questionId: "P3-exam-320",
+        userAnswer: "b",
+        isCorrect: false,
+        timeSpentMs: 200,
+        createdAt: new Date(now),
+      },
+    ],
+  });
+
+  await upsertAnswer(id, {
+    questionId: "P3-exam-321",
+    userAnswer: "c",
+    isCorrect: true,
+    timeSpentMs: 321,
+    createdAt: new Date().toISOString(),
+  });
+
+  const targetRows = await prisma.answer.findMany({
+    where: { attemptId: id, questionId: "P3-exam-321" },
+  });
+  check("historical-answer.single-row", targetRows.length === 1, `rows=${targetRows.length}`);
+  check("historical-answer.id-preserved", targetRows[0]?.id === historicalAnswerId);
+  check(
+    "historical-answer.fields-updated",
+    targetRows[0]?.userAnswer === "c" &&
+      targetRows[0]?.isCorrect === true &&
+      targetRows[0]?.timeSpentMs === 321,
+  );
+  const other = await prisma.answer.findFirst({
+    where: { attemptId: id, questionId: "P3-exam-320" },
+  });
+  check("historical-answer.other-question-preserved", other?.userAnswer === "b");
 }
 
 async function checkFavoriteAndNote(): Promise<void> {
@@ -235,6 +503,9 @@ async function main(): Promise<void> {
 
   // 无论 backend 选什么,都跑业务冒烟(让脚本对 KV/memory 也健康)
   await checkAttemptLifecycle();
+  await checkFinishAnswerAtomicity();
+  await checkLegacyAttemptAnswer();
+  await checkHistoricalAnswerUpsert();
   await checkFavoriteAndNote();
   await checkFeedback();
   await checkPersistence();

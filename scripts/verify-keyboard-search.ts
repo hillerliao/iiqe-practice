@@ -7,7 +7,10 @@ import {
   type ShiftKeyboardLike,
 } from "../lib/question-search";
 import {
+  ENTER_ACTIVATABLE_TARGET_SELECTOR,
   INTERACTIVE_TARGET_SELECTOR,
+  getAnswerShortcutLabel,
+  isEnterActivatableTargetDescriptor,
   isInteractiveTargetDescriptor,
   noModifiers,
   parseAnswerKey,
@@ -65,6 +68,27 @@ for (const [code, providerId] of [
   assert.equal(matchQuestionSearchProvider(shiftedEvent)?.id, providerId);
 }
 
+const reportEvent = keyboardEvent("KeyR");
+assert.equal(noModifiers(reportEvent), true, "KeyR should remain a plain report action");
+assert.equal(matchQuestionSearchProvider(reportEvent), undefined);
+assert.equal(
+  matchQuestionSearchProvider(keyboardEvent("KeyR", { shiftKey: true })),
+  undefined,
+  "Shift+R should not collide with a search provider",
+);
+for (const modifiers of [
+  { shiftKey: true },
+  { ctrlKey: true },
+  { metaKey: true },
+  { altKey: true },
+]) {
+  assert.equal(
+    noModifiers(keyboardEvent("KeyR", modifiers)),
+    false,
+    "Modified KeyR should not trigger the plain report action",
+  );
+}
+
 const handbookEvent = keyboardEvent("KeyH");
 assert.equal(noModifiers(handbookEvent), true, "KeyH should remain a plain handbook action");
 assert.equal(matchQuestionSearchProvider(handbookEvent), undefined);
@@ -74,17 +98,22 @@ assert.equal(
   "Shift+H should not collide with a search provider",
 );
 
-for (const [key, expected] of [
-  ["1", "a"],
-  ["2", "b"],
-  ["3", "c"],
-  ["4", "d"],
-  ["A", "a"],
-  ["B", "b"],
-  ["C", "c"],
-  ["D", "d"],
+for (const [key, expected, shortcutLabel] of [
+  ["1", "a", "A / 1"],
+  ["2", "b", "B / 2"],
+  ["3", "c", "C / 3"],
+  ["4", "d", "D / 4"],
+  ["A", "a", "A / 1"],
+  ["B", "b", "B / 2"],
+  ["C", "c", "C / 3"],
+  ["D", "d", "D / 4"],
 ] as const) {
   assert.equal(parseAnswerKey(key), expected, `${key} should select answer ${expected}`);
+  assert.equal(
+    getAnswerShortcutLabel(expected),
+    shortcutLabel,
+    `${expected} should expose its exact shortcut label`,
+  );
 }
 
 assert.equal(shouldHandleKeyRepeat({ repeat: false }), true);
@@ -130,6 +159,27 @@ for (const targetKind of [
     `${targetKind} should be interactive through closest()`,
   );
   assert.equal(receivedSelector, INTERACTIVE_TARGET_SELECTOR);
+}
+
+assert.equal(
+  isEnterActivatableTargetDescriptor({ tagName: "div" }),
+  false,
+  "plain content should allow the global Enter shortcut",
+);
+for (const targetKind of ["button", "link"] as const) {
+  let receivedSelector: string | undefined;
+  const target = {
+    closest(selector: string): unknown {
+      receivedSelector = selector;
+      return { targetKind };
+    },
+  };
+  assert.equal(
+    isEnterActivatableTargetDescriptor(target),
+    true,
+    `${targetKind} should keep its native Enter activation`,
+  );
+  assert.equal(receivedSelector, ENTER_ACTIVATABLE_TARGET_SELECTOR);
 }
 
 const query = "中文 & ? = # 空格";

@@ -6,6 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   XCircle,
   ChevronLeft,
   ChevronRight,
@@ -28,6 +36,8 @@ import { useToast, ToastContainer } from "@/components/useToast";
 import { authedFetch } from "@/lib/session-client";
 import { writeTextToClipboard } from "@/lib/clipboard";
 import {
+  getAnswerShortcutLabel,
+  isEnterActivatableEventTarget,
   noModifiers,
   normalizeKey,
   parseAnswerKey,
@@ -93,6 +103,7 @@ export function RedoPractice({
   const [isPersisting, setIsPersisting] = useState(false);
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
   const [notes, setNotes] = useState<Record<string, string>>({});
+  const [isRestartConfirmOpen, setIsRestartConfirmOpen] = useState(false);
   const autoNextTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const noteButtonRef = useRef<NoteButtonHandle>(null);
 
@@ -248,6 +259,19 @@ export function RedoPractice({
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function requestRestart() {
+    if (Object.keys(answers).length === 0) {
+      restart();
+      return;
+    }
+    setIsRestartConfirmOpen(true);
+  }
+
+  function confirmRestart() {
+    setIsRestartConfirmOpen(false);
+    restart();
+  }
+
   function jumpToQuestion(id: string) {
     clearAutoNext();
     const idx = items.findIndex((x) => x.questionId === id);
@@ -314,7 +338,8 @@ export function RedoPractice({
 
       if (
         noModifiers(event) &&
-        (key === "ArrowRight" || key === "Enter")
+        (key === "ArrowRight" ||
+          (key === "Enter" && !isEnterActivatableEventTarget(event.target)))
       ) {
         event.preventDefault();
         if (state.currentIdx >= state.total - 1) {
@@ -540,7 +565,7 @@ export function RedoPractice({
                   href={handbookHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  title="在新分頁開啟研習手冊對應章節"
+                  title="在新分頁開啟研習手冊對應章節 (H)"
                 >
                   <Badge
                     variant="outline"
@@ -574,6 +599,7 @@ export function RedoPractice({
                 ref={current.question.ref || undefined}
                 paper={current.paperCode || undefined}
                 size="xs"
+                showShortcutHints
               />
             </div>
           </div>
@@ -594,6 +620,7 @@ export function RedoPractice({
                 correctLetter={correctLetter}
                 showResult={isAnswered}
                 onPick={pickAnswer as (l: OptionLetter) => void}
+                title={`選擇 ${letter.toUpperCase()} (${getAnswerShortcutLabel(letter)})`}
               />
             );
           })}
@@ -630,17 +657,17 @@ export function RedoPractice({
                 ) : (
                   <>
                     <XCircle className="inline w-4 h-4 mr-1" />
-                    答錯 · 正確答案:{correctLetter.toUpperCase()}
+                    答錯。正確答案：{correctLetter.toUpperCase()}
                   </>
                 )}
               </p>
               {hasPrevAnswer ? (
                 <p className="text-xs text-muted-foreground mt-1">
-                  之前的答案:{prevRaw!.toUpperCase()}
+                  之前的答案：{prevRaw!.toUpperCase()}
                 </p>
               ) : prevRaw === "" ? (
                 <p className="text-xs text-muted-foreground mt-1">
-                  之前的答案:(未作答)
+                  之前的答案：（未作答）
                 </p>
               ) : null}
               {current.question.explanation && (
@@ -686,27 +713,37 @@ export function RedoPractice({
       </div>
 
       <div className="mt-4 flex items-center justify-between">
-        <Button variant="outline" onClick={goPrev} disabled={currentIdx === 0 || isPersisting}>
+        <Button
+          variant="outline"
+          onClick={goPrev}
+          disabled={currentIdx === 0 || isPersisting}
+          title="上一題 (←)"
+        >
           <ChevronLeft className="w-4 h-4 mr-1" />
           上一題
         </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={restart}
-          disabled={isPersisting}
-          title="重置所有作答"
-        >
-          <RotateCcw className="w-3.5 h-3.5 mr-1" />
-          重置
-        </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={requestRestart}
+            disabled={isPersisting}
+            title="清除本輪答案並回到第 1 題，不影響歷史記錄"
+          >
+            <RotateCcw className="w-3.5 h-3.5 mr-1" />
+            重新開始本輪
+          </Button>
         {currentIdx < total - 1 ? (
-          <Button onClick={goNext} disabled={isPersisting}>
+          <Button onClick={goNext} disabled={isPersisting} title="下一題 (→ / Enter)">
             下一題
             <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         ) : (
-          <Button onClick={goNext} variant="default" disabled={isPersisting}>
+          <Button
+            onClick={goNext}
+            variant="default"
+            disabled={isPersisting}
+            title="完成 (→ / Enter)"
+          >
             {isPersisting ? "儲存中..." : "完成"}
             <Check className="w-4 h-4 ml-1" />
           </Button>
@@ -731,6 +768,45 @@ export function RedoPractice({
       />
 
       <ToastContainer toasts={toasts} />
+      <RestartConfirmationDialog
+        open={isRestartConfirmOpen}
+        onOpenChange={setIsRestartConfirmOpen}
+        onConfirm={confirmRestart}
+        disabled={isPersisting}
+      />
     </div>
+  );
+}
+
+function RestartConfirmationDialog({
+  open,
+  onOpenChange,
+  onConfirm,
+  disabled,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  disabled: boolean;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle>重新開始本輪練習？</DialogTitle>
+          <DialogDescription>
+            本輪已選擇的答案將被清除，並回到第 1 題。歷史答題記錄、錯題本、收藏和筆記均不會刪除。
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={disabled}>
+            繼續目前練習
+          </Button>
+          <Button onClick={onConfirm} disabled={disabled}>
+            重新開始本輪
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

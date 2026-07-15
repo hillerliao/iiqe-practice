@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAttempt, getNote, listNotes } from "@/lib/kv";
+import { getAttempt, getNote, getPaperCode, listNotes } from "@/lib/kv";
 import { finishAttempt, submitAnswer, DomainError } from "@/lib/attempt-service";
 import { getQuestionById, getQuestions, getPapers } from "@/lib/data";
 import { requireSession } from "@/lib/auth";
@@ -32,10 +32,11 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  const paperCode = (await getPaperCode(attempt.paperId)) ?? attempt.paperId;
   const allQuestions = (attempt.questionIds.length > 0
     ? attempt.questionIds.map((qid) => getQuestionById(qid)).filter((q): q is NonNullable<typeof q> => q != null)
-    : getQuestions(attempt.paperId, attempt.source ?? "exam"));
-  const paperInfo = getPapers().find((p) => p.id === attempt.paperId);
+    : getQuestions(paperCode, attempt.source ?? "exam"));
+  const paperInfo = getPapers().find((p) => p.code === paperCode || p.id === attempt.paperId);
 
   return NextResponse.json({
     attempt: {

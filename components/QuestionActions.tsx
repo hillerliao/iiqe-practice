@@ -37,6 +37,7 @@ type QuestionActionsProps = {
   paper?: string;
   className?: string;
   size?: "xs" | "sm" | "default";
+  showShortcutHints?: boolean;
 };
 
 export function QuestionActions({
@@ -47,6 +48,7 @@ export function QuestionActions({
   paper,
   className,
   size = "xs",
+  showShortcutHints = false,
 }: QuestionActionsProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -97,7 +99,11 @@ export function QuestionActions({
         asChild
         variant="ghost"
         size={size}
-        title={`用 ${googleProvider.label} 搜尋這題`}
+        title={
+          showShortcutHints
+            ? `用 ${googleProvider.label} 搜尋這題 (${googleProvider.shortcutLabel})`
+            : `用 ${googleProvider.label} 搜尋這題`
+        }
         className={googleProvider.className}
       >
         <a
@@ -127,6 +133,7 @@ export function QuestionActions({
           <button
             type="button"
             onClick={handleCopy}
+            title={showShortcutHints ? "複製題目 (X)" : "複製題目"}
             className="flex items-center gap-2 w-full px-3 py-1.5 text-left text-sm hover:bg-muted text-foreground"
           >
             {copied ? (
@@ -146,6 +153,11 @@ export function QuestionActions({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
+                title={
+                  showShortcutHints
+                    ? `用 ${provider.label} 搜尋這題 (${provider.shortcutLabel})`
+                    : `用 ${provider.label} 搜尋這題`
+                }
                 className={cn(
                   "flex items-center gap-2 w-full px-3 py-1.5 text-sm",
                   provider.className

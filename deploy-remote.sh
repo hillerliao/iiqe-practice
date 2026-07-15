@@ -132,7 +132,7 @@ DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npx tsx scripts/dedupe-que
   echo "!!! [warn] dedupe-questions 返回非 0(可能无可自动判定的重复组)。prod.db 可能仍有重复,请人工核查。"
 
 echo "---[7/9] health check: verify-storage---"
-DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npx tsx scripts/verify-storage.ts 2>&1 | tail -40
+DATABASE_URL="${DATABASE_URL:-file:./prisma/prod.db}" npm run verify:storage 2>&1 | tail -40
 VERIFY_EXIT=$?
 if [ "$VERIFY_EXIT" -ne 0 ]; then
   echo "!!! verify-storage FAILED (exit=$VERIFY_EXIT); aborting swap. iiqe-app-prev preserved for rollback."

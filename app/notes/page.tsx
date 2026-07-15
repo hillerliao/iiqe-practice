@@ -84,7 +84,7 @@ export default function NotesPage() {
               在答題頁面點 <NotebookPen className="w-3.5 h-3.5 inline" /> 加筆記,即可在此處查看與管理。
             </p>
             <Button asChild variant="link" className="px-0 mt-2">
-              <Link href="/">返回首頁開始刷題</Link>
+              <Link href="/">返回首頁開始練習</Link>
             </Button>
           </CardContent>
         </Card>

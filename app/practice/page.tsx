@@ -21,7 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { authedFetch } from "@/lib/session-client";
 import { NoteButton, type NoteButtonHandle } from "@/components/NoteButton";
-import { ReportButton } from "@/components/ReportButton";
+import { ReportButton, type ReportButtonHandle } from "@/components/ReportButton";
 import { QuestionStem } from "@/components/QuestionStem";
 import { ShortcutHints } from "@/components/ShortcutHints";
 import { buildSearchQuery } from "@/components/QuestionSearchButtons";
@@ -31,7 +31,10 @@ import { useWindowKeydown } from "@/hooks/use-window-keydown";
 import { writeTextToClipboard } from "@/lib/clipboard";
 import { getChapterInfo } from "@/lib/chapters";
 import { getHandbookHrefForQuestion } from "@/lib/handbook-refs";
+import { getQuestionSourceDisplayName } from "@/lib/question-source-display";
 import {
+  getAnswerShortcutLabel,
+  isEnterActivatableEventTarget,
   noModifiers,
   normalizeKey,
   parseAnswerKey,
@@ -106,6 +109,7 @@ function PracticeInner() {
   const searchRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
   const noteButtonRef = useRef<NoteButtonHandle>(null);
+  const reportButtonRef = useRef<ReportButtonHandle>(null);
 
   const AUTO_NEXT_DELAY = 1200; // 答對後自動跳下一題的延遲(ms)
 
@@ -243,6 +247,7 @@ function PracticeInner() {
     setAnswers((prev) => ({ ...prev, [qId]: ans }));
     setShowFeedback(true);
 
+    let failureMessage = "答案儲存失敗，請重試";
     try {
       const res = await authedFetch("/api/attempt", {
         method: "PATCH",
@@ -257,7 +262,20 @@ function PracticeInner() {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "未知錯誤" }));
-        throw new Error(err.error ?? `HTTP ${res.status}`);
+        if (res.status === 401) {
+          failureMessage = "登入已失效，請重新整理頁面";
+        } else if (err.code === "QUESTION_NOT_IN_ATTEMPT") {
+          failureMessage = "本題不在本次作答範圍，請回到首頁重新開始";
+        } else if (err.code === "ATTEMPT_FINISHED") {
+          failureMessage = "本次作答已結束";
+        } else if (
+          res.status < 500 &&
+          typeof err.error === "string" &&
+          err.error.length <= 60
+        ) {
+          failureMessage = err.error;
+        }
+        throw new Error(`${err.code ? `[${err.code}] ` : ""}${err.error ?? `HTTP ${res.status}`}`);
       }
     } catch (error) {
       console.error("[submitAnswer] 儲存失敗:", error);
@@ -269,7 +287,7 @@ function PracticeInner() {
       });
       if (currentIdxRef.current === submittedIdx) setShowFeedback(false);
       answerRequestsRef.current.delete(qId);
-      toast("答案儲存失敗，請重試");
+      toast(failureMessage);
       return;
     }
 
@@ -476,13 +494,20 @@ function PracticeInner() {
       } else if (key === "n") {
         event.preventDefault();
         noteButtonRef.current?.toggleEditor();
+      } else if (key === "r") {
+        event.preventDefault();
+        reportButtonRef.current?.open();
       } else if (key === "g") {
         event.preventDefault();
         setShowJumpPanel((value) => !value);
       } else if (key === "x") {
         event.preventDefault();
         void handleCopy(true);
-      } else if (key === "Enter" && currentIdx >= questions.length - 1) {
+      } else if (
+        key === "Enter" &&
+        currentIdx >= questions.length - 1 &&
+        !isEnterActivatableEventTarget(event.target)
+      ) {
         event.preventDefault();
         handleFinish();
       }
@@ -515,7 +540,7 @@ function PracticeInner() {
               </span>
               <span aria-hidden="true">·</span>
               <span className="shrink-0">
-                {attempt.source === "mock" ? "模擬題" : "真題"}
+                {getQuestionSourceDisplayName(attempt.source)}
               </span>
             </div>
             <span className="text-border hidden sm:inline" aria-hidden="true">|</span>
@@ -528,7 +553,7 @@ function PracticeInner() {
                   href={handbookHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  title="在新分頁開啟研習手冊對應章節"
+                  title="在新分頁開啟研習手冊對應章節 (H)"
                   className="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium text-foreground/80 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
                 >
                   {currentQ.ref}
@@ -562,6 +587,7 @@ function PracticeInner() {
               variant="ghost"
               size="sm"
               onClick={() => setShowJumpPanel((v) => !v)}
+              title="跳題清單 (G)"
             >
               <List className="w-4 h-4" />
             </Button>
@@ -636,6 +662,7 @@ function PracticeInner() {
                 key={letter}
                 disabled={isAnswered}
                 onClick={() => submitAnswer(currentQ.id, letter)}
+                title={`選擇 ${letter.toUpperCase()} (${getAnswerShortcutLabel(letter)})`}
                 className={cn(
                   "w-full text-left p-3 rounded-lg border-2 transition-colors flex items-start gap-3",
                   !showResult && "hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/30",
@@ -690,7 +717,7 @@ function PracticeInner() {
                     )}
                   </span>
                 ) : (
-                  <span className="text-red-700">✗ 答錯 · 正確答案:{currentQ.answer}</span>
+                  <span className="text-red-700">✗ 答錯。正確答案：{currentQ.answer}</span>
                 )}
               </p>
               {currentQ.explanation && (
@@ -708,12 +735,17 @@ function PracticeInner() {
           variant="outline"
           onClick={goPrev}
           disabled={currentIdx === 0}
+          title="上一題 (←)"
         >
           <ChevronLeft className="w-4 h-4 md:mr-1" />
           <span className="hidden md:inline">上一題</span>
         </Button>
         <div className="flex items-center gap-0 md:gap-1">
-          <Button variant="ghost" onClick={() => toggleFavorite(currentQ.id)}>
+          <Button
+            variant="ghost"
+            onClick={() => toggleFavorite(currentQ.id)}
+            title={favorites.has(currentQ.id) ? "取消收藏 (F)" : "收藏 (F)"}
+          >
             <Star
               className={cn(
                 "w-4 h-4 md:mr-1",
@@ -726,7 +758,7 @@ function PracticeInner() {
             <Button
               variant="ghost"
               onClick={() => setSearchOpen((v) => !v)}
-              title="搜尋"
+              title="搜尋這題"
             >
               <Search className="w-4 h-4 md:mr-1" />
               <span className="hidden md:inline">搜尋</span>
@@ -742,6 +774,7 @@ function PracticeInner() {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setSearchOpen(false)}
+                      title={`用 ${provider.label} 搜尋這題 (${provider.shortcutLabel})`}
                       className={cn("flex items-center gap-2 px-3 py-1.5 text-sm", provider.className)}
                     >
                       {provider.label}
@@ -751,7 +784,7 @@ function PracticeInner() {
               );
             })()}
           </div>
-          <Button variant="ghost" onClick={() => void handleCopy()} title="複製題目">
+          <Button variant="ghost" onClick={() => void handleCopy()} title="複製題目 (X)">
             {copied ? (
               <Check className="w-4 h-4 md:mr-1 text-green-600 dark:text-green-400" />
             ) : (
@@ -777,18 +810,20 @@ function PracticeInner() {
             }}
           />
           <ReportButton
+            ref={reportButtonRef}
             questionId={currentQ.id}
             userAnswer={answers[currentQ.id] ?? null}
+            shortcutLabel="R"
             onSubmitted={() => toast("已收到您的回報,感謝!")}
           />
         </div>
         {currentIdx < questions.length - 1 ? (
-          <Button onClick={goNext}>
+          <Button onClick={goNext} title="下一題 (→)">
             <span className="hidden md:inline mr-1">下一題</span>
             <ChevronRight className="w-4 h-4" />
           </Button>
         ) : (
-          <Button onClick={handleFinish} variant="default">
+          <Button onClick={handleFinish} variant="default" title="交卷 (→ / Enter)">
             <span className="hidden md:inline">交卷</span>
           </Button>
         )}
@@ -798,10 +833,18 @@ function PracticeInner() {
         className="hidden md:flex mt-3"
         hints={[
           { id: "previous", key: "←", label: "上一題" },
-          { id: "next", key: "→", label: "下一題" },
+          {
+            id: "next",
+            key: "→",
+            label: currentIdx < questions.length - 1 ? "下一題" : "交卷",
+          },
+          ...(currentIdx >= questions.length - 1
+            ? [{ id: "enter", key: "Enter", label: "交卷" }]
+            : []),
           { id: "answer", key: "1-4 / A-D", label: "選答" },
           { id: "favorite", key: "F", label: "收藏" },
           { id: "note", key: "N", label: "筆記" },
+          { id: "report", key: "R", label: "報錯" },
           { id: "jump", key: "G", label: "跳題" },
           { id: "copy", key: "X", label: "複製" },
           ...(handbookHref
@@ -843,6 +886,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
   const [copied, setCopied] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const noteButtonRef = useRef<NoteButtonHandle>(null);
+  const reportButtonRef = useRef<ReportButtonHandle>(null);
   const favoriteRequestRef = useRef(false);
   const handbookHref = question
     ? getHandbookHrefForQuestion(paperCode, question.ref)
@@ -987,6 +1031,9 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
       } else if (key === "n") {
         event.preventDefault();
         noteButtonRef.current?.toggleEditor();
+      } else if (key === "r") {
+        event.preventDefault();
+        reportButtonRef.current?.open();
       } else if (key === "h" && handbookHref) {
         event.preventDefault();
         window.open(handbookHref, "_blank", "noopener,noreferrer");
@@ -1034,7 +1081,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
                 href={handbookHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                title="在新分頁開啟研習手冊對應章節"
+                title="在新分頁開啟研習手冊對應章節 (H)"
                 className="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium text-foreground/80 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
               >
                 {question.ref}
@@ -1075,7 +1122,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
                 variant="ghost"
                 size="xs"
                 onClick={() => setSearchOpen((value) => !value)}
-                title="搜尋"
+                title="搜尋這題"
                 aria-expanded={searchOpen}
               >
                 <Search className="w-3 h-3 mr-1" />
@@ -1098,6 +1145,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => setSearchOpen(false)}
+                        title={`用 ${provider.label} 搜尋這題 (${provider.shortcutLabel})`}
                         className={cn("flex items-center gap-2 w-full px-3 py-1.5 text-sm", provider.className)}
                       >
                         {provider.label}
@@ -1122,6 +1170,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
                 key={letter}
                 disabled={isAnswered}
                 onClick={() => pickAnswer(letter)}
+                title={`選擇 ${letter.toUpperCase()} (${getAnswerShortcutLabel(letter)})`}
                 className={cn(
                   "w-full text-left p-3 rounded-lg border-2 transition-colors flex items-start gap-3",
                   !showResult && "hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-950/30",
@@ -1171,7 +1220,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
                   isCorrect ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"
                 )}
               >
-                {isCorrect ? "✓ 答對了" : `✗ 答錯 · 正確答案:${correctLetter.toUpperCase()}`}
+                {isCorrect ? "✓ 答對了" : `✗ 答錯。正確答案：${correctLetter.toUpperCase()}`}
               </p>
               {question.explanation && (
                 <p className="text-sm text-foreground leading-relaxed">
@@ -1184,7 +1233,11 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
       </Card>
 
       <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
-        <Button variant="ghost" onClick={toggleFavorite}>
+        <Button
+          variant="ghost"
+          onClick={toggleFavorite}
+          title={isFavorite ? "取消收藏 (F)" : "收藏 (F)"}
+        >
           <Star
             className={cn(
               "w-4 h-4 md:mr-1",
@@ -1195,7 +1248,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
             {isFavorite ? "已收藏" : "收藏"}
           </span>
         </Button>
-        <Button variant="ghost" onClick={() => void handleCopy()} title="複製題目">
+        <Button variant="ghost" onClick={() => void handleCopy()} title="複製題目 (X)">
           {copied ? (
             <Check className="w-4 h-4 md:mr-1 text-green-600 dark:text-green-400" />
           ) : (
@@ -1213,8 +1266,10 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
           }}
         />
         <ReportButton
+          ref={reportButtonRef}
           questionId={question.id}
           userAnswer={picked}
+          shortcutLabel="R"
           onSubmitted={() => toast("已收到您的回報,感謝!")}
         />
       </div>
@@ -1224,6 +1279,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
           { id: "answer", key: "1-4 / A-D", label: "選答" },
           { id: "favorite", key: "F", label: "收藏" },
           { id: "note", key: "N", label: "筆記" },
+          { id: "report", key: "R", label: "報錯" },
           { id: "copy", key: "X", label: "複製" },
           ...(handbookHref
             ? [{ id: "handbook", key: "H", label: "研習手冊" }]

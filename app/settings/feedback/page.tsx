@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { authedFetch } from "@/lib/session-client";
+import { getQuestionSourceDisplayName } from "@/lib/question-source-display";
 import type { QuestionData } from "@/lib/data";
 import { QuestionStem } from "@/components/QuestionStem";
 
@@ -128,7 +129,7 @@ function FeedbackCard({
         <div className="flex items-center justify-between flex-wrap gap-1.5">
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="secondary">{item.paperCode}</Badge>
-            <Badge variant="outline">{item.source === "exam" ? "真題" : "模擬題"}</Badge>
+            <Badge variant="outline">{getQuestionSourceDisplayName(item.source)}</Badge>
             <span className="font-medium">#{item.number}</span>
             {item.ref && (
               <Badge variant="outline" className="text-xs">

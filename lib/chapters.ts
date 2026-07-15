@@ -123,13 +123,23 @@ function getChaptersByPaper(paperCode: string): Record<string, { main: string; s
 }
 
 /**
+ * 從題目 ref 取得可安全識別的二級章節鍵。
+ * 只接受字串開頭的 X.Y，避免替 "2(b)"、".1.2" 等殘缺資料猜測章節。
+ */
+export function getChapterKey(ref: string): string | null {
+  const match = (ref || "").trim().match(/^(\d+)\s*\.\s*(\d+)/);
+  if (!match) return null;
+  return `${Number(match[1])}.${Number(match[2])}`;
+}
+
+/**
  * 取得章節資訊
  * @param paperCode 卷別代碼(例 "P1" / "P3")
- * @param ref 題目 ref(例 "1.1"、"1.1.2a"),函式內部會自動取前兩段
+ * @param ref 題目 ref(例 "1.1"、"1.1.2a"),函式內部會自動取二級章節鍵
  * @returns 找到時回傳 { main, sub, path };找不到回傳 null
  */
 export function getChapterInfo(paperCode: string, ref: string): ChapterInfo | null {
-  const prefix = (ref || "").split(".").slice(0, 2).join(".");
+  const prefix = getChapterKey(ref);
   if (!prefix) return null;
   const table = getChaptersByPaper(paperCode);
   const entry = table[prefix];

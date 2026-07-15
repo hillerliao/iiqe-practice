@@ -8,6 +8,9 @@ node_modules/
 # deploy package to ~2.1GB and crashed the upload. Keep them locally only.
 *.tar
 *.tar.gz
+*.tgz
+*.zip
+*.7z
 iiqe-app.tar
 iiqe-build.tar.gz
 iiqe-runtime-update.tar.gz
@@ -15,6 +18,16 @@ iiqe-runtime-update.tar.gz
 # ===== Local SQLite databases (Vercel uses in-memory fallback) =====
 *.db
 *.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite3-journal
+*.sqlite3-shm
+*.sqlite3-wal
 orphan-dev.db
 prisma/dev.db
 prisma/*.db
@@ -35,3 +48,4 @@ nginx/
 # 临时从 Vercel 拉下来的解密密钥文件 / 测试脚本,绝不可上传
 ve-*.env
 smoke.mjs
+.iiqe-agent-tmp/

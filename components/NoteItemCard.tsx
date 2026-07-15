@@ -141,7 +141,7 @@ export function NoteItemCard({ item, onDeleted }: NoteItemCardProps) {
         {showAnswer && (
           <div className="p-3 rounded-lg border border-border bg-muted/50 text-sm space-y-1">
             <p>
-              <span className="text-muted-foreground">正確答案:</span>{" "}
+              <span className="text-muted-foreground">正確答案：</span>{" "}
               <span className="text-green-700 dark:text-green-300 font-medium">
                 {correctLetter.toUpperCase()} — {q.options[correctLetter]}
               </span>

@@ -46,9 +46,26 @@ for (const arr of Object.values(questionsBySource)) {
   }
 }
 
+const optionKeys = ["a", "b", "c", "d"] as const;
+
+export function isGradeableQuestion(question: QuestionData): boolean {
+  const answer = question.answer?.toLowerCase();
+  return (
+    answer != null &&
+    optionKeys.includes(answer as (typeof optionKeys)[number]) &&
+    optionKeys.every((key) => typeof question.options[key] === "string" && question.options[key].trim().length > 0)
+  );
+}
+
 // 同步导出(供 Vercel 静态路径 / 客户端组件直接使用,无 async 开销)
 export function getPapers(): PaperInfo[] {
-  return papersData as PaperInfo[];
+  return (papersData as PaperInfo[]).map((paper) => {
+    const bySource = {
+      exam: getQuestions(paper.code, "exam").length,
+      mock: getQuestions(paper.code, "mock").length,
+    };
+    return { ...paper, bySource, total: bySource.exam + bySource.mock };
+  });
 }
 
 export function getQuestions(
@@ -60,7 +77,7 @@ export function getQuestions(
   let list = questionsBySource[key];
   if (!list) return [];
 
-  let result = [...list];
+  let result = list.filter(isGradeableQuestion);
 
   if (opts?.shuffle) {
     for (let i = result.length - 1; i > 0; i--) {

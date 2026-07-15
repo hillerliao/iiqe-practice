@@ -13,9 +13,10 @@ build_handbook_p3.py — 將「卷三 - 长期保险 - 2022 年版.pdf」轉為
   p.42  第 3 章 保險利益附約及其他產品
   p.63  第 4 章 闡釋人壽保險單
   p.75  第 5 章 人壽保險程序
-  ~p.117+ 附件 A 起
+  p.121 模擬試題
+  p.123 附件 A 起
   p.190 術語解釋
-  p.~215 辭彙表(中英按字母)
+  p.207 辭彙表(中英按字母)
   p.226 模擬試題答案
   p.227 鳴謝
 
@@ -64,6 +65,13 @@ INLINE_BLOCKLIST_START = (
 H1_MAX_LEN = 25
 H2_MAX_LEN = 40
 H3_MAX_LEN = 60
+
+Line = tuple[str, str, float]
+ParagraphLine = tuple[str, float]
+
+CONTENT_LEFT_X = 68.0
+INDENT_STEP_X = 36.75
+MAX_INDENT_LEVEL = 3
 
 
 def esc(s: str) -> str:
@@ -117,27 +125,38 @@ _SEP_DASH_RE = re.compile(r"^[-–—=~•·*=\s]{3,}$")
 SUBLABEL_RE = re.compile(r"^\d+\.\d+(\.\d+)?[a-z]?\s")
 
 
-def render_paragraph(lines: list[str], is_mock_exam_zone: bool) -> str:
+def _indent_level(x0: float) -> int:
+    return max(0, min(MAX_INDENT_LEVEL, round((x0 - CONTENT_LEFT_X) / INDENT_STEP_X)))
+
+
+def render_paragraph(lines: list[ParagraphLine], is_mock_exam_zone: bool) -> str:
     if not lines:
         return ""
-    plain_lines = [_strip_markers(line).strip() for line in lines]
+    markdown_lines = [line for line, _ in lines]
+    indent_level = _indent_level(lines[0][1])
+    paragraph_class = (
+        f' class="handbook-indent-{indent_level}"' if indent_level else ""
+    )
+    plain_lines = [_strip_markers(line).strip() for line in markdown_lines]
     plain_lines = [p for p in plain_lines if p]
     if not plain_lines:
         return ""
-    joined_md = smart_join_markdown(lines)
+    joined_md = smart_join_markdown(markdown_lines)
     joined_plain = _strip_markers(joined_md).strip()
     joined_nobullet = re.sub(r"^[•·\-\*]\s+", "", joined_plain)
     if _SEP_O_RE.match(joined_nobullet) or _SEP_DASH_RE.match(joined_nobullet):
         return '<hr class="handbook-divider">'
     if all(re.match(r"^[•·\-\*]\s+", p) for p in plain_lines):
         items = []
-        for plain_line, line in zip(plain_lines, [l for l in lines if l.strip()]):
+        for plain_line, line in zip(
+            plain_lines, [line for line in markdown_lines if line.strip()]
+        ):
             stripped = re.sub(r"^[•·\-\*]\s+", "", line)
             items.append(f"<li>{_markdown_to_html(stripped)}</li>")
         return f"<ul>{''.join(items)}</ul>"
     inner = _markdown_to_html(joined_md)
     chunks = _split_long_paragraph(inner)
-    return "".join(f"<p>{c}</p>" for c in chunks)
+    return "".join(f"<p{paragraph_class}>{c}</p>" for c in chunks)
 
 
 def _font_flags(fontname: str) -> tuple[bool, bool]:
@@ -172,11 +191,11 @@ def _spans_to_html(spans: list[tuple[str, str]]) -> str:
     return "".join(out)
 
 
-def extract_pdf_pages() -> list[tuple[int, list[tuple[str, str]]]]:
+def extract_pdf_pages() -> list[tuple[int, list[Line]]]:
     """回傳 [(pdf_page_idx(1-based), lines), ...]
-    lines = [(plain, markdown)] 段間用 ('', '') 標記
+    lines = [(plain, markdown, x0)] 段間用 ('', '', 0.0) 標記
     """
-    pages: list[tuple[int, list[tuple[str, str]]]] = []
+    pages: list[tuple[int, list[Line]]] = []
     LINE_GAP = 2.5
     with pdfplumber.open(PDF_PATH) as pdf:
         for i, page in enumerate(pdf.pages, start=1):
@@ -199,7 +218,7 @@ def extract_pdf_pages() -> list[tuple[int, list[tuple[str, str]]]]:
                     merged[-1] = (y, merged[-1][1] + cs)
                 else:
                     merged.append((y, cs))
-            row_pairs: list[tuple[float, str, str]] = []
+            row_pairs: list[tuple[float, str, str, float]] = []
             for y, cs in merged:
                 spans: list[tuple[str, str]] = [
                     (c["text"], c.get("fontname", "")) for c in sorted(cs, key=lambda c: c["x0"])
@@ -209,29 +228,29 @@ def extract_pdf_pages() -> list[tuple[int, list[tuple[str, str]]]]:
                     continue
                 if re.match(r"^\d+\s*/\s*\d+$", plain):
                     continue
-                row_pairs.append((y, plain, _spans_to_markdown(spans)))
+                x0 = min(float(c["x0"]) for c in cs)
+                row_pairs.append((y, plain, _spans_to_markdown(spans), x0))
             if not row_pairs:
                 pages.append((i, []))
                 continue
-            segments: list[list[tuple[str, str]]] = []
-            current: list[tuple[str, str]] = []
+            segments: list[list[Line]] = []
+            current: list[Line] = []
             prev_y: float | None = None
-            for y, plain, mk in row_pairs:
+            for y, plain, mk, x0 in row_pairs:
                 if prev_y is None or (y - prev_y) <= 32.0:
-                    current.append((plain, mk))
+                    current.append((plain, mk, x0))
                 else:
                     if current:
                         segments.append(current)
-                    current = [(plain, mk)]
+                    current = [(plain, mk, x0)]
                 prev_y = y
             if current:
                 segments.append(current)
-            line_pairs: list[tuple[str, str]] = []
+            line_pairs: list[Line] = []
             for seg in segments:
-                for plain, mk in seg:
-                    line_pairs.append((plain, mk))
+                line_pairs.extend(seg)
                 if seg is not segments[-1]:
-                    line_pairs.append(("", ""))
+                    line_pairs.append(("", "", 0.0))
             pages.append((i, line_pairs))
     return pages
 
@@ -383,19 +402,13 @@ def _split_long_paragraph(inner_html: str) -> list[str]:
     return chunks or [inner_html]
 
 
-# 卷三附錄/模擬試題/術語解釋/辭彙表/鳴謝 起始頁(>此頁一律視為「附錄區」)
-# p.118-120 仍屬第 5 章(5.6 內容);附錄區從 p.121「模擬試題」開始
+# 卷三附錄區從 p.121「模擬試題」開始
 APPENDIX_START_PAGE = 121
-APX_DICT_START = 121   # 模擬試題
-APX_GLOSSARY_START = 190
-APX_VOCAB_START = 215
-APX_MOCK_ANSWERS_START = 226
-APX_ACK_START = 227
 
 
 def detect_chapter_for_page(pdf_page: int) -> int | None:
     """給定 PDF 頁碼,回傳其屬於第幾章(1-5),或 None 表示在附錄區。
-    附錄區從 p.118 開始(5.6 之後)。
+    附錄區從 p.121 開始(5.6 之後)。
     """
     if pdf_page >= APPENDIX_START_PAGE:
         return None
@@ -408,7 +421,7 @@ def detect_chapter_for_page(pdf_page: int) -> int | None:
     return chap
 
 
-def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> tuple[list[dict], str]:
+def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[dict], str]:
     chapters: list[dict] = []
     html_parts: list[str] = []
     pdf_pages_seen: set[int] = set()
@@ -416,7 +429,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
     current_h1_id: str | None = None
     current_h2_id: str | None = None
     current_h2_num: str | None = None
-    pending_lines: list[str] = []
+    pending_lines: list[ParagraphLine] = []
 
     def flush_paragraph():
         nonlocal pending_lines
@@ -431,7 +444,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
         if not pending_lines:
             return
         out_items: list[str] = []
-        for line in pending_lines:
+        for line, _ in pending_lines:
             plain = _strip_markers(line).strip()
             if not plain:
                 continue
@@ -440,6 +453,13 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
             html_parts.append(f'<div class="glossary-block">{"".join(out_items)}</div>')
         pending_lines = []
 
+    def page_badge(pdf_page: int) -> str:
+        anchor_id = ""
+        if pdf_page not in pdf_pages_seen:
+            pdf_pages_seen.add(pdf_page)
+            anchor_id = f' id="pdf-page-{pdf_page}"'
+        return f'<a class="page-badge"{anchor_id} href="#pdf-page-{pdf_page}">PDF p.{pdf_page}</a>'
+
     NEW_PARA_START_RE = re.compile(
         r"^(\([a-z]\)|\([ivx]+\)|\(\d+\)|註[:：]|"
         r"[一二三四五六七八九十]+[、.]|"
@@ -447,7 +467,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
     )
     BULLET_RE = re.compile(r"^[•·\-\*]\s+")
 
-    def process_line(plain: str, pdf_page: int, is_app_zone: bool, page_badge: str) -> bool:
+    def process_line(plain: str, pdf_page: int, is_app_zone: bool) -> bool:
         nonlocal current_h1_id, current_h2_id, current_h2_num
 
         if not is_app_zone:
@@ -483,7 +503,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
                                 "page": pdf_page,
                             })
                             html_parts.append(
-                                f'<h1 id="{h1_id}">{esc(number)} {esc(title)} {page_badge}</h1>'
+                                f'<h1 id="{h1_id}">{esc(number)} {esc(title)} {page_badge(pdf_page)}</h1>'
                             )
                             current_h1_id = h1_id
                             current_h2_id = None
@@ -535,7 +555,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
                         "parent": current_h1_id,
                     })
                     html_parts.append(
-                        f'<h2 id="{h2_id}">{esc(h2_num)} {esc(title)} {page_badge}</h2>'
+                        f'<h2 id="{h2_id}">{esc(h2_num)} {esc(title)} {page_badge(pdf_page)}</h2>'
                     )
                     current_h2_id = h2_id
                     current_h2_num = h2_num
@@ -554,18 +574,32 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
     # 抓標題邏輯:取緊接的標題行(不含「附件 X」/「資料來源」/頁碼)
     ATTACHMENT_RE = re.compile(r"^\s*附件\s*([A-N])\s*$")
     META_LINE_RE = re.compile(r"^\s*[\(（]?資料來源|^\s*\(?\d+/\d+\)?\s*$|^[\s\d/]+$")
-    # 「附件 X」後的第 1 個非「附件 X」、非元數據、非「（資料來源：）」的行就是標題
+    PAGE_COUNT_SUFFIX_RE = re.compile(r"\s*[（(]\s*\d+\s*/\s*\d+\s*[）)]\s*$")
+
+    attachment_titles: dict[str, str] = {}
+    for _, attachment_lines in pages:
+        visible_lines = [plain.strip() for plain, _, _ in attachment_lines if plain.strip()]
+        for index, line in enumerate(visible_lines):
+            match = ATTACHMENT_RE.match(line)
+            if not match or match.group(1) in attachment_titles:
+                continue
+            title_parts: list[str] = []
+            for candidate in visible_lines[index + 1:]:
+                if ATTACHMENT_RE.match(candidate) or META_LINE_RE.match(candidate):
+                    break
+                title_parts.append(PAGE_COUNT_SUFFIX_RE.sub("", candidate).strip())
+                if len(title_parts) == 2:
+                    break
+            if title_parts:
+                attachment_titles[match.group(1)] = " — ".join(title_parts)
 
     is_app_zone = False
 
     for pdf_page, line_pairs in pages:
         chap = detect_chapter_for_page(pdf_page)
         is_app_zone_now = chap is None
-        if pdf_page not in pdf_pages_seen:
-            pdf_pages_seen.add(pdf_page)
-        page_badge = f'<a class="page-badge" id="pdf-page-{pdf_page}" href="#pdf-page-{pdf_page}">PDF p.{pdf_page}</a>'
 
-        for plain, markdown in line_pairs:
+        for plain, markdown, x0 in line_pairs:
             if not plain:
                 if pending_lines and current_h1_id not in ("apx-vocab", "apx-glossary", "apx-mock-answers"):
                     flush_paragraph()
@@ -584,20 +618,21 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
                     if current_h1_id in ("apx-vocab", "apx-glossary"):
                         flush_glossary()
                     if not any(c["id"] == att_id for c in chapters):
+                        attachment_title = attachment_titles.get(letter, f"附件 {letter}")
                         chapters.append({
                             "id": att_id,
                             "level": 1,
                             "number": f"附件 {letter}",
-                            "title": f"附件 {letter}",
+                            "title": attachment_title,
                             "page": pdf_page,
                         })
                         html_parts.append(
-                            f'<h1 id="{att_id}">附件 {letter} {page_badge}</h1>'
+                            f'<h1 id="{att_id}">附件 {letter} {page_badge(pdf_page)}</h1>'
                         )
                         current_h1_id = att_id
                         current_h2_id = None
                         current_h2_num = None
-                    pending_lines.append(markdown)
+                    pending_lines.append((markdown, x0))
                     continue
 
                 # 附錄 H1 標題偵測
@@ -625,7 +660,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
                                 "page": pdf_page,
                             })
                             html_parts.append(
-                                f'<h1 id="{apx_id}">{esc(apx_title)} {page_badge}</h1>'
+                                f'<h1 id="{apx_id}">{esc(apx_title)} {page_badge(pdf_page)}</h1>'
                             )
                             current_h1_id = apx_id
                             current_h2_id = None
@@ -656,7 +691,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
                     current_h1_id = "apx-mock-answers"
                     continue
 
-            handled = process_line(plain, pdf_page, is_app_zone_now, page_badge)
+            handled = process_line(plain, pdf_page, is_app_zone_now)
             if handled:
                 continue
 
@@ -668,7 +703,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
                     pass
                 else:
                     flush_paragraph()
-            pending_lines.append(markdown)
+            pending_lines.append((markdown, x0))
 
         # 頁結束:辭彙表/術語解釋 走專用 flush
         if current_h1_id in ("apx-vocab", "apx-glossary"):

@@ -11,9 +11,15 @@
     "prisma:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "verify:storage": "tsx scripts/verify-storage.ts",
+    "verify:storage": "tsx --tsconfig scripts/tsconfig.json scripts/verify-storage.ts",
     "verify:question-text": "tsx scripts/verify-question-text.ts",
-    "verify:keyboard-search": "tsx scripts/verify-keyboard-search.ts"
+    "verify:question-statements": "tsx scripts/test_question_statements.mts",
+    "verify:question-data": "tsx scripts/test_question_data.mts",
+    "verify:question-route": "tsx --tsconfig scripts/tsconfig.json scripts/verify-question-route.ts",
+    "verify:keyboard-search": "tsx scripts/verify-keyboard-search.ts",
+    "verify:chapter-refs": "tsx scripts/test_chapter_refs.mts",
+    "verify:stats-chapters": "tsx scripts/test_stats_chapter_aggregation.mts",
+    "verify:handbook-integrity": "tsx scripts/test_handbook_integrity.mts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

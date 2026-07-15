@@ -70,20 +70,22 @@ if (-not (Test-Path $tarball)) {
   Write-Output "ERROR: tarball not produced"
   exit 1
 }
+$tarballPath = (Resolve-Path -LiteralPath $tarball).Path
+$deployScriptPath = (Resolve-Path -LiteralPath 'deploy-remote.sh').Path
 
 # 2) 上传 tarball + deploy-remote.sh 到 VPS
 # 注意: 用直接 & 调用而非 Start-Process —— 后者在构造环境块时会因
 # 父进程同时存在 'Path' 与 'PATH'(大小写重复)而抛
 # "Item has already been added" 崩溃,导致 scp 根本没发起。
 Write-Output "[2/4] uploading tarball + deploy-remote.sh"
-& 'C:\Windows\System32\OpenSSH\scp.exe' -o ConnectTimeout=10 -o StrictHostKeyChecking=no $tarball "${DeployAddr}:/home/${DeployUser}/" > $scpOut 2> $scpErr
+& 'C:\Windows\System32\OpenSSH\scp.exe' -O -o ConnectTimeout=10 -o StrictHostKeyChecking=no $tarballPath "${DeployAddr}:/home/${DeployUser}/" > $scpOut 2> $scpErr
 if ($LASTEXITCODE -ne 0) {
   Write-Output "ERROR: scp tarball failed (exit=$LASTEXITCODE)"
   Get-Content -LiteralPath $scpErr -Raw -ErrorAction SilentlyContinue
   exit 1
 }
 
-& 'C:\Windows\System32\OpenSSH\scp.exe' -o ConnectTimeout=10 -o StrictHostKeyChecking=no 'deploy-remote.sh' "${DeployAddr}:/home/${DeployUser}/deploy-remote.sh" > $upOut 2> $upErr
+& 'C:\Windows\System32\OpenSSH\scp.exe' -O -o ConnectTimeout=10 -o StrictHostKeyChecking=no $deployScriptPath "${DeployAddr}:/home/${DeployUser}/deploy-remote.sh" > $upOut 2> $upErr
 if ($LASTEXITCODE -ne 0) {
   Write-Output "ERROR: scp deploy-remote.sh failed (exit=$LASTEXITCODE)"
   Get-Content -LiteralPath $upErr -Raw -ErrorAction SilentlyContinue

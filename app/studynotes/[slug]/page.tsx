@@ -134,6 +134,9 @@ export default async function HandbookPage({
               margin-top: 0 !important;
               margin-bottom: 14px !important;
             }
+            .handbook-content .handbook-indent-1 { margin-inline-start: 36px !important; }
+            .handbook-content .handbook-indent-2 { margin-inline-start: 72px !important; }
+            .handbook-content .handbook-indent-3 { margin-inline-start: 108px !important; }
             .handbook-content ul,
             .handbook-content ol {
               font-size: 1rem !important;
@@ -213,6 +216,9 @@ export default async function HandbookPage({
             }
             @media (max-width: 768px) {
               .handbook-content .vocab-block { column-count: 1; }
+              .handbook-content .handbook-indent-1 { margin-inline-start: 18px !important; }
+              .handbook-content .handbook-indent-2 { margin-inline-start: 36px !important; }
+              .handbook-content .handbook-indent-3 { margin-inline-start: 54px !important; }
             }
 
             /* 內文內所有錨點加上 scroll-margin,避免被頂部單層 sticky header 擋住

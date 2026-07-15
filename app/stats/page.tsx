@@ -173,11 +173,9 @@ export default function StatsPage() {
                           <div className="flex justify-between text-sm mb-1">
                             <span className="font-medium">
                               {r.ref}
-                              {info && (
-                                <span className="text-muted-foreground font-normal ml-1.5">
-                                  {info.path}
-                                </span>
-                              )}
+                              <span className="text-muted-foreground font-normal ml-1.5">
+                                {info?.path ?? "未能識別章節"}
+                              </span>
                             </span>
                             <span className="text-muted-foreground shrink-0 ml-2">
                               {r.correct}/{r.total} ({(r.accuracy * 100).toFixed(0)}%)

@@ -1,6 +1,10 @@
 export const ANSWER_KEYS = ["a", "b", "c", "d"] as const;
 export type AnswerKey = (typeof ANSWER_KEYS)[number];
 
+export function getAnswerShortcutLabel(answer: AnswerKey): string {
+  return `${answer.toUpperCase()} / ${ANSWER_KEYS.indexOf(answer) + 1}`;
+}
+
 export type ModifierKeyState = Readonly<{
   altKey: boolean;
   ctrlKey: boolean;
@@ -47,6 +51,37 @@ export function parseAnswerKey(key: string): AnswerKey | undefined {
   if (numericIndex >= 0) return ANSWER_KEYS[numericIndex];
 
   return ANSWER_KEYS.find((answer) => answer === normalized);
+}
+
+export const ENTER_ACTIVATABLE_TARGET_SELECTOR = [
+  "button",
+  "a[href]",
+  "input[type='button']",
+  "input[type='submit']",
+  "input[type='reset']",
+  "[role='button']",
+  "[role='link']",
+].join(",");
+
+export function isEnterActivatableTargetDescriptor(
+  target: InteractiveTargetDescriptor | null | undefined,
+  selector = ENTER_ACTIVATABLE_TARGET_SELECTOR
+): boolean {
+  if (!target || typeof target.closest !== "function") return false;
+
+  try {
+    return Boolean(target.closest(selector));
+  } catch {
+    return false;
+  }
+}
+
+export function isEnterActivatableEventTarget(target: EventTarget | null): boolean {
+  if (typeof Element === "undefined" || !(target instanceof Element)) {
+    return false;
+  }
+
+  return isEnterActivatableTargetDescriptor(target);
 }
 
 export function isInteractiveTagName(tagName?: string | null): boolean {

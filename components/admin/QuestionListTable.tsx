@@ -6,6 +6,7 @@ import { Search, Plus, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { getQuestionSourceDisplayName } from "@/lib/question-source-display";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { adminFetch } from "@/lib/admin-fetch";
@@ -116,15 +117,15 @@ export function QuestionListTable({
             className="h-8 rounded-md border border-input bg-transparent px-2 text-sm"
             aria-label="選擇來源"
           >
-            <option value="exam">真題</option>
-            <option value="mock">模擬題</option>
+            <option value="exam">{getQuestionSourceDisplayName("exam")}</option>
+            <option value="mock">{getQuestionSourceDisplayName("mock")}</option>
           </select>
           <div className="relative flex-1 min-w-[180px]">
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <Input
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="搜索題面 / 選項 / ref"
+              placeholder="搜尋題幹／選項／參考編號"
               className="pl-7"
             />
           </div>
@@ -151,7 +152,7 @@ export function QuestionListTable({
             <thead>
               <tr className="text-left text-xs text-muted-foreground border-b">
                 <th className="py-2 px-2 font-medium w-16">題號</th>
-                <th className="py-2 px-2 font-medium w-24">ref</th>
+                <th className="py-2 px-2 font-medium w-24">參考編號</th>
                 <th className="py-2 px-2 font-medium">題面</th>
                 <th className="py-2 px-2 font-medium w-16">答案</th>
                 <th className="py-2 px-2 font-medium w-20">操作</th>

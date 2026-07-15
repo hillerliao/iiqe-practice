@@ -19,10 +19,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "IIQE 做题家",
-    template: "%s · IIQE 做题家",
+    default: "IIQE 做題家",
+    template: "%s · IIQE 做題家",
   },
-  description: "香港保險業監管局 IIQE 考試刷題應用",
+  description: "香港保險業監管局 IIQE 考試練習應用",
 };
 
 // 首次載入時,在第一次繪製前就把主題套用好,避免淺/深色閃爍 (FOUC)。
@@ -77,7 +77,7 @@ export default async function RootLayout({
           <Analytics />
           <main className="flex-1">{children}</main>
           <footer className="border-t py-3 text-center text-xs text-muted-foreground">
-            IIQE 做題家· 讓刷題更簡單
+            IIQE 做題家 · 讓練習更簡單
           </footer>
         </ThemeProvider>
       </body>

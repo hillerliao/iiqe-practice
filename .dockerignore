@@ -43,9 +43,27 @@ lib/generated/prisma
 # sqlite dev database
 *.db
 *.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite3-journal
+*.sqlite3-shm
+*.sqlite3-wal
 
 # IDE / AI agent artifacts
 .codebuddy
+.iiqe-agent-tmp
+
+# local deployment archives
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.7z
 
 # git
 .git

@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["./*"],
+      "server-only": ["./scripts/test-support/server-only.ts"]
+    }
+  },
+  "include": [
+    "./verify-storage.ts",
+    "./test-support/server-only.ts"
+  ],
+  "exclude": []
+}

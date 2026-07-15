@@ -52,6 +52,14 @@ next-env.d.ts
 *.db-journal
 *.db-shm
 *.db-wal
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite3-journal
+*.sqlite3-shm
+*.sqlite3-wal
 *.db.backup.*
 
 # IDE / AI agent artifacts
@@ -70,6 +78,7 @@ dev_err*.log
 # agent / tool caches (never commit)
 .workbuddy/
 .zcode/
+/.iiqe-agent-tmp/
 
 # python cache
 __pycache__/
@@ -95,6 +104,7 @@ scripts/mock_p3.json
 scripts/p3_clean.json
 scripts/_mock_*.txt
 scripts/test_question_*.mts
+!scripts/test_question_data.mts
 GIT_PUSH_REVIEW_*.md
 .cache_paper1.json
 .cache-prod-*.db-shm

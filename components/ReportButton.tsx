@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { authedFetch } from "@/lib/session-client";
+import { getQuestionSourceDisplayName } from "@/lib/question-source-display";
 
 const MAX_DESC_LEN = 500;
 
@@ -25,6 +26,8 @@ type ReportButtonProps = {
   userAnswer?: string | null;
   size?: "xs" | "sm" | "default";
   className?: string;
+  /** 已由父頁面註冊的快捷鍵提示(可選) */
+  shortcutLabel?: string;
   /** 提交成功回調(可選,父組件可用來 toast) */
   onSubmitted?: () => void;
 };
@@ -42,7 +45,7 @@ export type ReportButtonHandle = {
  */
 export const ReportButton = forwardRef<ReportButtonHandle, ReportButtonProps>(
   function ReportButton(
-    { questionId, userAnswer, size = "xs", className, onSubmitted },
+    { questionId, userAnswer, size = "xs", className, shortcutLabel, onSubmitted },
     ref
   ) {
     const [open, setOpen] = useState(false);
@@ -55,7 +58,7 @@ export const ReportButton = forwardRef<ReportButtonHandle, ReportButtonProps>(
     const parts = questionId.split("-");
     const paperCode = parts[0] ?? "";
     const source = parts[1] ?? "";
-    const sourceLabel = source === "exam" ? "真題" : source === "mock" ? "模擬題" : "";
+    const sourceLabel = getQuestionSourceDisplayName(source);
     const number = parts.slice(2).join("-");
 
     useImperativeHandle(ref, () => ({ open: () => setOpen(true) }), []);
@@ -140,7 +143,7 @@ export const ReportButton = forwardRef<ReportButtonHandle, ReportButtonProps>(
           variant="ghost"
           size={size}
           onClick={() => setOpen((v) => !v)}
-          title="回報題目問題"
+          title={`回報題目問題${shortcutLabel ? ` (${shortcutLabel})` : ""}`}
         >
           <Flag className={cn(iconSize, "md:mr-1")} />
           <span className="hidden md:inline">報錯</span>

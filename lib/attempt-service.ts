@@ -1,9 +1,10 @@
 import "server-only";
 
 import { createHash } from "node:crypto";
-import { createAttempt, createToolCall, getAttempt, getToolCall, updateAttempt, type AnswerRecord, type AttemptRecord } from "@/lib/kv";
+import { createAttempt, createToolCall, finishAttemptAtomically, getAttempt, getToolCall, upsertAnswerIfUnfinished, type AnswerRecord, type AttemptRecord } from "@/lib/kv";
 import { getQuestionById, getQuestions } from "@/lib/data";
 import { gradeAnswer, normalizeAnswer } from "@/lib/grading";
+import { isQuestionInAttemptScope } from "@/lib/attempt-scope";
 
 export class DomainError extends Error {
   constructor(message: string, public status: number, public code: string) {
@@ -51,9 +52,14 @@ export async function submitAnswer(input: {
 }): Promise<AnswerRecord> {
   const attempt = requireOwned(await getAttempt(input.attemptId), input.sessionId);
   if (attempt.finishedAt) throw new DomainError("Attempt 已完成", 409, "ATTEMPT_FINISHED");
-  if (!attempt.questionIds.includes(input.questionId)) throw new DomainError("題目不在本次作答中", 400, "QUESTION_NOT_IN_ATTEMPT");
+
   const question = getQuestionById(input.questionId);
   if (!question || !question.answer) throw new DomainError("Question not gradeable", 422, "QUESTION_NOT_GRADEABLE");
+
+  if (!(await isQuestionInAttemptScope(attempt, input.questionId))) {
+    throw new DomainError("題目不在本次作答中", 400, "QUESTION_NOT_IN_ATTEMPT");
+  }
+
   const normalizedAnswer = normalizeAnswer(input.userAnswer);
   if (!normalizedAnswer) throw new DomainError("答案必須是 A、B、C 或 D", 400, "INVALID_ANSWER");
   const answer: AnswerRecord = {
@@ -63,19 +69,17 @@ export async function submitAnswer(input: {
     timeSpentMs: input.timeSpentMs ?? null,
     createdAt: new Date().toISOString(),
   };
-  const answers = attempt.answers.filter((item) => item.questionId !== input.questionId);
-  answers.push(answer);
-  await updateAttempt(attempt.id, { answers });
+  const result = await upsertAnswerIfUnfinished(attempt.id, answer);
+  if (result === "finished") throw new DomainError("Attempt 已完成", 409, "ATTEMPT_FINISHED");
+  if (result === "missing") throw new DomainError("Attempt not found", 404, "ATTEMPT_NOT_FOUND");
   return answer;
 }
 
 export async function finishAttempt(sessionId: string, attemptId: string): Promise<AttemptRecord> {
   const attempt = requireOwned(await getAttempt(attemptId), sessionId);
   if (attempt.finishedAt) return attempt;
-  const finishedAt = new Date().toISOString();
-  const correct = attempt.answers.filter((answer) => answer.isCorrect).length;
-  await updateAttempt(attempt.id, { finishedAt, correct });
-  return { ...attempt, finishedAt, correct };
+  const finalized = await finishAttemptAtomically(attempt.id, new Date().toISOString());
+  return requireOwned(finalized, sessionId);
 }
 
 export async function idempotentToolCall<T>(input: {

@@ -1127,6 +1127,9 @@ body {
 }
 :root.dark .content h4 { color: #d1d5db; }
 .content p { margin: 0 0 14px; font-size: 16px; }
+.content .handbook-indent-1 { margin-inline-start: 36px; }
+.content .handbook-indent-2 { margin-inline-start: 72px; }
+.content .handbook-indent-3 { margin-inline-start: 108px; }
 .content ul, .content ol { margin: 12px 0 14px; padding-left: 28px; }
 .content li { margin-bottom: 6px; }
 .page-badge {
@@ -1253,6 +1256,9 @@ body {
   .content h1 { font-size: 24px; }
   .content h2 { font-size: 20px; }
   .content h3 { font-size: 18px; }
+  .content .handbook-indent-1 { margin-inline-start: 18px; }
+  .content .handbook-indent-2 { margin-inline-start: 36px; }
+  .content .handbook-indent-3 { margin-inline-start: 54px; }
   .vocab-block { column-count: 1; }
   .back-to-top { right: 16px; bottom: 16px; }
 }
