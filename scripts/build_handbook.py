@@ -355,6 +355,28 @@ _PARA_HARD = 420             # 單段絕對上限,超過無論如何都在軟斷
 _SOFT_BAD_LEAD = "的而及或並且亦也仍則與"
 
 
+def _previous_visible_char(s: str, from_idx: int) -> str:
+    """從 from_idx 之前找第一個可見文字字元(跳過標籤/實體/空白)。"""
+    i = from_idx - 1
+    while i >= 0:
+        ch = s[i]
+        if ch == ">":
+            i = s.rfind("<", 0, i)
+            if i == -1:
+                return ""
+            i -= 1
+            continue
+        if ch == ";":
+            j = s.rfind("&", 0, i)
+            if j != -1 and i - j <= 8:
+                i = j - 1
+                continue
+        if not ch.isspace():
+            return ch
+        i -= 1
+    return ""
+
+
 def _next_visible_char(s: str, from_idx: int) -> str:
     """從 from_idx 之後找第一個可見文字字元(跳過標籤/實體/空白)。"""
     i = from_idx + 1
@@ -432,7 +454,12 @@ def _split_long_paragraph(inner_html: str) -> list[str]:
         vlen += 1
         do_split = False
         if ch in _PRIMARY_END and vlen >= _PARA_TARGET:
-            do_split = True
+            prev = _previous_visible_char(inner_html, i)
+            nxt = _next_visible_char(inner_html, i)
+            if ch == "." and prev.isdigit() and nxt.isdigit():
+                do_split = False
+            else:
+                do_split = True
         elif ch in _SOFT_END:
             # 軟斷點:下一個可見字是純接續連詞就不切,避免殘句;
             # 但若已超過絕對上限仍強制切,以免段落過長。

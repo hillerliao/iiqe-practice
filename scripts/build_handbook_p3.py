@@ -312,6 +312,27 @@ _PARA_HARD = 420
 _SOFT_BAD_LEAD = "的而及或並且亦也仍則與"
 
 
+def _previous_visible_char(s: str, from_idx: int) -> str:
+    i = from_idx - 1
+    while i >= 0:
+        ch = s[i]
+        if ch == ">":
+            i = s.rfind("<", 0, i)
+            if i == -1:
+                return ""
+            i -= 1
+            continue
+        if ch == ";":
+            j = s.rfind("&", 0, i)
+            if j != -1 and i - j <= 8:
+                i = j - 1
+                continue
+        if not ch.isspace():
+            return ch
+        i -= 1
+    return ""
+
+
 def _next_visible_char(s: str, from_idx: int) -> str:
     i = from_idx + 1
     n = len(s)
@@ -381,7 +402,12 @@ def _split_long_paragraph(inner_html: str) -> list[str]:
         vlen += 1
         do_split = False
         if ch in _PRIMARY_END and vlen >= _PARA_TARGET:
-            do_split = True
+            prev = _previous_visible_char(inner_html, i)
+            nxt = _next_visible_char(inner_html, i)
+            if ch == "." and prev.isdigit() and nxt.isdigit():
+                do_split = False
+            else:
+                do_split = True
         elif ch in _SOFT_END:
             nxt = _next_visible_char(inner_html, i)
             if vlen >= _PARA_HARD:
