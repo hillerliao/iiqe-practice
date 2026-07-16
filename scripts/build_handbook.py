@@ -1163,6 +1163,12 @@ body {
 .content .handbook-indent-1 { text-indent: 2em; }
 .content .handbook-indent-2 { text-indent: 4em; }
 .content .handbook-indent-3 { text-indent: 6em; }
+/* a. / b. / c. 列舉項:相對於父級 (ii)/(iii) 再往右推 2em,顯示子層級。
+   同時覆寫 text-indent 並用 padding-left 處理 wrap 續行的對齊。 */
+.content p.handbook-list-item {
+  text-indent: 0;
+  padding-left: 8em;
+}
 .content ul, .content ol { margin: 12px 0 14px; padding-left: 28px; }
 .content li { margin-bottom: 6px; }
 .page-badge {
@@ -1292,6 +1298,7 @@ body {
   .content .handbook-indent-1 { text-indent: 2em; }
   .content .handbook-indent-2 { text-indent: 4em; }
   .content .handbook-indent-3 { text-indent: 6em; }
+  .content p.handbook-list-item { text-indent: 0; padding-left: 8em; }
   .vocab-block { column-count: 1; }
   .back-to-top { right: 16px; bottom: 16px; }
 }

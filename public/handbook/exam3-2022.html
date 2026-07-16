@@ -369,6 +369,12 @@ body {
 .content .handbook-indent-1 { text-indent: 2em; }
 .content .handbook-indent-2 { text-indent: 4em; }
 .content .handbook-indent-3 { text-indent: 6em; }
+/* a. / b. / c. 列舉項:相對於父級 (ii)/(iii) 再往右推 2em,顯示子層級。
+   同時覆寫 text-indent 並用 padding-left 處理 wrap 續行的對齊。 */
+.content p.handbook-list-item {
+  text-indent: 0;
+  padding-left: 8em;
+}
 .content ul, .content ol { margin: 12px 0 14px; padding-left: 28px; }
 .content li { margin-bottom: 6px; }
 .page-badge {
@@ -498,6 +504,7 @@ body {
   .content .handbook-indent-1 { text-indent: 2em; }
   .content .handbook-indent-2 { text-indent: 4em; }
   .content .handbook-indent-3 { text-indent: 6em; }
+  .content p.handbook-list-item { text-indent: 0; padding-left: 8em; }
   .vocab-block { column-count: 1; }
   .back-to-top { right: 16px; bottom: 16px; }
 }
@@ -1445,62 +1452,62 @@ body {
 <p class="handbook-indent-2"><strong>(a) </strong>適用範圍</p>
 <p class="handbook-indent-3">(i) 指引29適用於所有經營長期業務的獲授權保險人及所有就長期業務進行受規管活動的持牌保險中介人。</p>
 <p class="handbook-indent-3">(ii) 除下列保單外，指引29適用於所有新訂立的人壽保險保單：</p>
-<p class="handbook-indent-3">a. 團體保單；及</p>
-<p class="handbook-indent-3">b. 任何屬於該條例附表1第2部類別G、類別H及類別I所指明的性質的保單。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 團體保單；及</p>
+<p class="handbook-indent-3 handbook-list-item">b. 任何屬於該條例附表1第2部類別G、類別H及類別I所指明的性質的保單。</p>
 <p class="handbook-indent-3">(iii) 指引29亦不適用於下列有關人壽保險保單的交易：</p>
-<p class="handbook-indent-3">a. 為提高現有保單的保額而增加保費；</p>
-<p class="handbook-indent-3">b. 根據現有保單條款及條件行使抗通脹條文以提高保額；</p>
-<p class="handbook-indent-3">c. 為現有人壽保險保單加入新的附加保障；及</p>
-<p class="handbook-indent-3">d. 保單持有人根據現有保單條款及條件行使轉換權（例如將定期保單或定期附加保障轉換為終身人壽保險保單的權利）。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 為提高現有保單的保額而增加保費；</p>
+<p class="handbook-indent-3 handbook-list-item">b. 根據現有保單條款及條件行使抗通脹條文以提高保額；</p>
+<p class="handbook-indent-3 handbook-list-item">c. 為現有人壽保險保單加入新的附加保障；及</p>
+<p class="handbook-indent-3 handbook-list-item">d. 保單持有人根據現有保單條款及條件行使轉換權（例如將定期保單或定期附加保障轉換為終身人壽保險保單的權利）。</p>
 <p class="handbook-indent-2"><strong>(b) </strong>冷靜期</p>
 <p class="handbook-indent-3">(i) 就本指引而言，冷靜期是有關指引29所適用的人壽保險保單的一項機制，該機制讓保單持有人於21個曆日期間內取消保單並獲退還保費。</p>
 <p class="handbook-indent-3">(ii) 獲授權保險人及持牌保險中介人須透過以下方式令保單持有人注意到冷靜期的機制：</p>
-<p class="handbook-indent-3">a. 根據第(e)段於投保申請書載列有關冷靜期的陳述；</p>
-<p class="handbook-indent-3">b. 根據第(f)段於交付人壽保險保單時在保單附上提示；及</p>
-<p class="handbook-indent-3">c. 由獲授權保險人將冷靜期通知書交付予保單持有人（或保單持有人的指定代表）。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 根據第(e)段於投保申請書載列有關冷靜期的陳述；</p>
+<p class="handbook-indent-3 handbook-list-item">b. 根據第(f)段於交付人壽保險保單時在保單附上提示；及</p>
+<p class="handbook-indent-3 handbook-list-item">c. 由獲授權保險人將冷靜期通知書交付予保單持有人（或保單持有人的指定代表）。</p>
 <p class="handbook-indent-3">(iii) 冷靜期將由下列文件交付予保單持有人或保單持有人的指定代表起計算：</p>
-<p class="handbook-indent-3">a. 人壽保險保單（連同第(f)段所述的冷靜期提示）；或</p>
-<p class="handbook-indent-3">b. 冷靜期通知書，以較早者為準。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 人壽保險保單（連同第(f)段所述的冷靜期提示）；或</p>
+<p class="handbook-indent-3 handbook-list-item">b. 冷靜期通知書，以較早者為準。</p>
 <p class="handbook-indent-3">(iv) 冷靜期為緊接下列文件交付予保單持有人或保單持有人的指定代表之日起計的21個曆日的期間：</p>
-<p class="handbook-indent-3">a. 人壽保險保單；或</p>
-<p class="handbook-indent-3">b. 冷靜期通知書，以較早者為準。為免生疑問，交付人壽保險保單或冷靜期通知書當天並不包括在計算21個曆日的期間內。然而，若第21個曆日當天並非工作天，則冷靜期將包括隨後的工作天的一天在內。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 人壽保險保單；或</p>
+<p class="handbook-indent-3 handbook-list-item">b. 冷靜期通知書，以較早者為準。為免生疑問，交付人壽保險保單或冷靜期通知書當天並不包括在計算21個曆日的期間內。然而，若第21個曆日當天並非工作天，則冷靜期將包括隨後的工作天的一天在內。</p>
 <p class="handbook-indent-3">(v) 為使冷靜期在人壽保險保單簽發日期後的適當時間範圍內展開：</p>
-<p class="handbook-indent-3">a. 若人壽保險保單由獲授權保險人直接交付予保單持有人（或保單持有人的指定代表），則獲授權保險人應在保單簽發日期起計9個曆日內交付該保單（「<strong>9</strong>個曆日限期」）；</p>
-<p class="handbook-indent-3">b. 若人壽保險保單透過持牌保險中介人交付予保單持有人（或保單持有人的指定代表），則</p>
+<p class="handbook-indent-3 handbook-list-item">a. 若人壽保險保單由獲授權保險人直接交付予保單持有人（或保單持有人的指定代表），則獲授權保險人應在保單簽發日期起計9個曆日內交付該保單（「<strong>9</strong>個曆日限期」）；</p>
+<p class="handbook-indent-3 handbook-list-item">b. 若人壽保險保單透過持牌保險中介人交付予保單持有人（或保單持有人的指定代表），則</p>
 <p class="handbook-indent-3">(1) 獲授權保險人應在9個曆日限期結束前預留充足時間向持牌保險中介人提供該保單，以便持牌保險中介人能夠在9個曆日限期內交付該保單予保單持有人（或保單持有人的指定代表）；及</p>
 <p class="handbook-indent-3">(2) 於收到該保單後，持牌保險中介人應盡其合理努力在9個曆日限期內交付該保單予保單持有人（或保單持有人的指定代表）；</p>
-<p class="handbook-indent-3">c. 獲授權保險人應在9個曆日限期內直接交付冷靜期通知書予保單持有人（或保單持有人的指定代表）；及</p>
-<p class="handbook-indent-3">d. 若9個曆日限期的最後一天並非工作天，則該限期將包括隨後的工作天的一天在內。</p>
+<p class="handbook-indent-3 handbook-list-item">c. 獲授權保險人應在9個曆日限期內直接交付冷靜期通知書予保單持有人（或保單持有人的指定代表）；及</p>
+<p class="handbook-indent-3 handbook-list-item">d. 若9個曆日限期的最後一天並非工作天，則該限期將包括隨後的工作天的一天在內。</p>
 <p class="handbook-indent-2"><strong>(c) </strong>冷靜期內取消保單的權利</p>
 <p class="handbook-indent-3">(i) 保單持有人有權在冷靜期內的任何時間取消人壽保險保單，並獲退還保費。保單持有人需要直接向獲授權保險人提供書面通知要求取消保單並退回保單（如適用），以行使此取消保單的權利。</p>
 <p class="handbook-indent-3">(ii) 就指引29適用的所有人壽保險保單（除屬於該條例附表1第2部類別C所指明的性質的保單及整付保費保單外），保單持有人應獲退還全數（即100%）已繳保費。</p>
 <p class="handbook-indent-3">(iii) 就指引29適用的該條例附表1第2部類別C所指明的所有人壽保險保單及所有整付保費保單，獲授權保險人有權於符合以下所有的規定下，對保費作出市值調整，以釐定應退還的保費金額：</p>
-<p class="handbook-indent-3">a. 市值調整的計算應只參照獲授權保險人於變現以有關保單的保費所作之投資而獲取的資產時，其所可能出現的虧損。與獲授權保險人簽發保單有關的費用或佣金支出不得計算在市值調整之內。</p>
-<p class="handbook-indent-3">b. 保單持有人於完成填寫投保申請書前，獲授權保險人可作出市值調整的權利及其計算基準必須透過相關的產品小冊子中予以披露。</p>
-<p class="handbook-indent-3">c. 準保單持有人於簽署其投保申請書前，必須獲告知獲授權保險人可作出市值調整的權利及其計算基準。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 市值調整的計算應只參照獲授權保險人於變現以有關保單的保費所作之投資而獲取的資產時，其所可能出現的虧損。與獲授權保險人簽發保單有關的費用或佣金支出不得計算在市值調整之內。</p>
+<p class="handbook-indent-3 handbook-list-item">b. 保單持有人於完成填寫投保申請書前，獲授權保險人可作出市值調整的權利及其計算基準必須透過相關的產品小冊子中予以披露。</p>
+<p class="handbook-indent-3 handbook-list-item">c. 準保單持有人於簽署其投保申請書前，必須獲告知獲授權保險人可作出市值調整的權利及其計算基準。</p>
 <p class="handbook-indent-2"><strong>(d) </strong>獲授權保險人及持牌保險中介人的特定義務</p>
 <p class="handbook-indent-3">(i) 獲授權保險人必須交付冷靜期通知書予保單持有人或保單持有人的指定代表。獲授權保險人應在冷靜期通知書中包含以下資料：</p>
-<p class="handbook-indent-3">a. 有關的人壽保險保單可供領取的情況，及冷靜期的屆滿日期；</p>
-<p class="handbook-indent-3">b. 在冷靜期內可重新考慮其購買人壽保險產品的決定的權利；</p>
-<p class="handbook-indent-3">c. 在冷靜期內取消保單可獲退還已繳保費的權利；</p>
-<p class="handbook-indent-3">d. 獲授權保險人客戶服務部的聯絡資料（包括其地址、客戶服務熱線號碼和電郵地址）；及</p>
-<p class="handbook-indent-3">e. 若保單持有人或保單持有人的指定代表於冷靜期通知書交付後的9個曆日內仍未收到保單，便應聯絡獲授權保險人的提示。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 有關的人壽保險保單可供領取的情況，及冷靜期的屆滿日期；</p>
+<p class="handbook-indent-3 handbook-list-item">b. 在冷靜期內可重新考慮其購買人壽保險產品的決定的權利；</p>
+<p class="handbook-indent-3 handbook-list-item">c. 在冷靜期內取消保單可獲退還已繳保費的權利；</p>
+<p class="handbook-indent-3 handbook-list-item">d. 獲授權保險人客戶服務部的聯絡資料（包括其地址、客戶服務熱線號碼和電郵地址）；及</p>
+<p class="handbook-indent-3 handbook-list-item">e. 若保單持有人或保單持有人的指定代表於冷靜期通知書交付後的9個曆日內仍未收到保單，便應聯絡獲授權保險人的提示。</p>
 <p class="handbook-indent-3">(ii) 獲授權保險人亦必須：</p>
-<p class="handbook-indent-3">a. 在獲授權保險人直接交付人壽保險保單予保單持有人（或保單持有人的指定代表）的情況下，遵守第(b)(v)a段所載的規定；</p>
-<p class="handbook-indent-3">b. 在透過持牌保險中介人交付保單予保單持有人（或保單持有人的指定代表）的情況下，遵守第(b)(v)b(1)段所載的規定；</p>
-<p class="handbook-indent-3">c. 在其持牌保險中介人的培訓資料及內部指引中訂明，其保險中介人必須遵守第(b)(v)b(2)、</p>
+<p class="handbook-indent-3 handbook-list-item">a. 在獲授權保險人直接交付人壽保險保單予保單持有人（或保單持有人的指定代表）的情況下，遵守第(b)(v)a段所載的規定；</p>
+<p class="handbook-indent-3 handbook-list-item">b. 在透過持牌保險中介人交付保單予保單持有人（或保單持有人的指定代表）的情況下，遵守第(b)(v)b(1)段所載的規定；</p>
+<p class="handbook-indent-3 handbook-list-item">c. 在其持牌保險中介人的培訓資料及內部指引中訂明，其保險中介人必須遵守第(b)(v)b(2)、</p>
 <p class="handbook-indent-3">(c)(iii)及(d)(iii)段所載的規定；</p>
-<p class="handbook-indent-3">d. 在保單並非經由持牌保險中介人訂立的情況下，遵守第(d)(iii)a段所載的規定；</p>
-<p class="handbook-indent-3">e. 制定內部監控措施，以確保並為下述事項提供證據證明：</p>
+<p class="handbook-indent-3 handbook-list-item">d. 在保單並非經由持牌保險中介人訂立的情況下，遵守第(d)(iii)a段所載的規定；</p>
+<p class="handbook-indent-3 handbook-list-item">e. 制定內部監控措施，以確保並為下述事項提供證據證明：</p>
 <p class="handbook-indent-3">(1) 保單在9個曆日限期內已交付予保單持有人（或保單持有人的指定代表）；及</p>
 <p class="handbook-indent-3">(2) 冷靜期通知書在9個曆日限期內已交付予保單持有人（或保單持有人的指定代表）；</p>
-<p class="handbook-indent-3">f. 備存證據紀錄（例如，確認保單已交付的收據副本）。若有投訴或爭議，獲授權保險人可能需要出示證據，以證明其已交付保單或冷靜期通知書（以及交付的時間）；</p>
-<p class="handbook-indent-3">g. 就保單持有人於冷靜期屆滿後，要求取消其保單以獲退還保費而遭拒絕的個案，保存有關投訴或爭議的紀錄；及</p>
-<p class="handbook-indent-3">h. 在切實可行的範圍內，盡快應保監局的要求提供第(d)(ii)e、f及g段提述的紀錄。</p>
+<p class="handbook-indent-3 handbook-list-item">f. 備存證據紀錄（例如，確認保單已交付的收據副本）。若有投訴或爭議，獲授權保險人可能需要出示證據，以證明其已交付保單或冷靜期通知書（以及交付的時間）；</p>
+<p class="handbook-indent-3 handbook-list-item">g. 就保單持有人於冷靜期屆滿後，要求取消其保單以獲退還保費而遭拒絕的個案，保存有關投訴或爭議的紀錄；及</p>
+<p class="handbook-indent-3 handbook-list-item">h. 在切實可行的範圍內，盡快應保監局的要求提供第(d)(ii)e、f及g段提述的紀錄。</p>
 <p class="handbook-indent-3">(iii) 持牌保險中介人應：</p>
-<p class="handbook-indent-3">a. 在準保單持有人簽署投保申請書前，告知準保單持有人可在冷靜期內取消保單的權利、冷靜期的屆滿日期，以及獲授權保險人可作出市值調整的權利及其計算基準（如適用）；</p>
-<p class="handbook-indent-3">b. 如適用，遵守第(b)(v)b(2)段所載的規定；及</p>
-<p class="handbook-indent-3">c. 遵守適用於該持牌保險中介人的其他守則及指引內所載有關冷靜期的任何其他規定。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 在準保單持有人簽署投保申請書前，告知準保單持有人可在冷靜期內取消保單的權利、冷靜期的屆滿日期，以及獲授權保險人可作出市值調整的權利及其計算基準（如適用）；</p>
+<p class="handbook-indent-3 handbook-list-item">b. 如適用，遵守第(b)(v)b(2)段所載的規定；及</p>
+<p class="handbook-indent-3 handbook-list-item">c. 遵守適用於該持牌保險中介人的其他守則及指引內所載有關冷靜期的任何其他規定。</p>
 <p class="handbook-indent-2"><strong>(e) </strong>投保申請書所載有關冷靜期的陳述</p>
 <p class="handbook-indent-3">(i) 獲授權保險人應在投保申請書內緊接在準保單持有人簽署欄的正上方，印上符合「投保申請書所載有關冷靜期的陳述指引」（見附件<strong>A</strong>）的陳述。</p>
 <p class="handbook-indent-3">(ii) 該陳述應使用清晰易讀的文字並以顯著的方式展示，該陳述的字體不得小於投保申請書內其他聲明所使用的字體。不論投保申請書是使用紙張、電子或其他形式顯示，獲授權保險人均須遵守本規定。</p>
@@ -1518,28 +1525,28 @@ body {
 <p class="handbook-indent-3">(i) 指引27適用於所有經營長期業務的獲授權保險人及所有就長期業務進行受規管活動的持牌保險中介人。</p>
 <p class="handbook-indent-3">(ii) 除非屬第(a)(iii)或(a)(iv)段中所列明適用的例外情況，否則指引27適用於客戶在本指引生效日期後所申請購買的任何人壽保險保單。</p>
 <p class="handbook-indent-3">(iii) 指引27不適用於：</p>
-<p class="handbook-indent-3">a. 購買任何為團體保單的人壽保險保單；</p>
-<p class="handbook-indent-3">b. 在符合下文第(a)(iv)段所有條件的情況下而銷售的人壽保險保單；或</p>
-<p class="handbook-indent-3">c. 獲授權保險人獲授權保險人或持牌保險中介人（視屬何情況而定）已獲得保監局事前的書面同意以豁免遵守指引27的規定的任何人壽保險保單（例如透過保險科技沙盒）。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 購買任何為團體保單的人壽保險保單；</p>
+<p class="handbook-indent-3 handbook-list-item">b. 在符合下文第(a)(iv)段所有條件的情況下而銷售的人壽保險保單；或</p>
+<p class="handbook-indent-3 handbook-list-item">c. 獲授權保險人獲授權保險人或持牌保險中介人（視屬何情況而定）已獲得保監局事前的書面同意以豁免遵守指引27的規定的任何人壽保險保單（例如透過保險科技沙盒）。</p>
 <p class="handbook-indent-3">(iv) 上文第(a)(iii)b段提及的條件是：</p>
-<p class="handbook-indent-3">a. 該人壽保險保單由獲授權保險人獲授權保險人，或認可機構以獲授權保險人的獲授權保險人的持牌保險代理機構的身份，直接銷售給客戶；</p>
-<p class="handbook-indent-3">b. 該人壽保險保單通過數碼分銷渠道，如：網頁或手機應用程式的銷售；</p>
-<p class="handbook-indent-3">c. 獲授權保險人獲授權保險人或認可機構在銷售之前或期間並未向客戶提供建議；及</p>
-<p class="handbook-indent-3">d. 除須遵守所有現有的產品披露規定外，獲授權保險人獲授權保險人或認可機構在人壽保險保單銷售時以顯著的方式展示聲明，以警告客戶如購買該人壽保險保單是為了取代現有的人壽保險保單，則客戶應尋求專業意見以了解相關風險及轉保的不利後果。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 該人壽保險保單由獲授權保險人獲授權保險人，或認可機構以獲授權保險人的獲授權保險人的持牌保險代理機構的身份，直接銷售給客戶；</p>
+<p class="handbook-indent-3 handbook-list-item">b. 該人壽保險保單通過數碼分銷渠道，如：網頁或手機應用程式的銷售；</p>
+<p class="handbook-indent-3 handbook-list-item">c. 獲授權保險人獲授權保險人或認可機構在銷售之前或期間並未向客戶提供建議；及</p>
+<p class="handbook-indent-3 handbook-list-item">d. 除須遵守所有現有的產品披露規定外，獲授權保險人獲授權保險人或認可機構在人壽保險保單銷售時以顯著的方式展示聲明，以警告客戶如購買該人壽保險保單是為了取代現有的人壽保險保單，則客戶應尋求專業意見以了解相關風險及轉保的不利後果。</p>
 <p class="handbook-indent-2"><strong>(b) </strong>轉保</p>
 <p class="handbook-indent-3">(i) 就購買指引27所適用的任何人壽保險保單（見上文第(a)(ii)段）而言，該保單的獲授權保險人及進行與該保單有關的受規管活動的持牌保險中介人，應採取一切合理步驟，以識別客戶購買該人壽保險保單是否屬轉保的情況。</p>
 <p class="handbook-indent-3">(ii) 就上文第(b)(i)段而言，對於購買指引27所適用的人壽保險保單的情況，若該情況在所購買新的人壽保險保單之申請日期符合下述條件，則該情況屬於轉保的情況：</p>
-<p class="handbook-indent-3">a. 客戶現時或曾經擁有另一份（或多份）人壽保險保單（統稱為“現有人壽保險保單”）；</p>
-<p class="handbook-indent-3">b. 現有人壽保險保單的保單持有人與所購買的人壽保險保單的保單持有人相同；及</p>
-<p class="handbook-indent-3">c. 客戶透過下列方式，使用現有人壽保險保單的部分或全部現金價值總額，或使用通過減少現有人壽保險保單應付的保費而節省或將節省的任何金額，以資助購買新的人壽保險保單所需的費用：</p>
+<p class="handbook-indent-3 handbook-list-item">a. 客戶現時或曾經擁有另一份（或多份）人壽保險保單（統稱為“現有人壽保險保單”）；</p>
+<p class="handbook-indent-3 handbook-list-item">b. 現有人壽保險保單的保單持有人與所購買的人壽保險保單的保單持有人相同；及</p>
+<p class="handbook-indent-3 handbook-list-item">c. 客戶透過下列方式，使用現有人壽保險保單的部分或全部現金價值總額，或使用通過減少現有人壽保險保單應付的保費而節省或將節省的任何金額，以資助購買新的人壽保險保單所需的費用：</p>
 <p class="handbook-indent-3">(1) 客戶藉行使（或已行使）保單下的權利（例如提取保單款項、提早退保）或藉保單條款及細則自動運作的情況（例如保單失效、減額繳清、展期保單），以減少現有人壽保險保單的現金價值總額或保額；或</p>
 <p class="handbook-indent-3">(2) 客戶從現有人壽保險保單中提取（或已提取）保單貸款（不論是應客戶要求或是藉保單條款及細則自動運作的情況而提取）；或</p>
 <p class="handbook-indent-3">(3) 客戶暫停或終止支付現有人壽保險保單下所須繳付的保費。</p>
 <p class="handbook-indent-3">(iii) 下述交易不會被視為屬轉保的情況：</p>
-<p class="handbook-indent-3">a. 該新的人壽保險保單的訂立，是僅基於根據現有人壽保險保單的條文由現有人壽保險保單轉換為新的人壽保險保單；</p>
-<p class="handbook-indent-3">b. 在現有人壽保險保單與新的人壽保險保單是由同一位獲授權保險人發出，並且在不需要再次進行核保的情況下，該新的人壽保險保單是僅基於根據該保險人提供的轉換或轉移計劃，而使現有人壽保險保單轉換或轉移為新的人壽保險保單；</p>
-<p class="handbook-indent-3">c. 對現有人壽保險保單的唯一變更是關乎其附加條款的保障，而該保單基本計劃的人壽保險保障並沒有作出變更；及</p>
-<p class="handbook-indent-3">d. 購買新的人壽保險保單是為了取代在冷靜期（根據《冷靜期權益指引》（指引29）所定義者）內取消的現有人壽保險保單。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 該新的人壽保險保單的訂立，是僅基於根據現有人壽保險保單的條文由現有人壽保險保單轉換為新的人壽保險保單；</p>
+<p class="handbook-indent-3 handbook-list-item">b. 在現有人壽保險保單與新的人壽保險保單是由同一位獲授權保險人發出，並且在不需要再次進行核保的情況下，該新的人壽保險保單是僅基於根據該保險人提供的轉換或轉移計劃，而使現有人壽保險保單轉換或轉移為新的人壽保險保單；</p>
+<p class="handbook-indent-3 handbook-list-item">c. 對現有人壽保險保單的唯一變更是關乎其附加條款的保障，而該保單基本計劃的人壽保險保障並沒有作出變更；及</p>
+<p class="handbook-indent-3 handbook-list-item">d. 購買新的人壽保險保單是為了取代在冷靜期（根據《冷靜期權益指引》（指引29）所定義者）內取消的現有人壽保險保單。</p>
 <p class="handbook-indent-3">(iv) 應採取一切的合理步驟的規定，獲授權保險人或持牌保險中介人所應採取的步驟包括確保充分向客戶作出查詢，以得知客戶是否使用現有人壽保險保單的現金價值總額，或使用通過減少現有人壽保險保單應付的保費而節省的金額，以資助或打算資助購買新的人壽保險保單。有關查詢應最低限度包括範本中所載的問題（見附件<strong>C</strong>）。</p><p class="handbook-indent-3">該等查詢應在新的人壽保險保單的銷售過程中提出，而有關查詢亦可作為獨立的部分納入保單申請表內。獲授權保險人及持牌保險中介人可以修改範本中所載的問題（見附件<strong>C</strong>），使用財務需要分析過程中收集的資料，並根據客戶的特別情況更改就轉保應作出的查詢。</p>
 <p class="handbook-indent-3">(v) 持牌保險中介人應為客戶評估購買新的人壽保險保單是否符合客戶的最佳利益並為此向客戶提供意見，當中必須考慮客戶減少現有人壽保險保單的現金價值總額或保額而引致的影響以及任何因轉保而對客戶造成的其他不利後果。持牌保險中介人應要求客戶提供有關現有人壽保險保單的資料，以為客戶提供該等評估。</p><p class="handbook-indent-3">持牌保險中介人必須妥善記錄客戶在此評估過程中提供的資料，其所考慮的因素、所作之評價及建議，以及該建議的理由。</p>
 <p class="handbook-indent-2"><strong>(c) </strong>《重要資料聲明書<strong>--</strong>轉保》</p>
@@ -1550,8 +1557,8 @@ body {
 <p class="handbook-indent-2"><strong>(d) </strong>內部轉保</p>
 <p class="handbook-indent-3">(i) “內部轉保”指就購買新的人壽保險保單的交易已被識別為轉保（根據上文第(b)(ii)段）的情況下，該新的人壽保險保單的獲授權保險人同時為客戶現有人壽保險保單的保險人的個案。</p>
 <p class="handbook-indent-3">(ii) 獲授權保險人應根據上文第(b)(ii)段所載的準則，實施核對其內部紀錄和數據庫的程序，以識別內部轉保的情況，而該等程序的具體如下：每當收到新的人壽保險保單的申請時，獲授權保險人應核對：</p>
-<p class="handbook-indent-3">a. 就新保單的申請日期而言，客戶有否在緊接該申請日期前的12個月內曾經與該獲授權保險人訂立現有人壽保險保單，及</p>
-<p class="handbook-indent-3">b. 如有此情況，現有人壽保險保單在緊接該申請日期前的12個月內有否出現上文第(b)(ii)c(1)、</p>
+<p class="handbook-indent-3 handbook-list-item">a. 就新保單的申請日期而言，客戶有否在緊接該申請日期前的12個月內曾經與該獲授權保險人訂立現有人壽保險保單，及</p>
+<p class="handbook-indent-3 handbook-list-item">b. 如有此情況，現有人壽保險保單在緊接該申請日期前的12個月內有否出現上文第(b)(ii)c(1)、</p>
 <p class="handbook-indent-3">(2)或(3)段中的任何情況。如確認有上文第(d)(ii)b段中的情況出現，獲授權保險人須判斷是否需要聯絡客戶，以再次確認其是否有意通過更改現有人壽保險保單以資助購買新的人壽保險保單，並告知客戶此舉的不利之處。</p>
 <p class="handbook-indent-3">(iii) 若獲授權保險人識別某客戶在申請新的人壽保險保單時，已與其訂立現有人壽保險保單（基於進行上文第(d)(ii)段所述的核對），惟新的人壽保險保單在該申請時並不被視為屬轉保的情況，該保險人則應設定程序，以繼續監察緊接有關新的人壽保險保單之申請日期後的12個月內，現有人壽保險保單有否出現任何可能構成轉保（根據第(b)(ii)c(1)、(2)及(3)段）的變化。</p><p class="handbook-indent-3">如於監察期間識別出現第</p>
 <p class="handbook-indent-3">(b)(ii)c(1)、(2)或(3)段中的任何情況，則獲授權保險人須判斷是否需要聯絡客戶，以再次確認其是否有意通過更改現有人壽保險保單以資助購買新的人壽保險保單，並告知客戶此舉的不利之處。</p>
@@ -1559,11 +1566,11 @@ body {
 <p class="handbook-indent-3">(i) 獲授權保險人應記錄與轉保個案相關的投訴（並保存該等投訴紀錄），並持續監察投訴的趨勢。如發現有任何異常情況，應採取適當的管理行動以識別投訴的問題根源並採取相關的補救行動。</p>
 <p class="handbook-indent-2"><strong>(f) </strong>獲授權保險人、持牌保險經紀公司及持牌保險代理機構設立的有效管控及程序</p>
 <p class="handbook-indent-3">(i) 獲授權保險人應設立內部管控措施，以確保其委任的持牌個人保險代理及持牌保險代理機構遵從指引27的規定，並確保通過持牌保險經紀作出的人壽保險保單的申請亦符合指引27的規定。該等管控措施應包括下述事宜的管控：</p>
-<p class="handbook-indent-3">a. 確保已採取合理步驟以識別客戶是否購買人壽保險保單作為轉保，並保留適當的紀錄以證明已採取該等步驟；</p>
-<p class="handbook-indent-3">b. 在已識別為轉保的情況下，確保客戶獲提供《重要資料聲明書--轉保》並簽署該文件，使客戶意識到轉保可能產生的不利之處，並保留適當紀錄以作證明；</p>
-<p class="handbook-indent-3">c. 確保設有有效的機制以識別並處理內部轉保個案；</p>
-<p class="handbook-indent-3">d. 識別持牌保險中介人逃避管控措施，或協助或教唆客戶逃避有關監控措施（例如，客戶在未獲機會閱讀及了解《重要資料聲明書--轉保》前已簽署該文件）的潛在個案，並於必要時採取包括針對有關持牌保險中介人的補救行動；及</p>
-<p class="handbook-indent-3">e. 識別可疑的轉保個案（例如，持牌保險中介人為該保險人銷售大量屬轉保的新的人壽保險保單）及其問題的根源，以及於必要時採取補救行動。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 確保已採取合理步驟以識別客戶是否購買人壽保險保單作為轉保，並保留適當的紀錄以證明已採取該等步驟；</p>
+<p class="handbook-indent-3 handbook-list-item">b. 在已識別為轉保的情況下，確保客戶獲提供《重要資料聲明書--轉保》並簽署該文件，使客戶意識到轉保可能產生的不利之處，並保留適當紀錄以作證明；</p>
+<p class="handbook-indent-3 handbook-list-item">c. 確保設有有效的機制以識別並處理內部轉保個案；</p>
+<p class="handbook-indent-3 handbook-list-item">d. 識別持牌保險中介人逃避管控措施，或協助或教唆客戶逃避有關監控措施（例如，客戶在未獲機會閱讀及了解《重要資料聲明書--轉保》前已簽署該文件）的潛在個案，並於必要時採取包括針對有關持牌保險中介人的補救行動；及</p>
+<p class="handbook-indent-3 handbook-list-item">e. 識別可疑的轉保個案（例如，持牌保險中介人為該保險人銷售大量屬轉保的新的人壽保險保單）及其問題的根源，以及於必要時採取補救行動。</p>
 <p class="handbook-indent-3">(ii) 持牌保險經紀公司及持牌保險代理機構亦須設立並實施內部管控措施，以確保該等經紀公司及代理機構及其持牌業務代表（經紀）及持牌業務代表（代理人）（視屬何情況而定）遵從指引27的規定。</p>
 <p class="handbook-indent-2"><strong>(g) </strong>備存紀錄</p>
 <p class="handbook-indent-3">(i) 獲授權保險人、持牌保險經紀公司及持牌保險代理機構應就轉保的事宜保存妥當的紀錄，包括但不限於指引27中所載的必要文件，以供保監局查閱及審閱。</p>
@@ -1573,9 +1580,9 @@ body {
 <p class="handbook-indent-2">(i) 指引28適用於所有經營長期業務的獲授權保險人，並載述獲授權保險人須就指引28所適用的人壽保險保單提供的銷售時利益說明、補充利益說明及有效利益說明的最低限度規定。</p>
 <p class="handbook-indent-2">(ii) 就所有具現金價值的人壽保險保單而言（團體保單除外），指引28所定下的規定必須獲遵從。就指引28而言，具可退款特點的個人保單將被視為具現金價值的人壽保險保單。</p>
 <p class="handbook-indent-2">(iii) 對於下列類別的人壽保險保單而言，可由獲授權保險人選擇是否發出有效利益說明：</p>
-<p class="handbook-indent-3">a. 減額清繳保險保單及展期保險保單，而這些保單派發未來紅利及可支取現金的權益均已作廢，而其存款賬戶（如有）是按保證利率累積；</p>
+<p class="handbook-indent-3 handbook-list-item">a. 減額清繳保險保單及展期保險保單，而這些保單派發未來紅利及可支取現金的權益均已作廢，而其存款賬戶（如有）是按保證利率累積；</p>
 <p class="handbook-indent-3">b . 非分紅保單；及</p>
-<p class="handbook-indent-3">c. 投資相連壽險計劃（“投連壽險”）保單（即該條例附表1第2部類別C（相連長期）的保險合約）。</p>
+<p class="handbook-indent-3 handbook-list-item">c. 投資相連壽險計劃（“投連壽險”）保單（即該條例附表1第2部類別C（相連長期）的保險合約）。</p>
 <p class="handbook-indent-1"><strong>(b) </strong>一般原則</p>
 <p class="handbook-indent-2">(i) 就有關指引28所適用的人壽保險保單而言，獲授權保險人應於銷售時提供利益說明，而該利益說明應最低限度應載有指引28附錄中標準說明（“標準說明”）內顯示的資料。獲授權保險人有責任確保其利益說明文件所提供的資料為充足、準確、清晰及不屬誤導。</p>
 <p class="handbook-indent-2">(ii) 除指引28另有述明外，任何補充利益說明及有效利益說明亦應遵從標準說明中的最低限度規定。</p>
@@ -1583,14 +1590,14 @@ body {
 <p class="handbook-indent-2">(iv) 指引28相關附錄載有特定產品類別的具體規定。</p>
 <p class="handbook-indent-2">(v) 獲授權保險人應要求客戶簽署銷售時所提供的利益說明文件中的聲明。保險人可選擇是否要求客戶簽署補充利益說明。數碼簽署或其他相類的簽署認證技術均為可接受的簽署方式。為免生疑問，獲授權保險人無須就有效利益說明取得客戶的簽署。</p>
 <p class="handbook-indent-2">(vi) 如透過非親身的分銷渠道（如互聯網或電話營銷）銷售人壽保險保單，則在符合以下條件的情況下，客戶會被視為已簽署該利益說明文件：</p>
-<p class="handbook-indent-3">a. 在銷售過程中，客戶已獲提供相關保單的主要產品特點之解說文件；b . 在透過互聯網銷售的情況下，作為在線購買過程的一部分，客戶須（並確實）確認他／她已審閱該利益說明文件；及</p>
-<p class="handbook-indent-3">c. 在向客戶交付保單時會一併將該利益說明文件致予客戶。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 在銷售過程中，客戶已獲提供相關保單的主要產品特點之解說文件；b . 在透過互聯網銷售的情況下，作為在線購買過程的一部分，客戶須（並確實）確認他／她已審閱該利益說明文件；及</p>
+<p class="handbook-indent-3 handbook-list-item">c. 在向客戶交付保單時會一併將該利益說明文件致予客戶。</p>
 <p class="handbook-indent-1"><strong>(c) </strong>補充利益說明</p>
 <p class="handbook-indent-2">(i) 獲授權保險人可就保單持有人不時選擇之可供選取的產品選項（如保費假期、部分退保、增加投保額等）提供補充利益說明。如有關資料已在標準說明中顯示，則可於補充利益說明省略該資料。</p>
 <p class="handbook-indent-2">(ii) 如保費抵銷的選項於補充利益說明中闡述，則須符合保監局發出的《承保長期保險業務（保險業監管局類別C業務除外）》（指引16）（參見<strong>5.2.8</strong>及附件<strong>K</strong>）的規定。</p>
 <p class="handbook-indent-2">(iii) 就有關保單抵押貸款而言，獲授權保險人應向保單持有人提供通知，提醒保單持有人因保單抵押貸款款額超逾戶口／退保價值所產生的失效風險，以及（投連壽險保單的情況除外）根據保單抵押貸款的現時假設而導致保單失效的預計時間（以年為單位）（“提醒通知”）。在下列情況下應向保單持有人提供提醒通知：</p>
-<p class="handbook-indent-3">a. 如在銷售時向保單持有人提供含有保單抵押貸款之基本計劃的補充利益說明；b . 如保單持有人申請保單抵押貸款；c. （盡快）於首次發出自動保單抵押貸款後（提供）；及</p>
-<p class="handbook-indent-3">d. 就有關已提取保單抵押貸款的保單，發出定期週年結單時。此外，獲授權保險人須按要求提供保單抵押貸款金額的更新預測，並清楚表明保單抵押貸款的利率將視乎市場情況而不時修訂。獲授權保險人應在提供提醒通知時，告知保單持有人其可以要求此更新預測的權利。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 如在銷售時向保單持有人提供含有保單抵押貸款之基本計劃的補充利益說明；b . 如保單持有人申請保單抵押貸款；c. （盡快）於首次發出自動保單抵押貸款後（提供）；及</p>
+<p class="handbook-indent-3 handbook-list-item">d. 就有關已提取保單抵押貸款的保單，發出定期週年結單時。此外，獲授權保險人須按要求提供保單抵押貸款金額的更新預測，並清楚表明保單抵押貸款的利率將視乎市場情況而不時修訂。獲授權保險人應在提供提醒通知時，告知保單持有人其可以要求此更新預測的權利。</p>
 <p class="handbook-indent-2">(iv) 獲授權保險人可選擇是否就附加保障提供利益說明。如獲授權保險人選擇在銷售時提供附加保障的利益說明或就附加保障提供有效利益說明，則最低限度須向保單持有人提供基本計劃的利益說明，另需提供一份集合基本計劃和附加保障的補充利益說明。</p>
 <p class="handbook-indent-1"><strong>(d) </strong>按客戶需要的修訂</p>
 <p class="handbook-indent-2">(i) 獲授權保險人可按客戶需要修訂其利益說明文件，以刪除不適用於該產品或與客戶無關的資料，或加入額外的資料，惟該額外的資料不得具誤導成分及不應影響客戶對於標準說明所披露的資料的關注。</p>
@@ -1599,13 +1606,13 @@ body {
 <p class="handbook-indent-2">(iv) 獲授權保險人不得重點指出任何非保證的數字（即以有別於利益說明文件中一般文本的格式，如以粗體、下劃線或任何顏色或字體大小的特別格式所顯示）。</p>
 <p class="handbook-indent-1"><strong>(e) </strong>利益說明文件的編制及提供時間</p>
 <p class="handbook-indent-2">(i) 提供利益說明文件的時間如下：</p>
-<p class="handbook-indent-3">a. 就於銷售時提供的利益說明文件而言，應於潛在的保單持有人簽署申請表格前供其審閱及簽署（上文第(b)(vi)段適用的情況除外）；及b . 在保單發出後，應最少每年一次向保單持有人提供有效利益說明（此規定並不適用於可選擇是否提供有效利益說明的保單 - 見上文第(a)(iii)段）。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 就於銷售時提供的利益說明文件而言，應於潛在的保單持有人簽署申請表格前供其審閱及簽署（上文第(b)(vi)段適用的情況除外）；及b . 在保單發出後，應最少每年一次向保單持有人提供有效利益說明（此規定並不適用於可選擇是否提供有效利益說明的保單 - 見上文第(a)(iii)段）。</p>
 <p class="handbook-indent-2">(ii) 獲授權保險人須提供反映個別客戶詳情的說明（而不是使用適用於所有客戶的樣本說明）。該等客戶詳情應包括（但不限於）年齡、性別或吸煙習慣。</p>
 <p class="handbook-indent-2">(iii) 獲授權保險人應使用與其他預售文件中相同的語言作為利益說明文件的語言。利益說明文件的英文或中文文本須按客戶要求供客戶取閱。獲授權保險人有責任確保所有銷售材料的內容一致。利益說明文件必須以清晰易讀的文字、格式及設計所顯示。<strong>5.2.6a </strong>投資壽險保單利益說明文件的具體規定（指引<strong>28-</strong>附件<strong>I</strong>）</p>
 <p class="handbook-indent-2"><strong>(a) </strong>假設淨回報率</p>
 <p class="handbook-indent-3">(i) 獲授權保險人可選擇下列兩項中的其中一項，以闡述假設淨回報率：</p>
-<p class="handbook-indent-3">a. 以四個假設年度淨回報率，即0%、3%、6%及9%，作闡述，並以不同的列表分別顯示其相應的退保發還金額及身故賠償額；及</p>
-<p class="handbook-indent-3">b. 以三個假設年度淨回報率，即0%、3%及6%，作闡述，並在同一列表中顯示其相應的退保發還金額及身故賠償額。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 以四個假設年度淨回報率，即0%、3%、6%及9%，作闡述，並以不同的列表分別顯示其相應的退保發還金額及身故賠償額；及</p>
+<p class="handbook-indent-3 handbook-list-item">b. 以三個假設年度淨回報率，即0%、3%及6%，作闡述，並在同一列表中顯示其相應的退保發還金額及身故賠償額。</p>
 <p class="handbook-indent-3">(ii) 就上述兩個選項而言，除0%的假設年度淨回報率外，所有其他回報率（即3%、6%及9%）為獲授權保險人可採用的最高回報率。獲授權保險人亦可選擇使用較低的假設年度淨回報率（如0%、2%、5%及7%）作闡述。</p>
 <p class="handbook-indent-2"><strong>(b) </strong>費用及收費</p>
 <p class="handbook-indent-3">(i) 獲授權保險人的利益說明文件應以反映所有保單層面的費用及收費（但不包括基金管理費用）所編制。基金管理費用指僅由基金經理所收取的費用及收費。</p>
@@ -1630,16 +1637,16 @@ body {
 <p class="handbook-indent-3">(iii) 獲授權保險人可選擇用獨立的表格，以退保發還金額先於身故賠償額的方式列出該等數字，而“繳付保費總額”欄則必須顯示於各個表格中。就規定而言，悲觀情景和樂觀情景須在同一頁面中顯示。如獲授權保險人需要就悲觀情景和樂觀情景以不同的分頁表達，保監局會視乎其理據及有關表達方式是否屬誤導或較可能具誤導成分，並按個別情況考慮是否給予書面同意。</p>
 <p class="handbook-indent-3">(iv) 獲授權保險人可選擇是否於補充利益說明及有效利益說明中顯示悲觀情景和樂觀情景。如獲授權保險人選擇顯示與基本情景有分別的情景，則最低限度須顯示悲觀情景。</p>
 <p class="handbook-indent-3">(v) 利益說明文件只應顯示於“保單年度終結”時的數字，並應就下列年度提供利益說明：</p>
-<p class="handbook-indent-3">a. 顯示不少於30年（於第5個保單年度後，以至少每5年的期間顯示）或保障年期（如較短）；及</p>
-<p class="handbook-indent-3">b. 在65歲時，或在保單年期屆滿時（如較早）；及</p>
-<p class="handbook-indent-3">c. 在100歲時，或在保單年期屆滿時（如較早）；及</p>
-<p class="handbook-indent-3">d. 在保單年期屆滿時。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 顯示不少於30年（於第5個保單年度後，以至少每5年的期間顯示）或保障年期（如較短）；及</p>
+<p class="handbook-indent-3 handbook-list-item">b. 在65歲時，或在保單年期屆滿時（如較早）；及</p>
+<p class="handbook-indent-3 handbook-list-item">c. 在100歲時，或在保單年期屆滿時（如較早）；及</p>
+<p class="handbook-indent-3 handbook-list-item">d. 在保單年期屆滿時。</p>
 <p class="handbook-indent-2">註：分紅保單利益說明文件的式樣可以在《附件<strong>F</strong>》找到。</p>
 <p class="handbook-indent-2"><strong>5.2.6c </strong>萬用壽險（非投資相連）保單利益說明文件的具體規定（指引<strong>28 - </strong>附件<strong>III</strong>）</p>
 <p class="handbook-indent-2"><strong>(a) </strong>回報率</p>
 <p class="handbook-indent-3">(i) 獲授權保險人應使用以下兩種不同假設來推算利益價值：</p>
-<p class="handbook-indent-3">a. 根據保單訂明的最低保證派息率（不包括任何非保證紅利）。如保單並沒有提供任何保證派息率，則應使用每年0%的保守派息率（“保證基礎”或“保守假設基礎”）。</p>
-<p class="handbook-indent-3">b. 根據獲授權保險人預測的現時假設派息率（即基於最佳估算的現行派息率的假設）（“現時假設基礎”），而該派息率可能與可不時更改的現行派息率不同。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 根據保單訂明的最低保證派息率（不包括任何非保證紅利）。如保單並沒有提供任何保證派息率，則應使用每年0%的保守派息率（“保證基礎”或“保守假設基礎”）。</p>
+<p class="handbook-indent-3 handbook-list-item">b. 根據獲授權保險人預測的現時假設派息率（即基於最佳估算的現行派息率的假設）（“現時假設基礎”），而該派息率可能與可不時更改的現行派息率不同。</p>
 <p class="handbook-indent-3">(ii) 所使用的派息率應採用未經扣除任何相關保單費用及收費前的派息率。</p>
 <p class="handbook-indent-3">(iii) 在釐定現時假設基礎的最佳估算假設時，委任精算師應參照精算學會發出的精算指引9，尤其是該指引附錄A中涵蓋利益說明假設的指引及考慮事項。</p>
 <p class="handbook-indent-3">(iv) 獲授權保險人只可以不高於根據最佳估算所釐定的派息率闡述利益價值。</p>
@@ -1647,13 +1654,13 @@ body {
 <p class="handbook-indent-3">(i) 在保證基礎或保守假設基礎下，有關推算應採用最高的費用及收費標準。如最高的費用及收費標準並不適用，則應採用現時的費用及收費標準。</p>
 <p class="handbook-indent-3">(ii) 在現時假設基礎下，有關推算應採用現時的費用及收費標準。</p>
 <p class="handbook-indent-3">(iii) 獲授權保險人須於銷售時及就有效利益說明提供萬用壽險（非投資相連）保單標準說明中，訂明費用及收費摘要。除其他費用及收費外，亦應披露以下各項：</p>
-<p class="handbook-indent-3">a. 應披露退保費用率／退保費用金額（如適用）。如顯示退保費用率，則須清楚述明有關費率適用的基礎。</p>
-<p class="handbook-indent-3">b. 應披露首10個保單年度中各年度的保險成本費率。對於其後年度的收費，獲授權保險人可按每5年的期間直至保單年期屆滿而顯示費率。</p>
-<p class="handbook-indent-3">c. 除現時收費率外，亦應顯示最高收費率。如沒有最高收費，則應於該欄中標明“不適用”。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 應披露退保費用率／退保費用金額（如適用）。如顯示退保費用率，則須清楚述明有關費率適用的基礎。</p>
+<p class="handbook-indent-3 handbook-list-item">b. 應披露首10個保單年度中各年度的保險成本費率。對於其後年度的收費，獲授權保險人可按每5年的期間直至保單年期屆滿而顯示費率。</p>
+<p class="handbook-indent-3 handbook-list-item">c. 除現時收費率外，亦應顯示最高收費率。如沒有最高收費，則應於該欄中標明“不適用”。</p>
 <p class="handbook-indent-2"><strong>(c) </strong>悲觀情景及樂觀情景</p>
 <p class="handbook-indent-3">(i) 獲授權保險人可選擇是否按悲觀和樂觀情景下的假設派息率以提供有關說明，而有關說明則僅應在符合以下兩個條件的情況下提供：</p>
-<p class="handbook-indent-3">a. 有關保險計劃的目標資產組合具重大的（佔20%或以上）股權投資；及</p>
-<p class="handbook-indent-3">b. 獲授權保險人的委任精算師認為可選擇提供的有關說明不會誤導申請人。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 有關保險計劃的目標資產組合具重大的（佔20%或以上）股權投資；及</p>
+<p class="handbook-indent-3 handbook-list-item">b. 獲授權保險人的委任精算師認為可選擇提供的有關說明不會誤導申請人。</p>
 <p class="handbook-indent-3">(ii) 此說明的提供主要為反映因股權投資而可能導致派息率的變動。該說明不應被用作為未來派息率的指標，因該等使用會被視為誤導申請人。</p>
 <p class="handbook-indent-3">(iii) 獲授權保險人須採用預計投資回報的第二十五（25th）及第七十五（75th）百分位數以計算悲觀和樂觀情景（除非獲授權保險人已向保監局闡明並使其信納遵從此規定的實際困難，及獲得保監局另行的書面同意），並同時須保留其他假設不變（紅利／可支取現金的累積利率除外）。</p>
 <p class="handbook-indent-2"><strong>(d) </strong>披露</p>
@@ -1665,10 +1672,10 @@ body {
 <p class="handbook-indent-3">(vi) 獲授權保險人可選擇是否於補充利益說明及有效利益說明中顯示悲觀情景和樂觀情景。如獲授權</p>
 <p class="handbook-indent-3">保險人選擇顯示與基本情景有分別的情景，則須同時顯示悲觀情景和樂觀情景。</p>
 <p class="handbook-indent-3">(vii) 利益說明文件只應顯示於“保單年度終結”時的數字，並應就下列年度提供利益說明：</p>
-<p class="handbook-indent-3">a. 顯示不少於30年（於第5個保單年度後，以至少每5年的期間顯示）或保障年期（如較短）；及</p>
-<p class="handbook-indent-3">b. 在65歲時，或在保單年期屆滿時（如較早）；及</p>
-<p class="handbook-indent-3">c. 在100歲時，或在保單年期屆滿時（如較早）；及</p>
-<p class="handbook-indent-3">d. 在保單年期屆滿時。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 顯示不少於30年（於第5個保單年度後，以至少每5年的期間顯示）或保障年期（如較短）；及</p>
+<p class="handbook-indent-3 handbook-list-item">b. 在65歲時，或在保單年期屆滿時（如較早）；及</p>
+<p class="handbook-indent-3 handbook-list-item">c. 在100歲時，或在保單年期屆滿時（如較早）；及</p>
+<p class="handbook-indent-3 handbook-list-item">d. 在保單年期屆滿時。</p>
 <p class="handbook-indent-3">註：萬用壽險（非投資相連）保單利益說明文件的式樣可以在《附件<strong>G</strong>》找到。</p>
 <p class="handbook-indent-2"><strong>5.2.6d </strong>非分紅保單利益說明文件的具體規定（指引<strong>28 - </strong>附件<strong>IV</strong>）</p>
 <p class="handbook-indent-2"><strong>(a) </strong>原則</p>
@@ -1678,10 +1685,10 @@ body {
 <p class="handbook-indent-3">(i) 利益說明文件中的保險術語應使用「指引28」附件第一部分（見附件<strong>I</strong>）所述的可接納的保險術語，並與其他產品資料文件（如產品小冊子、保單條款等）保持一致。如獲授權保險人需要使用其自身採用的術語，保監局會視乎其理據及有關術語是否屬誤導或較可能具誤導成分，並按個別情況考慮是否給予書面同意。</p><p class="handbook-indent-3">為免生疑問，請注意「指引28」附件第二部分（見附件<strong>J</strong>）列出被視為具誤導成分的不可接納的術語清單。</p>
 <p class="handbook-indent-3">(ii) 於保監局發出的指引16生效前所發出的保單，如有效利益說明中的保險術語與其他保單文件的保險術語有所不同，獲授權保險人應向保單持有人提供一份可接納的詞彙表以供對照。</p>
 <p class="handbook-indent-3">(iii) 利益說明文件只應顯示在“保單年度終結”時的數字，並應就下列年度提供利益說明：</p>
-<p class="handbook-indent-3">a. 顯示不少於30年（於第5個保單年度後，以至少每5年的期間顯示）或保障年期（如較短）；及</p>
-<p class="handbook-indent-3">b. 在65歲時，或在保單年期屆滿時（如較早）；及</p>
-<p class="handbook-indent-3">c. 在100歲時，或在保單年期屆滿時（如較早）；及</p>
-<p class="handbook-indent-3">d. 在保單年期屆滿時。</p>
+<p class="handbook-indent-3 handbook-list-item">a. 顯示不少於30年（於第5個保單年度後，以至少每5年的期間顯示）或保障年期（如較短）；及</p>
+<p class="handbook-indent-3 handbook-list-item">b. 在65歲時，或在保單年期屆滿時（如較早）；及</p>
+<p class="handbook-indent-3 handbook-list-item">c. 在100歲時，或在保單年期屆滿時（如較早）；及</p>
+<p class="handbook-indent-3 handbook-list-item">d. 在保單年期屆滿時。</p>
 <p class="handbook-indent-2">註：非分紅保單利益說明文件的式樣可以在《附件<strong>H</strong>》找到。</p>
 <h3 id="ch-5-2-7">5.2.7 派發保單紅利</h3>
 <p class="handbook-indent-2"><strong>5.2.7a </strong>派發紅利的基本原理也在本手冊的其他部分進行討論（見<strong>1.3.1b</strong>(a)及<strong>4.10</strong>）的分紅保單，是帶着獲得保單紅利這類回報的期望而購買的，它一般也會產生現金價值的。一般來説，所宣佈及派發的紅利金額與相關的分紅保單的匯集基金的業績情況有直接的關係的。（所謂「匯集基金」(pooled fund)是指相關的保險人隨着提供了分紅保單而在其資產負債表上顯示出來的資產的全部，而之後保險人須為這些保單管理該等資產。</p><p class="handbook-indent-2">）匯集基金在特定期間的業績情況與其在同一段期間的投資收益、費用、賠付金等因素有密切的關係。一般而言，滙集基金的投資回報對紅利額有最大的影響，但和保險人的整體業績就不一定一致。一個謹慎的保險人只會在得知了實際的業績情況比其之前所作的精算和財務假設更有利後才宣佈保單紅利的。</p>
@@ -1721,11 +1728,11 @@ body {
 <p class="handbook-indent-3">(2) 提供保險保障（如住院現金、醫療、危疾、個人意外、殘疾或長期護理保障）而不含高儲蓄成分的保費回贈保單或無現金價值的可續保保單；或</p>
 <p class="handbook-indent-3">(3) 團體保單；b. 《保險業條例》附表1第2部指明類別C的保單。</p>
 <p class="handbook-indent-2">(ii) 如產品符合下文（a至d）的所有規定，則有關保單屬豁免產品（因此就有關該保單之申請毋須進行財務需要分析）：</p>
-<p class="handbook-indent-3">a. 保單為：</p>
+<p class="handbook-indent-3 handbook-list-item">a. 保單為：</p>
 <p class="handbook-indent-3">(1) 非分紅儲蓄產品，其保證款項於保單年期屆滿時不少於所繳保費總額；或</p>
 <p>1 就現有保單的新附加保障或額外保障的申請，應遵從財務需要分析的規定，猶如有關附加保障或額外保障是一份新的人壽保險保單。</p>
 <p class="handbook-indent-3">(2) 萬用壽險產品，其退保價值於任何時間均不少於所繳保費總額；b . 保單由獲授權保險人或其持牌保險代理機構透過數碼分銷渠道（如網頁或手機應用程式）直接銷售予客戶；</p>
-<p class="handbook-indent-3">c. 獲授權保險人或持牌保險代理機構在銷售之前或期間並未向客戶提供任何建議；及d . 除須遵從所有現有的產品披露規定外，獲授權保險人或持牌保險代理機構在客戶購買有關保單前，就有關保單作出以下披露：</p>
+<p class="handbook-indent-3 handbook-list-item">c. 獲授權保險人或持牌保險代理機構在銷售之前或期間並未向客戶提供任何建議；及d . 除須遵從所有現有的產品披露規定外，獲授權保險人或持牌保險代理機構在客戶購買有關保單前，就有關保單作出以下披露：</p>
 <p class="handbook-indent-3">(1) 說明保單的目標；</p>
 <p class="handbook-indent-3">(2) 說明保單的類別及性質（例如“保單屬［獲授權保險人名稱］承保的長期保險計劃，並非銀行存款或銀行儲蓄計劃”）；</p>
 <p class="handbook-indent-3">(3) 標明目標保費金額、保費繳付期及保障期；</p>

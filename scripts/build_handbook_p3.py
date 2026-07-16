@@ -73,6 +73,12 @@ CONTENT_LEFT_X = 68.0
 INDENT_STEP_X = 36.75
 MAX_INDENT_LEVEL = 3
 
+# 列舉項 a. / b. / c. …:PDF 中每項常獨立成行,但 build script 把它們
+# 跟上一段合併成同一個 <p>。在行首偵測 [a-h]\. + 空白 + CJK 字元
+# 來當作新段切點;排除 e.g./i.e. 等英文縮寫(它們後面還有 .)、
+# 以及 glossary/vocab/mock-answers(由專用 flush 處理)。
+LIST_ITEM_RE = re.compile(r"^[a-h]\.\s+[一-鿿]")
+
 
 def esc(s: str) -> str:
     return escape(s, quote=True)
@@ -134,9 +140,14 @@ def render_paragraph(lines: list[ParagraphLine], is_mock_exam_zone: bool) -> str
         return ""
     markdown_lines = [line for line, _ in lines]
     indent_level = _indent_level(lines[0][1])
-    paragraph_class = (
-        f' class="handbook-indent-{indent_level}"' if indent_level else ""
-    )
+    # 列舉項 a. / b. / c. …:相對於父級 (ii)/(iii) 再深一級,用 padding-left 推 2em
+    is_list_item = bool(LIST_ITEM_RE.match(_strip_markers(markdown_lines[0]).strip()))
+    classes: list[str] = []
+    if indent_level:
+        classes.append(f"handbook-indent-{indent_level}")
+    if is_list_item:
+        classes.append("handbook-list-item")
+    paragraph_class = f' class="{" ".join(classes)}"' if classes else ""
     plain_lines = [_strip_markers(line).strip() for line in markdown_lines]
     plain_lines = [p for p in plain_lines if p]
     if not plain_lines:
@@ -504,11 +515,6 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
         r"\d+\s+[一-鿿])"
     )
     BULLET_RE = re.compile(r"^[•·\-\*]\s+")
-    # 列舉項 a. / b. / c. …:PDF 中每項常獨立成行,但 build script 把它們
-    # 跟上一段合併成同一個 <p>。在行首偵測 [a-h]\. + 空白 + CJK 字元
-    # 來當作新段切點;排除 e.g./i.e. 等英文縮寫(它們後面還有 .)、
-    # 以及 glossary/vocab/mock-answers(由專用 flush 處理)。
-    LIST_ITEM_RE = re.compile(r"^[a-h]\.\s+[一-鿿]")
 
     def process_line(plain: str, pdf_page: int, is_app_zone: bool) -> bool:
         nonlocal current_h1_id, current_h2_id, current_h2_num
