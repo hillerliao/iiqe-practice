@@ -2934,7 +2934,7 @@
       "c": "好似終身壽險，是純保障產品",
       "d": "它是最便宜的人壽計劃"
     },
-    "answer": null,
+    "answer": "c",
     "explanation": null,
     "page": 33,
     "source": "mock",
@@ -3274,7 +3274,7 @@
       "c": "他們的子女",
       "d": "貸款機構"
     },
-    "answer": null,
+    "answer": "a",
     "explanation": null,
     "page": 37,
     "source": "mock",
@@ -3291,7 +3291,7 @@
       "c": "抵押贖回壽險",
       "d": "遞減定期壽險"
     },
-    "answer": null,
+    "answer": "a",
     "explanation": null,
     "page": 37,
     "source": "mock",

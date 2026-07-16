@@ -560,6 +560,11 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
     )
     BULLET_RE = re.compile(r"^[•·\-\*]\s+")
     BULLET_LINE_RE = re.compile(r"^\s*[•·\-\*]\s+\S")
+    # 列舉項 a. / b. / c. …:PDF 中每項常獨立成行,但 build script 把它們
+    # 跟上一段合併成同一個 <p>。在行首偵測 [a-h]\. + 空白 + CJK 字元
+    # 來當作新段切點;排除 e.g./i.e. 等英文縮寫(它們後面還有 .)、
+    # 以及 glossary 詞條(由 flush_vocab 處理)。
+    LIST_ITEM_RE = re.compile(r"^[a-h]\.\s+[一-鿿]")
 
     def process_line(plain: str, pdf_page: int, is_mock_exam_zone: bool, page_badge: str) -> bool:
         """處理單行;回傳 True 表示已消化。plain 是純文字(給 regex)。"""
@@ -756,9 +761,10 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
             is_new_para = bool(NEW_PARA_START_RE.match(plain))
             is_bullet = bool(BULLET_RE.match(plain))
             is_sublabel = bool(SUBLABEL_RE.match(plain)) if current_h1_id != "apx-vocab" else False
+            is_list_item = bool(LIST_ITEM_RE.match(plain)) and current_h1_id != "apx-vocab"
             # 辭彙表內:把這些視為「分節標題」,不觸發任何 flush(由 flush_vocab 處理)
             # 但仍 append 進 pending,讓 flush_vocab 識別為 vocab-section
-            if (is_new_para or is_bullet or is_sublabel) and pending_lines:
+            if (is_new_para or is_bullet or is_sublabel or is_list_item) and pending_lines:
                 if current_h1_id == "apx-vocab":
                     pass  # 不 flush,留給頁結束
                 else:

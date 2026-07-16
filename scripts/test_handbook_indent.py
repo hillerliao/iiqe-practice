@@ -1,7 +1,11 @@
 import unittest
 
 from build_handbook import _split_long_paragraph as split_p1_paragraph
-from build_handbook_p3 import _indent_level, render_paragraph
+from build_handbook_p3 import (
+    _indent_level,
+    _split_long_paragraph as split_p3_paragraph,
+    render_paragraph,
+)
 
 
 class HandbookIndentTest(unittest.TestCase):
@@ -38,6 +42,30 @@ class HandbookIndentTest(unittest.TestCase):
             html,
         )
         self.assertIn("<strong>4.</strong><strong>2</strong>段）。", html)
+
+    def test_p3_long_paragraph_formats_lettered_items_on_separate_lines(self) -> None:
+        text = (
+            "(v) 利益說明文件應就下列年度提供利益說明："
+            "a. 顯示不少於30年；及b. 在65歲時；及"
+            "c. 在100歲時；及d. 在保單年期屆滿時。"
+        )
+        html = render_paragraph([(text, 178.4)], False)
+        self.assertIn("：<br>a. 顯示不少於30年", html)
+        self.assertIn("；及<br>b. 在65歲時", html)
+        self.assertIn("；及<br>c. 在100歲時", html)
+        self.assertIn("；及<br>d. 在保單年期屆滿時。", html)
+
+    def test_p3_long_paragraph_keeps_lettered_list_item_together(self) -> None:
+        inner_html = (
+            "(iii) 利益說明文件只應顯示在保單年度終結時的數字，"
+            + "甲" * 130
+            + "；及d. 在保單年期屆滿時。"
+        )
+        chunks = split_p3_paragraph(inner_html)
+        html = "</p><p>".join(chunks)
+        self.assertNotIn("及d.</p><p> 在保單年期屆滿時。", html)
+        self.assertIn("及d. 在保單年期屆滿時。", html)
+
     def test_p1_long_paragraph_keeps_section_reference_together(self) -> None:
         inner_html = "甲" * 130 + "（見下文<strong>3.</strong><strong>2</strong>）。"
         chunks = split_p1_paragraph(inner_html)

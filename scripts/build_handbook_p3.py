@@ -155,8 +155,17 @@ def render_paragraph(lines: list[ParagraphLine], is_mock_exam_zone: bool) -> str
             items.append(f"<li>{_markdown_to_html(stripped)}</li>")
         return f"<ul>{''.join(items)}</ul>"
     inner = _markdown_to_html(joined_md)
+    inner = _format_inline_lettered_list(inner)
     chunks = _split_long_paragraph(inner)
     return "".join(f"<p{paragraph_class}>{c}</p>" for c in chunks)
+
+
+def _format_inline_lettered_list(inner_html: str) -> str:
+    markers = [f"{letter}." for letter in "abcd"]
+    if not all(marker in inner_html for marker in markers):
+        return inner_html
+    formatted = re.sub(r"(?<=：)(?=a\.\s)", "<br>", inner_html)
+    return re.sub(r"(?<=[；;])及(?=[b-d]\.\s)", "及<br>", formatted)
 
 
 def _font_flags(fontname: str) -> tuple[bool, bool]:
@@ -404,7 +413,10 @@ def _split_long_paragraph(inner_html: str) -> list[str]:
         if ch in _PRIMARY_END and vlen >= _PARA_TARGET:
             prev = _previous_visible_char(inner_html, i)
             nxt = _next_visible_char(inner_html, i)
-            if ch == "." and prev.isdigit() and nxt.isdigit():
+            if ch == "." and (
+                (prev.isdigit() and nxt.isdigit())
+                or (prev.isascii() and prev.isalpha() and bool(nxt))
+            ):
                 do_split = False
             else:
                 do_split = True
@@ -492,6 +504,11 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
         r"\d+\s+[一-鿿])"
     )
     BULLET_RE = re.compile(r"^[•·\-\*]\s+")
+    # 列舉項 a. / b. / c. …:PDF 中每項常獨立成行,但 build script 把它們
+    # 跟上一段合併成同一個 <p>。在行首偵測 [a-h]\. + 空白 + CJK 字元
+    # 來當作新段切點;排除 e.g./i.e. 等英文縮寫(它們後面還有 .)、
+    # 以及 glossary/vocab/mock-answers(由專用 flush 處理)。
+    LIST_ITEM_RE = re.compile(r"^[a-h]\.\s+[一-鿿]")
 
     def process_line(plain: str, pdf_page: int, is_app_zone: bool) -> bool:
         nonlocal current_h1_id, current_h2_id, current_h2_num
@@ -723,8 +740,11 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
 
             is_new_para = bool(NEW_PARA_START_RE.match(plain))
             is_bullet = bool(BULLET_RE.match(plain))
+            is_list_item = bool(LIST_ITEM_RE.match(plain)) and current_h1_id not in (
+                "apx-vocab", "apx-glossary", "apx-mock-answers",
+            )
 
-            if (is_new_para or is_bullet) and pending_lines:
+            if (is_new_para or is_bullet or is_list_item) and pending_lines:
                 if current_h1_id in ("apx-vocab", "apx-glossary", "apx-mock-answers"):
                     pass
                 else:
