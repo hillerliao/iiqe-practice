@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SetupReminder } from "@/components/SetupReminder";
@@ -7,14 +7,26 @@ import { Analytics } from "@/components/Analytics";
 import { GlobalHeader } from "@/components/GlobalHeader";
 import { listHandbookEntries } from "@/lib/handbook";
 
-const geistSans = Geist({
+// 本地字型檔 (.woff2): 用於建置環境無法訪問 fonts.gstatic.com 時的後備方案。
+// - Geist Sans / Geist Mono 變數字型,權重範圍 100-900。
+// - 與原 next/font/google(subsets:["latin"]) 行為等價: latin 變數子集。
+// - 若之後恢復 Google Fonts 可訪問,只需把 localFont 換回 Geist / Geist_Mono。
+const geistSans = localFont({
+  src: "./fonts/geist-sans-latin.woff2",
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  display: "swap",
+  weight: "100 900",
+  preload: true,
+  fallback: ["ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: "./fonts/geist-mono-latin.woff2",
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
+  weight: "100 900",
+  preload: true,
+  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
 });
 
 export const metadata: Metadata = {
