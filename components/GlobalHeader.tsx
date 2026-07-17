@@ -17,6 +17,7 @@ import {
   NavHome,
   NavBarChart3,
   NavBookOpen,
+  NavXCircle,
   NavStar,
   NavSettings,
 } from "@/components/NavIcons";
@@ -63,7 +64,7 @@ export function GlobalHeader({
             href="/wrongbook"
             className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
           >
-            <NavBookOpen className="w-4 h-4" />
+            <NavXCircle className="w-4 h-4" />
             <span className="hidden md:inline">錯題本</span>
           </Link>
           <Link

@@ -154,7 +154,9 @@ function PracticeInner() {
         });
         const ans: Record<string, string> = {};
         data.attempt.answers.forEach((a: any) => {
-          if (a.userAnswer) ans[a.questionId] = a.userAnswer;
+          // 後端 grading 寫入時會把 userAnswer 轉成大寫,前端統一還原成小寫,
+          // 避免和 currentQ.answer (API 已 lowerCase) 用 === 比對時因大小寫不符而誤判。
+          if (a.userAnswer) ans[a.questionId] = String(a.userAnswer).toLowerCase();
         });
         setAnswers(ans);
         // 繼續上次進度:跳到第一個尚未作答的題目
@@ -219,7 +221,11 @@ function PracticeInner() {
   const currentQ = questions[currentIdx];
   const userAnswer = currentQ ? answers[currentQ.id] : undefined;
   const isAnswered = !!userAnswer;
-  const isCorrect = currentQ && userAnswer === currentQ.answer;
+  // 比對統一用小寫:currentQ.answer 已 lowerCase;userAnswer 在新作答時是小寫,
+  // 從 DB 載入時原本是大寫(後端 normalize 過),雖然載入時已 toLowerCase,
+  // 這裡再保險比一次,避免任何中間環節混入大寫導致誤判。
+  const isCorrect =
+    currentQ && userAnswer != null && String(userAnswer).toLowerCase() === String(currentQ.answer).toLowerCase();
   const handbookHref = currentQ
     ? getHandbookHrefForQuestion(attempt?.paperCode, currentQ.ref)
     : null;
@@ -297,7 +303,8 @@ function PracticeInner() {
     const q = questions[submittedIdx];
     if (
       q &&
-      ans === q.answer &&
+      ans != null &&
+      String(ans).toLowerCase() === String(q.answer ?? "").toLowerCase() &&
       submittedIdx < questions.length - 1 &&
       currentIdxRef.current === submittedIdx &&
       navigationVersionRef.current === navigationVersion
@@ -653,8 +660,10 @@ function PracticeInner() {
           {(["a", "b", "c", "d"] as const).map((letter) => {
             const optText = currentQ.options[letter];
             if (!optText) return null;
-            const isSelected = userAnswer === letter;
-            const isThisCorrect = currentQ.answer === letter;
+            const isSelected =
+              userAnswer != null && String(userAnswer).toLowerCase() === letter;
+            const isThisCorrect =
+              currentQ.answer != null && String(currentQ.answer).toLowerCase() === letter;
             const showResult = showFeedback && isAnswered;
 
             return (

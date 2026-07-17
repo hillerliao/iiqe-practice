@@ -177,7 +177,9 @@ export function RedoPractice({
   const userAnswer = current ? answers[current.questionId] : undefined;
   const isAnswered = userAnswer != null;
   const correctLetter = current ? current.question.answer.toLowerCase() : "";
-  const isCorrect = current && isAnswered && userAnswer === correctLetter;
+  // 兩端都保險 lowerCase 比一次,避免 userAnswer 從後端回傳時被 normalize 成大寫
+  const isCorrect =
+    current && isAnswered && String(userAnswer).toLowerCase() === correctLetter;
   const isFavorite = current ? favoriteIds.has(current.questionId) : false;
   const currentNote = current ? notes[current.questionId] ?? "" : "";
   const handbookHref = current
@@ -616,7 +618,7 @@ export function RedoPractice({
                 key={letter}
                 letter={letter}
                 text={optText}
-                isPicked={userAnswer === letter}
+                isPicked={String(userAnswer ?? "").toLowerCase() === letter}
                 correctLetter={correctLetter}
                 showResult={isAnswered}
                 onPick={pickAnswer as (l: OptionLetter) => void}

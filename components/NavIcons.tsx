@@ -7,6 +7,7 @@ import {
   Star,
   Settings,
   Monitor,
+  XCircle,
 } from "lucide-react";
 import { ReactNode } from "react";
 
@@ -17,6 +18,10 @@ interface IconProps {
 // Export individual icon components to maintain same import style
 export const NavBookOpen = ({ className }: IconProps) => (
   <BookOpen className={className} />
+);
+
+export const NavXCircle = ({ className }: IconProps) => (
+  <XCircle className={className} />
 );
 
 export const NavHome = ({ className }: IconProps) => (
