@@ -9,6 +9,9 @@
   },
   "include": [
     "./verify-storage.ts",
+    "./verify-wrongbook-record-route.ts",
+    "./verify-wrongbook-route.ts",
+    "./test_wrongbook_filter.mts",
     "./test-support/server-only.ts"
   ],
   "exclude": []

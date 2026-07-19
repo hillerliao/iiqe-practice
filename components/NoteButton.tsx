@@ -210,9 +210,9 @@ export const NoteButton = forwardRef<NoteButtonHandle, NoteButtonProps>(function
         <span className="hidden md:inline">{hasNote ? "筆記" : "加筆記"}</span>
       </Button>
 
-      {/* Popover 面板(在按鈕右上方浮出) */}
+      {/* 手機端置中顯示，桌面端維持錨定在按鈕右上方 */}
       {open && (
-        <div className="absolute bottom-full right-0 mb-2 w-96 max-w-[calc(100vw-2rem)] p-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-popover shadow-lg text-left space-y-2 z-20">
+        <div className="fixed left-1/2 top-[50dvh] z-50 max-h-[calc(100dvh-2rem)] w-96 max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 space-y-2 overflow-y-auto rounded-lg border border-amber-200 bg-popover p-3 text-left shadow-lg dark:border-amber-800 md:absolute md:bottom-full md:left-auto md:right-0 md:top-auto md:mb-2 md:max-h-none md:translate-x-0 md:translate-y-0 md:overflow-visible">
           {editing ? (
             <>
               <textarea

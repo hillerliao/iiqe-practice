@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import {
   Eye,
   EyeOff,
   Play,
+  Shuffle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { authedFetch } from "@/lib/session-client";
@@ -16,8 +17,26 @@ import { QuestionActions } from "@/components/QuestionActions";
 import { QuestionStem } from "@/components/QuestionStem";
 import { NoteSection } from "@/components/NoteSection";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
-import { RedoPractice, type RedoItem } from "@/components/RedoPractice";
+import { RedoPractice, type RedoItem, type RedoPracticeState } from "@/components/RedoPractice";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { ToastContainer, useToast } from "@/components/useToast";
+import { getSessionId } from "@/lib/session";
+import {
+  createRedoSubmissionId,
+  createWrongbookDraft,
+  getWrongbookDraftKey,
+  parseWrongbookDraft,
+  reconcileWrongbookDraft,
+  type RedoPracticeDraft,
+} from "@/lib/redo-practice-draft";
+import {
+  DEFAULT_REPEATED_THRESHOLD,
+  MAX_REPEATED_THRESHOLD,
+  MIN_REPEATED_THRESHOLD,
+  getWrongbookThresholdKey,
+  normalizeRepeatedThreshold,
+} from "@/lib/wrongbook-filter";
 
 type WrongItem = {
   questionId: string;
@@ -41,6 +60,8 @@ type WrongItem = {
     sourceLabel: string;
   };
 };
+
+type WrongbookView = "all" | "repeated";
 
 function WrongItemCard({ item }: { item: WrongItem }) {
   const [revealed, setRevealed] = useState(false);
@@ -182,8 +203,16 @@ export default function WrongbookPage() {
   const [items, setItems] = useState<WrongItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [repeatedCount, setRepeatedCount] = useState(0);
+  const [view, setView] = useState<WrongbookView>("all");
+  const [threshold, setThreshold] = useState(DEFAULT_REPEATED_THRESHOLD);
+  const [thresholdInput, setThresholdInput] = useState(
+    String(DEFAULT_REPEATED_THRESHOLD),
+  );
+  const thresholdKeyRef = useRef<string | null>(null);
   const [practiceMode, setPracticeMode] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
+  const [practiceDraft, setPracticeDraft] = useState<RedoPracticeDraft | null>(null);
+  const draftKeyRef = useRef<string | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<ReadonlySet<string>>(new Set());
   const favoriteRequestsRef = useRef<Set<string>>(new Set());
   const { toast, toasts } = useToast();
@@ -199,8 +228,32 @@ export default function WrongbookPage() {
         .catch(() => ({ items: [] })),
     ])
       .then(([wrongbookData, favoritesData]) => {
-        setItems(wrongbookData.items);
-        setRepeatedCount(wrongbookData.repeatedCount ?? 0);
+        const nextItems: WrongItem[] = wrongbookData.items;
+        setItems(nextItems);
+        const sessionId = getSessionId();
+        const thresholdKey = getWrongbookThresholdKey(sessionId);
+        thresholdKeyRef.current = thresholdKey;
+        const storedThreshold = normalizeRepeatedThreshold(
+          localStorage.getItem(thresholdKey),
+        );
+        setThreshold(storedThreshold);
+        setThresholdInput(String(storedThreshold));
+        const draftKey = getWrongbookDraftKey(sessionId);
+        draftKeyRef.current = draftKey;
+        const restored = reconcileWrongbookDraft(
+          parseWrongbookDraft(localStorage.getItem(draftKey)),
+          nextItems.map((item) => item.questionId),
+        );
+        if (restored) {
+          localStorage.setItem(draftKey, JSON.stringify(restored));
+          setPracticeDraft(restored);
+          setShuffle(restored.shuffle);
+          setPracticeMode(true);
+        } else {
+          localStorage.removeItem(draftKey);
+          setPracticeDraft(null);
+          setPracticeMode(false);
+        }
         setFavoriteIds(
           new Set<string>(
             favoritesData.items.map((item: { questionId: string }) => item.questionId)
@@ -212,6 +265,28 @@ export default function WrongbookPage() {
         setError(e.message);
         setLoading(false);
       });
+  }, []);
+
+  const repeatedItems = useMemo(
+    () => items.filter((item) => item.wrongCount >= threshold),
+    [items, threshold],
+  );
+  const visibleItems = view === "all" ? items : repeatedItems;
+
+  const practiceItems = useMemo(() => {
+    if (!practiceDraft) return [];
+    const itemById = new Map(items.map((item) => [item.questionId, item]));
+    return practiceDraft.questionIds
+      .map((questionId) => itemById.get(questionId))
+      .filter((item): item is WrongItem => item != null);
+  }, [items, practiceDraft]);
+
+  const applyThreshold = useCallback((raw: string) => {
+    const next = normalizeRepeatedThreshold(raw);
+    setThreshold(next);
+    setThresholdInput(String(next));
+    const key = thresholdKeyRef.current;
+    if (key) localStorage.setItem(key, String(next));
   }, []);
 
   const toggleFavorite = useCallback(
@@ -253,24 +328,69 @@ export default function WrongbookPage() {
     [favoriteIds, toast]
   );
 
+  const saveDraft = useCallback((draft: RedoPracticeDraft) => {
+    setPracticeDraft(draft);
+    const key = draftKeyRef.current;
+    if (key) localStorage.setItem(key, JSON.stringify(draft));
+  }, []);
+
+  const startPractice = useCallback(() => {
+    const draft = createWrongbookDraft(
+      visibleItems.map((item) => item.questionId),
+      shuffle,
+    );
+    saveDraft(draft);
+    setPracticeMode(true);
+  }, [visibleItems, saveDraft, shuffle]);
+
+  const updatePracticeState = useCallback(
+    (state: RedoPracticeState) => {
+      setPracticeDraft((current) => {
+        if (!current) return current;
+        const next = { ...current, ...state, updatedAt: Date.now() };
+        const key = draftKeyRef.current;
+        if (key) localStorage.setItem(key, JSON.stringify(next));
+        return next;
+      });
+    },
+    [],
+  );
+
+  const restartPractice = useCallback(() => {
+    setPracticeDraft((current) => {
+      if (!current) return current;
+      const next = {
+        ...current,
+        submissionId: createRedoSubmissionId(),
+        updatedAt: Date.now(),
+      };
+      const key = draftKeyRef.current;
+      if (key) localStorage.setItem(key, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   // 將重做練習的作答寫回後端(/api/wrongbook/record),讓「又錯了」累積進 wrongCount
   // 注意:失敗時要拋出(而非吞掉),persistAnswers 的 .catch 才會重置 recordedRef 以便重試
   const recordRedo = useCallback(
     async (answers: Record<string, string>) => {
-      const payload = items
+      const payload = practiceItems
         .map((it) => ({ questionId: it.questionId, userAnswer: answers[it.questionId] }))
         .filter((a) => a.userAnswer != null && a.userAnswer !== "");
       if (payload.length === 0) return;
       const r = await authedFetch("/api/wrongbook/record", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: payload }),
+        body: JSON.stringify({
+          answers: payload,
+          submissionId: practiceDraft?.submissionId,
+        }),
       });
       if (!r.ok) {
         throw new Error(`記錄重做結果失敗: ${r.status}`);
       }
     },
-    [items]
+    [practiceItems, practiceDraft?.submissionId]
   );
 
   // 退出重做模式:重新整理錯題本,使更新後的 wrongCount / 反覆錯標籤立即反映
@@ -280,12 +400,14 @@ export default function WrongbookPage() {
       if (r.ok) {
         const data = await r.json();
         setItems(data.items);
-        setRepeatedCount(data.repeatedCount ?? 0);
       }
     } catch {
       /* 重新整理失敗不阻斷退出 */
     }
     setPracticeMode(false);
+    setPracticeDraft(null);
+    const key = draftKeyRef.current;
+    if (key) localStorage.removeItem(key);
   }, []);
 
   if (loading) {
@@ -296,22 +418,28 @@ export default function WrongbookPage() {
   }
 
   // 做題模式
-  if (practiceMode) {
-    const redoItems: RedoItem[] = items.map((it) => ({
+  if (practiceMode && practiceDraft) {
+    const orderedItems = practiceItems;
+    const isFocusedPractice = practiceDraft.questionIds.length < items.length;
+    const redoItems: RedoItem[] = orderedItems.map((it) => ({
       questionId: it.questionId,
       paperCode: it.paperCode,
       paperName: it.paperName,
       question: it.question,
     }));
-    const prevAnswerMap = new Map(items.map((it) => [it.questionId, it.userAnswer]));
+    const prevAnswerMap = new Map(orderedItems.map((it) => [it.questionId, it.userAnswer]));
 
     return (
       <>
         <RedoPractice
           items={redoItems}
-          title="錯題本 · 重做練習"
+          title={isFocusedPractice ? "錯題本 · 重點重做" : "錯題本 · 重做練習"}
           prevUserAnswer={(id) => prevAnswerMap.get(id)}
-          recordAnswers={recordRedo}
+          recordAnswers={practiceDraft.recorded ? undefined : recordRedo}
+          initialState={practiceDraft}
+          onStateChange={updatePracticeState}
+          onRestart={restartPractice}
+          shuffled={practiceDraft.shuffle}
           favoriteIds={favoriteIds}
           onToggleFavorite={toggleFavorite}
           onExit={handleExit}
@@ -321,23 +449,89 @@ export default function WrongbookPage() {
     );
   }
 
+  const isRepeatedView = view === "repeated";
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <h1 className="text-2xl font-bold">錯題本</h1>
         {items.length > 0 && (
-          <div className="flex items-center gap-3 text-sm">
-            {repeatedCount > 0 && (
-              <Badge variant="destructive">反覆錯 {repeatedCount} 題</Badge>
-            )}
-            <span className="text-muted-foreground">共 {items.length} 題</span>
-            <Button onClick={() => setPracticeMode(true)}>
+          <div className="flex items-center gap-3 text-sm flex-wrap justify-end">
+            <span className="text-muted-foreground">
+              共 {items.length} 題
+              {isRepeatedView ? ` · 篩選後 ${visibleItems.length} 題` : ""}
+            </span>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <Checkbox
+                checked={shuffle}
+                onCheckedChange={(checked) => setShuffle(checked === true)}
+              />
+              <Shuffle className="w-4 h-4" />
+              <span>亂序</span>
+            </label>
+            <Button onClick={startPractice} disabled={visibleItems.length === 0}>
               <Play className="w-4 h-4 mr-1" />
-              練習模式
+              {isRepeatedView
+                ? `重點重做（${visibleItems.length} 題）`
+                : `練習全部（${items.length} 題）`}
             </Button>
           </div>
         )}
       </div>
+
+      {items.length > 0 && (
+        <Card className="mb-4">
+          <CardContent>
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="inline-flex rounded-lg border border-border overflow-hidden" role="group" aria-label="錯題篩選">
+                <Button
+                  type="button"
+                  variant={isRepeatedView ? "ghost" : "secondary"}
+                  size="sm"
+                  className="rounded-none border-0"
+                  onClick={() => setView("all")}
+                >
+                  全部錯題
+                </Button>
+                <Button
+                  type="button"
+                  variant={isRepeatedView ? "secondary" : "ghost"}
+                  size="sm"
+                  className="rounded-none border-0 border-l border-border"
+                  onClick={() => setView("repeated")}
+                >
+                  反覆錯 ≥{threshold} 題
+                </Button>
+              </div>
+              <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                累計答錯 ≥
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  min={MIN_REPEATED_THRESHOLD}
+                  max={MAX_REPEATED_THRESHOLD}
+                  value={thresholdInput}
+                  onChange={(event) => setThresholdInput(event.target.value)}
+                  onBlur={(event) => applyThreshold(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      applyThreshold(event.currentTarget.value);
+                    }
+                  }}
+                  className="w-20 h-8 text-center"
+                  aria-label="反覆錯題門檻"
+                />
+                次才算反覆錯
+              </label>
+              {isRepeatedView && repeatedItems.length > 0 && (
+                <Badge variant="destructive">符合 {repeatedItems.length} 題</Badge>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {items.length === 0 ? (
         <Card>
           <CardHeader>
@@ -349,9 +543,20 @@ export default function WrongbookPage() {
             </p>
           </CardContent>
         </Card>
+      ) : visibleItems.length === 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>沒有符合條件的錯題</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground text-sm">
+              目前沒有累計答錯 ≥{threshold} 次的題目。可調低門檻或查看全部錯題。
+            </p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="space-y-3">
-          {items.map((it) => (
+          {visibleItems.map((it) => (
             <WrongItemCard key={it.questionId} item={it} />
           ))}
         </div>

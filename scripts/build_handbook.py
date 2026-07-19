@@ -20,6 +20,11 @@ from html import escape
 
 import pdfplumber
 
+try:
+    from .handbook_text_utils import join_wrapped_heading, split_long_paragraph
+except ImportError:
+    from handbook_text_utils import join_wrapped_heading, split_long_paragraph
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PDF_PATH = os.path.join(
     os.path.dirname(ROOT),
@@ -57,6 +62,8 @@ H1_MAX_LEN = 25
 # H2/H3 標題長度限制
 H2_MAX_LEN = 40
 H3_MAX_LEN = 60
+WRAPPED_HEADING_MAX_LEN = 140
+_WRAPPED_HEADING_MARKER = "\x02"
 
 
 def esc(s: str) -> str:
@@ -402,84 +409,16 @@ def _next_visible_char(s: str, from_idx: int) -> str:
 
 
 def _split_long_paragraph(inner_html: str) -> list[str]:
-    """把一段內文 HTML 切成多段 inner HTML(inline 標籤保持平衡)。
-
-    只在總可見字數足夠長時才切,避免動到本來就短的段落。
-    回傳 list,長度 1 表示不需切。
-    """
-    # 粗略總可見字數(標籤/實體不計)
-    def total_visible(s: str) -> int:
-        t = re.sub(r"</?[^>]+>", "", s)
-        t = re.sub(r"&[a-zA-Z#0-9]+;", "X", t)
-        return len(t)
-
-    if total_visible(inner_html) < _PARA_TARGET:
-        return [inner_html]
-
-    chunks: list[str] = []
-    cur = ""                 # 當前段累積的 HTML
-    stack: list[str] = []    # 當前開著的 inline 標籤(strong/em),保持平衡
-    vlen = 0                 # 當前段可見字數
-    i, n = 0, len(inner_html)
-    while i < n:
-        ch = inner_html[i]
-        if ch == "<":
-            j = inner_html.find(">", i)
-            if j == -1:
-                cur += inner_html[i:]
-                break
-            tag = inner_html[i:j + 1]
-            cur += tag
-            m_open = re.match(r"<(strong|em)>", tag, re.IGNORECASE)
-            m_close = re.match(r"</(strong|em)>", tag, re.IGNORECASE)
-            if m_open:
-                stack.append(m_open.group(1).lower())
-            elif m_close:
-                nm = m_close.group(1).lower()
-                if stack and stack[-1] == nm:
-                    stack.pop()
-                elif nm in stack:
-                    stack.remove(nm)
-            i = j + 1
-            continue
-        if ch == "&":  # HTML 實體視為 1 字
-            j = inner_html.find(";", i)
-            if j != -1 and j - i <= 8:
-                cur += inner_html[i:j + 1]
-                vlen += 1
-                i = j + 1
-                continue
-        # 一般文字字元
-        cur += ch
-        vlen += 1
-        do_split = False
-        if ch in _PRIMARY_END and vlen >= _PARA_TARGET:
-            prev = _previous_visible_char(inner_html, i)
-            nxt = _next_visible_char(inner_html, i)
-            if ch == "." and prev.isdigit() and nxt.isdigit():
-                do_split = False
-            else:
-                do_split = True
-        elif ch in _SOFT_END:
-            # 軟斷點:下一個可見字是純接續連詞就不切,避免殘句;
-            # 但若已超過絕對上限仍強制切,以免段落過長。
-            nxt = _next_visible_char(inner_html, i)
-            if vlen >= _PARA_HARD:
-                do_split = True
-            elif nxt and nxt in _SOFT_BAD_LEAD:
-                do_split = False
-            elif vlen >= _PARA_SOFT_MIN:
-                do_split = True
-        if do_split:
-            close = "".join(f"</{t}>" for t in reversed(stack))
-            reopen = "".join(f"<{t}>" for t in stack)
-            chunks.append(cur + close)
-            cur = reopen
-            vlen = 0
-        i += 1
-    if cur.strip():
-        chunks.append(cur)
-    return chunks or [inner_html]
+    """把一段內文 HTML 切成多段 inner HTML(inline 標籤保持平衡)。"""
+    return split_long_paragraph(
+        inner_html,
+        primary_end=_PRIMARY_END,
+        soft_end=_SOFT_END,
+        target=_PARA_TARGET,
+        soft_min=_PARA_SOFT_MIN,
+        hard_limit=_PARA_HARD,
+        soft_bad_lead=_SOFT_BAD_LEAD,
+    )
 
 
 def detect_chapter_for_page(pdf_page: int) -> int | None:
@@ -504,7 +443,75 @@ def detect_chapter_for_page(pdf_page: int) -> int | None:
     return None
 
 
+def _is_structural_line(text: str) -> bool:
+    stripped = text.strip()
+    return bool(
+        H1_CN_RE.match(stripped)
+        or H1_PLAIN_RE.match(stripped)
+        or H2_RE.match(stripped)
+        or H3_RE.match(stripped)
+        or SUBLABEL_RE.match(stripped)
+        or re.match(
+            r"^(?:[•·\-*]\s+|\([a-z]\)|\([ivx]+\)|\(\d+\)|"
+            r"[一二三四五六七八九十]+[、.]|\d+\s+[一-鿿])",
+            stripped,
+        )
+    )
+
+
+def _merge_wrapped_heading_lines(
+    pages: list[tuple[int, list[tuple[str, str]]]],
+) -> list[tuple[int, list[tuple[str, str]]]]:
+    merged_pages: list[tuple[int, list[tuple[str, str]]]] = []
+    for pdf_page, lines in pages:
+        merged_lines: list[tuple[str, str]] = []
+        index = 0
+        while index < len(lines):
+            plain, markdown = lines[index]
+            match = H3_RE.match(plain) or H2_RE.match(plain)
+            next_plain = lines[index + 1][0] if index + 1 < len(lines) else None
+            if match:
+                title = match.group(match.lastindex or 0).strip()
+                joined = join_wrapped_heading(
+                    title,
+                    next_plain,
+                    is_blocked=_is_structural_line,
+                )
+                if joined is not None:
+                    prefix = plain[:match.start(match.lastindex or 0)]
+                    merged_lines.append((_WRAPPED_HEADING_MARKER + prefix + joined, markdown))
+                    index += 2
+                    continue
+            merged_lines.append((plain, markdown))
+            index += 1
+        merged_pages.append((pdf_page, merged_lines))
+    return merged_pages
+
+
+def _carry_pages(pages: list[tuple[int, list[tuple[str, str]]]]) -> set[int]:
+    result: set[int] = set()
+    for (pdf_page, lines), (next_page, next_lines) in zip(pages, pages[1:]):
+        if next_page != pdf_page + 1 or next_page in CHAPTER_START_PAGES.values():
+            continue
+        if pdf_page >= 173:
+            continue
+        current_visible = [plain.strip() for plain, _ in lines if plain.strip()]
+        next_visible = [plain.strip() for plain, _ in next_lines if plain.strip()]
+        if not current_visible or not next_visible:
+            continue
+        last_line = current_visible[-1]
+        first_next = next_visible[0]
+        if last_line.endswith(("。", "！", "？", "!", "?")):
+            continue
+        if _is_structural_line(first_next):
+            continue
+        result.add(pdf_page)
+    return result
+
+
 def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> tuple[list[dict], str, list[int]]:
+    pages = _merge_wrapped_heading_lines(pages)
+    carry_pages = _carry_pages(pages)
     chapters: list[dict] = []
     html_parts: list[str] = []
     pdf_pages_seen: set[int] = set()
@@ -569,6 +576,9 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
     def process_line(plain: str, pdf_page: int, is_mock_exam_zone: bool, page_badge: str) -> bool:
         """處理單行;回傳 True 表示已消化。plain 是純文字(給 regex)。"""
         nonlocal current_h1_id, current_h2_id, current_h2_num
+        is_wrapped_heading = plain.startswith(_WRAPPED_HEADING_MARKER)
+        if is_wrapped_heading:
+            plain = plain.removeprefix(_WRAPPED_HEADING_MARKER)
 
         if not is_mock_exam_zone:
             expected_chap = next(
@@ -617,7 +627,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
             # N.M.K 編號是強信號:即使 title 以「如/如果/關」開頭也視為標題
             if (current_h1_id
                     and int(a) == int(current_h1_id.split("-")[1])
-                    and len(title) <= H3_MAX_LEN):
+                    and len(title) <= (WRAPPED_HEADING_MAX_LEN if is_wrapped_heading else H3_MAX_LEN)):
                 h3_id = f"ch-{a}-{b}-{c}"
                 if not any(cc["id"] == h3_id for cc in chapters):
                     flush_paragraph()
@@ -641,7 +651,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
             # N.M 編號是強信號:即使 title 以內文起首詞開頭也視為標題
             if (current_h1_id
                     and int(a) == int(current_h1_id.split("-")[1])
-                    and len(title) <= H2_MAX_LEN):
+                    and len(title) <= (WRAPPED_HEADING_MAX_LEN if is_wrapped_heading else H2_MAX_LEN)):
                 h2_id = f"ch-{a}-{b}"
                 if not any(cc["id"] == h2_id for cc in chapters):
                     flush_paragraph()
@@ -770,11 +780,18 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
                 else:
                     flush_paragraph()
             pending_lines.append(markdown)
-        # 頁結束 → 強制 flush(辭彙表用專用,其他用通用)
+        # 頁結束:只有語意段落確實終止時才 flush；跨頁續行保留整個 pending buffer。
+        if pdf_page in carry_pages:
+            continue
         if current_h1_id == "apx-vocab":
             flush_vocab()
         else:
             flush_paragraph()
+
+    if current_h1_id == "apx-vocab":
+        flush_vocab()
+    else:
+        flush_paragraph()
 
     return chapters, "\n".join(html_parts), sorted(CHAPTER_START_PAGES.values())
 

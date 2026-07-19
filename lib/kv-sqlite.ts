@@ -11,6 +11,13 @@ import type { Prisma } from "@/lib/generated/prisma";
 
 type TransactionClient = Prisma.TransactionClient;
 
+function isUniqueConstraintError(error: unknown): boolean {
+  return (
+    (typeof error === "object" && error !== null && "code" in error && error.code === "P2002") ||
+    (error instanceof Error && /unique constraint/i.test(error.message))
+  );
+}
+
 function parseQuestionIds(value: string): string[] {
   try {
     const parsed = JSON.parse(value);
@@ -291,6 +298,52 @@ export async function createAttemptSqlite(record: AttemptRecord): Promise<void> 
       });
     }
   });
+}
+
+export async function createAttemptIfAbsentSqlite(record: AttemptRecord): Promise<boolean> {
+  const prisma = getPrisma();
+  try {
+    await prisma.$transaction(async (tx: TransactionClient) => {
+      await tx.attempt.create({
+        data: {
+          id: record.id,
+          sessionId: record.sessionId,
+          paperId: record.paperId,
+          mode: record.mode,
+          source: record.source ?? "exam",
+          startedAt: new Date(record.startedAt),
+          finishedAt: record.finishedAt ? new Date(record.finishedAt) : null,
+          durationSec: record.durationSec,
+          totalQ: record.totalQ,
+          questionIds: JSON.stringify(record.questionIds),
+          correct: record.correct,
+        },
+      });
+      for (const ans of record.answers) {
+        await tx.answer.create({
+          data: {
+            id: `${record.id}::${ans.questionId}`,
+            attemptId: record.id,
+            questionId: ans.questionId,
+            userAnswer: ans.userAnswer,
+            isCorrect: ans.isCorrect,
+            timeSpentMs: ans.timeSpentMs,
+            createdAt: new Date(ans.createdAt),
+          },
+        });
+      }
+    });
+    return true;
+  } catch (error) {
+    if (isUniqueConstraintError(error)) {
+      const existing = await prisma.attempt.findUnique({
+        where: { id: record.id },
+        select: { id: true },
+      });
+      if (existing) return false;
+    }
+    throw error;
+  }
 }
 
 export async function getAttemptSqlite(id: string): Promise<AttemptRecord | null> {

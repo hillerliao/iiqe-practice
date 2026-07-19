@@ -19,7 +19,11 @@
     "verify:keyboard-search": "tsx scripts/verify-keyboard-search.ts",
     "verify:chapter-refs": "tsx scripts/test_chapter_refs.mts",
     "verify:stats-chapters": "tsx scripts/test_stats_chapter_aggregation.mts",
-    "verify:handbook-integrity": "tsx scripts/test_handbook_integrity.mts"
+    "verify:handbook-integrity": "tsx scripts/test_handbook_integrity.mts",
+    "verify:redo-practice": "tsx scripts/test_redo_practice_draft.mts",
+    "verify:wrongbook-filter": "tsx scripts/test_wrongbook_filter.mts",
+    "verify:wrongbook-route": "tsx --tsconfig scripts/tsconfig.json scripts/verify-wrongbook-route.ts",
+    "verify:wrongbook-record-route": "tsx --tsconfig scripts/tsconfig.json scripts/verify-wrongbook-record-route.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

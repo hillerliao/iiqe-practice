@@ -17,8 +17,13 @@
 import { describeBackend } from "@/lib/storage-backend";
 import {
   createAttempt,
+  createAttemptIfAbsent,
+  ensureAttemptIndexed,
+  findUnfinishedAttempt,
   getAttempt,
   listAttempts,
+  kv,
+  attemptKey,
   addFavorite,
   removeFavorite,
   listFavorites,
@@ -400,6 +405,133 @@ async function checkHistoricalAnswerUpsert(): Promise<void> {
   check("historical-answer.other-question-preserved", other?.userAnswer === "b");
 }
 
+async function checkAtomicAttemptCreation(): Promise<void> {
+  const now = new Date().toISOString();
+  const makeRecord = (
+    id: string,
+    sessionId: string,
+    userAnswer: string,
+    questionId = "P1-exam-1",
+  ): AttemptRecord => ({
+    id,
+    sessionId,
+    paperId: "P1",
+    mode: "wrongbook-redo",
+    source: "wrongbook-redo",
+    startedAt: now,
+    finishedAt: now,
+    durationSec: null,
+    totalQ: 1,
+    questionIds: [questionId],
+    correct: userAnswer === "c" ? 1 : 0,
+    answers: [{
+      questionId,
+      userAnswer,
+      isCorrect: userAnswer === "c",
+      timeSpentMs: null,
+      createdAt: now,
+    }],
+  });
+
+  const sequentialId = `at_create_once_${crypto.randomUUID()}`;
+  const first = makeRecord(sequentialId, FAKE_SESSION, "c");
+  const conflicting = makeRecord(sequentialId, `${FAKE_SESSION}-other`, "a");
+  check("attempt.create-if-absent.first", await createAttemptIfAbsent(first));
+  check("attempt.create-if-absent.repeat", !(await createAttemptIfAbsent(conflicting)));
+  const preserved = await getAttempt(sequentialId);
+  check(
+    "attempt.create-if-absent.preserved",
+    preserved?.sessionId === first.sessionId &&
+      preserved.answers[0]?.userAnswer === "c" &&
+      preserved.answers.length === 1,
+  );
+
+  const raceId = `at_create_race_${crypto.randomUUID()}`;
+  const racers = Array.from({ length: 12 }, (_, index) =>
+    makeRecord(raceId, FAKE_SESSION, index % 2 === 0 ? "a" : "c"),
+  );
+  const raceResults = await Promise.all(racers.map(createAttemptIfAbsent));
+  check(
+    "attempt.create-if-absent.concurrent-single-winner",
+    raceResults.filter(Boolean).length === 1,
+    `created=${raceResults.filter(Boolean).length}`,
+  );
+  const raceList = await listAttempts(FAKE_SESSION);
+  check(
+    "attempt.create-if-absent.concurrent-single-index",
+    raceList.filter((attempt) => attempt.id === raceId).length === 1,
+  );
+  const raceWinner = await getAttempt(raceId);
+  check(
+    "attempt.create-if-absent.concurrent-complete-winner",
+    raceWinner?.answers.length === 1 && raceWinner.questionIds.length === 1,
+  );
+
+  const manyIds = Array.from({ length: 12 }, () => `at_many_${crypto.randomUUID()}`);
+  const manyResults = await Promise.all(
+    manyIds.map((id, index) => createAttemptIfAbsent(makeRecord(id, FAKE_SESSION, index % 2 ? "a" : "c"))),
+  );
+  check("attempt.create-if-absent.concurrent-distinct-created", manyResults.every(Boolean));
+  const manyList = await listAttempts(FAKE_SESSION);
+  check(
+    "attempt.create-if-absent.concurrent-distinct-indexed",
+    manyIds.every((id) => manyList.some((attempt) => attempt.id === id)),
+  );
+  const unfinishedId = `at_unfinished_${crypto.randomUUID()}`;
+  const unfinished = { ...makeRecord(unfinishedId, FAKE_SESSION, "a"), finishedAt: null };
+  await createAttemptIfAbsent(unfinished);
+  check(
+    "attempt.create-if-absent.immediately-findable",
+    (await findUnfinishedAttempt(FAKE_SESSION, "P1", "wrongbook-redo"))?.id === unfinishedId,
+  );
+
+  if (describeBackend().backend === "sqlite") {
+    const rollbackId = `at_create_rollback_${crypto.randomUUID()}`;
+    const rollbackRecord = makeRecord(rollbackId, FAKE_SESSION, "a");
+    rollbackRecord.answers = [rollbackRecord.answers[0], rollbackRecord.answers[0]];
+    let rollbackThrew = false;
+    try {
+      await createAttemptIfAbsent(rollbackRecord);
+    } catch {
+      rollbackThrew = true;
+    }
+    check("attempt.create-if-absent.answer-failure-threw", rollbackThrew);
+    check(
+      "attempt.create-if-absent.answer-failure-rolled-back",
+      (await getAttempt(rollbackId)) === null,
+    );
+  }
+
+  if (describeBackend().backend !== "sqlite") {
+    const foreignSession = `${FAKE_SESSION}-foreign`;
+    const foreignId = `at_foreign_${crypto.randomUUID()}`;
+    await createAttemptIfAbsent(makeRecord(foreignId, foreignSession, "a"));
+    const sessionIndexKey = `session:attempts:${FAKE_SESSION}`;
+    await kv.set(sessionIndexKey, [raceId, raceId, "missing-attempt", foreignId]);
+    const defensiveList = await listAttempts(FAKE_SESSION);
+    check(
+      "attempt.index.defensive-list",
+      defensiveList.length === 1 && defensiveList[0]?.id === raceId,
+      `ids=${defensiveList.map((attempt) => attempt.id).join(",")}`,
+    );
+    check(
+      "attempt.index.defensive-unfinished",
+      (await findUnfinishedAttempt(FAKE_SESSION)) === null,
+    );
+
+    const orphanId = `at_orphan_${crypto.randomUUID()}`;
+    const orphan = makeRecord(orphanId, FAKE_SESSION, "c");
+    await kv.set(attemptKey(orphanId), orphan);
+    await ensureAttemptIndexed(FAKE_SESSION, orphanId);
+    await ensureAttemptIndexed(FAKE_SESSION, orphanId);
+    const repairedIds = await kv.lrange<string>(sessionIndexKey, 0, -1);
+    check(
+      "attempt.index.repair-idempotent",
+      repairedIds.filter((id) => id === orphanId).length === 1,
+    );
+  }
+}
+
 async function checkFavoriteAndNote(): Promise<void> {
   await addFavorite(FAKE_SESSION, "P1-exam-1");
   let favs = await listFavorites(FAKE_SESSION);
@@ -500,12 +632,20 @@ async function main(): Promise<void> {
   } else {
     log("sqlite-skipped", true, `backend=${info.backend}; sqlite-only checks skipped`);
   }
+  if (info.backend !== "kv") {
+    log(
+      "upstash-integration-skipped",
+      true,
+      "no explicitly selected cleanable Upstash test backend",
+    );
+  }
 
   // 无论 backend 选什么,都跑业务冒烟(让脚本对 KV/memory 也健康)
   await checkAttemptLifecycle();
   await checkFinishAnswerAtomicity();
   await checkLegacyAttemptAnswer();
   await checkHistoricalAnswerUpsert();
+  await checkAtomicAttemptCreation();
   await checkFavoriteAndNote();
   await checkFeedback();
   await checkPersistence();

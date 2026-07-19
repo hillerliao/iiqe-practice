@@ -32,9 +32,17 @@ from html import escape
 # 復用卷一(mini-header + 三檔主題 dropdown + 返回首頁/頂部)的最新版 make_offline_html
 # 卷一與卷三的「HTML/JSON 結構」不同(chapters schema 一致),但離線預覽樣式完全相同,
 # 故兩版本共用同一份 HTML template。
-from build_handbook import make_offline_html as _p1_make_offline_html  # type: ignore[import-not-found]  # noqa: E402
+try:
+    from .build_handbook import make_offline_html as _p1_make_offline_html
+except ImportError:
+    from build_handbook import make_offline_html as _p1_make_offline_html  # type: ignore[import-not-found]
 
 import pdfplumber
+
+try:
+    from .handbook_text_utils import join_wrapped_heading, split_long_paragraph
+except ImportError:
+    from handbook_text_utils import join_wrapped_heading, split_long_paragraph
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PARENT = os.path.dirname(ROOT)
@@ -65,6 +73,8 @@ INLINE_BLOCKLIST_START = (
 H1_MAX_LEN = 25
 H2_MAX_LEN = 40
 H3_MAX_LEN = 60
+WRAPPED_HEADING_MAX_LEN = 140
+_WRAPPED_HEADING_MARKER = "\x02"
 
 Line = tuple[str, str, float]
 ParagraphLine = tuple[str, float]
@@ -78,6 +88,11 @@ MAX_INDENT_LEVEL = 3
 # 來當作新段切點;排除 e.g./i.e. 等英文縮寫(它們後面還有 .)、
 # 以及 glossary/vocab/mock-answers(由專用 flush 處理)。
 LIST_ITEM_RE = re.compile(r"^[a-h]\.\s+[一-鿿]")
+STANDALONE_LETTERED_SUBHEADINGS = {
+    "(a) 背景",
+    "(b) 自願醫保下的稅務扣減",
+    "(c) 自願醫保的管理",
+}
 
 
 def esc(s: str) -> str:
@@ -133,6 +148,18 @@ SUBLABEL_RE = re.compile(r"^\d+\.\d+(\.\d+)?[a-z]?\s")
 
 def _indent_level(x0: float) -> int:
     return max(0, min(MAX_INDENT_LEVEL, round((x0 - CONTENT_LEFT_X) / INDENT_STEP_X)))
+
+
+def _is_standalone_lettered_subheading(
+    text: str,
+    x0: float,
+    next_line: Line | None,
+) -> bool:
+    normalized = re.sub(r"\s+", " ", text.strip())
+    if next_line is None or normalized not in STANDALONE_LETTERED_SUBHEADINGS:
+        return False
+    next_plain, _, next_x0 = next_line
+    return bool(next_plain.strip()) and _indent_level(next_x0) > _indent_level(x0)
 
 
 def render_paragraph(lines: list[ParagraphLine], is_mock_exam_zone: bool) -> str:
@@ -377,78 +404,15 @@ def _next_visible_char(s: str, from_idx: int) -> str:
 
 
 def _split_long_paragraph(inner_html: str) -> list[str]:
-    def total_visible(s: str) -> int:
-        t = re.sub(r"</?[^>]+>", "", s)
-        t = re.sub(r"&[a-zA-Z#0-9]+;", "X", t)
-        return len(t)
-
-    if total_visible(inner_html) < _PARA_TARGET:
-        return [inner_html]
-
-    chunks: list[str] = []
-    cur = ""
-    stack: list[str] = []
-    vlen = 0
-    i, n = 0, len(inner_html)
-    while i < n:
-        ch = inner_html[i]
-        if ch == "<":
-            j = inner_html.find(">", i)
-            if j == -1:
-                cur += inner_html[i:]
-                break
-            tag = inner_html[i:j + 1]
-            cur += tag
-            m_open = re.match(r"<(strong|em)>", tag, re.IGNORECASE)
-            m_close = re.match(r"</(strong|em)>", tag, re.IGNORECASE)
-            if m_open:
-                stack.append(m_open.group(1).lower())
-            elif m_close:
-                nm = m_close.group(1).lower()
-                if stack and stack[-1] == nm:
-                    stack.pop()
-                elif nm in stack:
-                    stack.remove(nm)
-            i = j + 1
-            continue
-        if ch == "&":
-            j = inner_html.find(";", i)
-            if j != -1 and j - i <= 8:
-                cur += inner_html[i:j + 1]
-                vlen += 1
-                i = j + 1
-                continue
-        cur += ch
-        vlen += 1
-        do_split = False
-        if ch in _PRIMARY_END and vlen >= _PARA_TARGET:
-            prev = _previous_visible_char(inner_html, i)
-            nxt = _next_visible_char(inner_html, i)
-            if ch == "." and (
-                (prev.isdigit() and nxt.isdigit())
-                or (prev.isascii() and prev.isalpha() and bool(nxt))
-            ):
-                do_split = False
-            else:
-                do_split = True
-        elif ch in _SOFT_END:
-            nxt = _next_visible_char(inner_html, i)
-            if vlen >= _PARA_HARD:
-                do_split = True
-            elif nxt and nxt in _SOFT_BAD_LEAD:
-                do_split = False
-            elif vlen >= _PARA_SOFT_MIN:
-                do_split = True
-        if do_split:
-            close = "".join(f"</{t}>" for t in reversed(stack))
-            reopen = "".join(f"<{t}>" for t in stack)
-            chunks.append(cur + close)
-            cur = reopen
-            vlen = 0
-        i += 1
-    if cur.strip():
-        chunks.append(cur)
-    return chunks or [inner_html]
+    return split_long_paragraph(
+        inner_html,
+        primary_end=_PRIMARY_END,
+        soft_end=_SOFT_END,
+        target=_PARA_TARGET,
+        soft_min=_PARA_SOFT_MIN,
+        hard_limit=_PARA_HARD,
+        soft_bad_lead=_SOFT_BAD_LEAD,
+    )
 
 
 # 卷三附錄區從 p.121「模擬試題」開始
@@ -470,7 +434,79 @@ def detect_chapter_for_page(pdf_page: int) -> int | None:
     return chap
 
 
+def _is_structural_line(text: str) -> bool:
+    stripped = text.strip()
+    return bool(
+        H1_CN_RE.match(stripped)
+        or H1_PLAIN_RE.match(stripped)
+        or H2_RE.match(stripped)
+        or H3_RE.match(stripped)
+        or SUBLABEL_RE.match(stripped)
+        or LIST_ITEM_RE.match(stripped)
+        or re.match(r"^附件\s*[A-N]$", stripped)
+        or stripped in {"模擬試題", "模擬試題答案", "術語解釋", "辭彙表", "鳴謝"}
+        or re.match(
+            r"^(?:[•·\-*]\s+|\([a-z]\)|\([ivx]+\)|\(\d+\)|"
+            r"[一二三四五六七八九十]+[、.]|\d+\s+[一-鿿「『“])",
+            stripped,
+        )
+    )
+
+
+def _merge_wrapped_heading_lines(
+    pages: list[tuple[int, list[Line]]],
+) -> list[tuple[int, list[Line]]]:
+    merged_pages: list[tuple[int, list[Line]]] = []
+    for pdf_page, lines in pages:
+        merged_lines: list[Line] = []
+        index = 0
+        while index < len(lines):
+            plain, markdown, x0 = lines[index]
+            match = H3_RE.match(plain) or H2_RE.match(plain)
+            next_plain = lines[index + 1][0] if index + 1 < len(lines) else None
+            if match:
+                title_group = match.lastindex or 0
+                title = match.group(title_group).strip()
+                joined = join_wrapped_heading(
+                    title,
+                    next_plain,
+                    is_blocked=_is_structural_line,
+                )
+                if joined is not None:
+                    prefix = plain[:match.start(title_group)]
+                    merged_lines.append((_WRAPPED_HEADING_MARKER + prefix + joined, markdown, x0))
+                    index += 2
+                    continue
+            merged_lines.append((plain, markdown, x0))
+            index += 1
+        merged_pages.append((pdf_page, merged_lines))
+    return merged_pages
+
+
+def _carry_pages(pages: list[tuple[int, list[Line]]]) -> set[int]:
+    result: set[int] = set()
+    for (pdf_page, lines), (next_page, next_lines) in zip(pages, pages[1:]):
+        if next_page != pdf_page + 1 or next_page in CHAPTER_START_PAGES.values():
+            continue
+        if pdf_page >= APPENDIX_START_PAGE:
+            continue
+        current_visible = [(plain.strip(), x0) for plain, _, x0 in lines if plain.strip()]
+        next_visible = [(plain.strip(), x0) for plain, _, x0 in next_lines if plain.strip()]
+        if not current_visible or not next_visible:
+            continue
+        last_line, last_x0 = current_visible[-1]
+        first_next, next_x0 = next_visible[0]
+        if last_line.endswith(("。", "！", "？", "!", "?")):
+            continue
+        if _is_structural_line(first_next) or abs(last_x0 - next_x0) > 4.0:
+            continue
+        result.add(pdf_page)
+    return result
+
+
 def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[dict], str]:
+    pages = _merge_wrapped_heading_lines(pages)
+    carry_pages = _carry_pages(pages)
     chapters: list[dict] = []
     html_parts: list[str] = []
     pdf_pages_seen: set[int] = set()
@@ -512,12 +548,15 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
     NEW_PARA_START_RE = re.compile(
         r"^(\([a-z]\)|\([ivx]+\)|\(\d+\)|註[:：]|"
         r"[一二三四五六七八九十]+[、.]|"
-        r"\d+\s+[一-鿿])"
+        r"\d+\s+[一-鿿「『“])"
     )
     BULLET_RE = re.compile(r"^[•·\-\*]\s+")
 
     def process_line(plain: str, pdf_page: int, is_app_zone: bool) -> bool:
         nonlocal current_h1_id, current_h2_id, current_h2_num
+        is_wrapped_heading = plain.startswith(_WRAPPED_HEADING_MARKER)
+        if is_wrapped_heading:
+            plain = plain.removeprefix(_WRAPPED_HEADING_MARKER)
 
         if not is_app_zone:
             expected_chap = next(
@@ -566,7 +605,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
             if (current_h1_id
                     and re.match(r"^[1-5]$", a)
                     and int(a) == int(current_h1_id.split("-")[1])
-                    and len(title) <= H3_MAX_LEN):
+                    and len(title) <= (WRAPPED_HEADING_MAX_LEN if is_wrapped_heading else H3_MAX_LEN)):
                 h3_id = f"ch-{a}-{b}-{c}"
                 if not any(cc["id"] == h3_id for cc in chapters):
                     flush_paragraph()
@@ -590,7 +629,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
             if (current_h1_id
                     and re.match(r"^[1-5]$", a)
                     and int(a) == int(current_h1_id.split("-")[1])
-                    and len(title) <= H2_MAX_LEN):
+                    and len(title) <= (WRAPPED_HEADING_MAX_LEN if is_wrapped_heading else H2_MAX_LEN)):
                 h2_id = f"ch-{a}-{b}"
                 if not any(cc["id"] == h2_id for cc in chapters):
                     flush_paragraph()
@@ -648,7 +687,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
         chap = detect_chapter_for_page(pdf_page)
         is_app_zone_now = chap is None
 
-        for plain, markdown, x0 in line_pairs:
+        for line_index, (plain, markdown, x0) in enumerate(line_pairs):
             if not plain:
                 if pending_lines and current_h1_id not in ("apx-vocab", "apx-glossary", "apx-mock-answers"):
                     flush_paragraph()
@@ -756,12 +795,25 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
                 else:
                     flush_paragraph()
             pending_lines.append((markdown, x0))
+            next_line = line_pairs[line_index + 1] if line_index + 1 < len(line_pairs) else None
+            if (
+                current_h1_id not in ("apx-vocab", "apx-glossary", "apx-mock-answers")
+                and _is_standalone_lettered_subheading(plain, x0, next_line)
+            ):
+                flush_paragraph()
 
-        # 頁結束:辭彙表/術語解釋 走專用 flush
+        # 頁結束:正文跨頁續行時保留整個 pending buffer。
+        if pdf_page in carry_pages:
+            continue
         if current_h1_id in ("apx-vocab", "apx-glossary"):
             flush_glossary()
         else:
             flush_paragraph()
+
+    if current_h1_id in ("apx-vocab", "apx-glossary"):
+        flush_glossary()
+    else:
+        flush_paragraph()
 
     return chapters, "\n".join(html_parts)
 

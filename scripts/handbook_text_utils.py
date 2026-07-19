@@ -45,18 +45,20 @@ def _next_visible_char(s: str, from_idx: int) -> str:
     return ""
 
 
-def _is_non_sentence_period(prev: str, nxt: str) -> bool:
+def _is_non_sentence_period(s: str, index: int, prev: str, nxt: str) -> bool:
     if prev == "." or nxt == ".":
         return True
     if prev.isdigit() and nxt.isdigit():
         return True
-    return (
-        bool(prev)
-        and bool(nxt)
-        and prev.isascii()
-        and prev.isalpha()
+
+    prefix = re.sub(r"<[^>]+>", "", s[max(0, index - 100):index])
+    if prev.isascii() and prev in "abcdefgh" and s[index + 1:index + 2].isspace():
+        return True
+    return bool(
+        nxt
         and nxt.isascii()
         and (nxt.isalnum() or nxt in "/_-#")
+        and re.search(r"(?:https?://|www\.)[^\s]*$", prefix, re.IGNORECASE)
     )
 
 
@@ -118,7 +120,9 @@ def split_long_paragraph(
         if ch in primary_end and visible_length >= target:
             prev = _previous_visible_char(inner_html, i)
             nxt = _next_visible_char(inner_html, i)
-            should_split = not (ch == "." and _is_non_sentence_period(prev, nxt))
+            should_split = not (
+                ch == "." and _is_non_sentence_period(inner_html, i, prev, nxt)
+            )
         elif ch in soft_end:
             nxt = _next_visible_char(inner_html, i)
             if visible_length >= hard_limit:

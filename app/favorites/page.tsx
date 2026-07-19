@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import {
   EyeOff,
   RotateCcw,
   Play,
+  Shuffle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { authedFetch } from "@/lib/session-client";
@@ -17,8 +18,17 @@ import { QuestionActions } from "@/components/QuestionActions";
 import { QuestionStem } from "@/components/QuestionStem";
 import { NoteSection } from "@/components/NoteSection";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
-import { RedoPractice, type RedoItem } from "@/components/RedoPractice";
+import { RedoPractice, type RedoItem, type RedoPracticeState } from "@/components/RedoPractice";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ToastContainer, useToast } from "@/components/useToast";
+import { getSessionId } from "@/lib/session";
+import {
+  createRedoPracticeDraft,
+  getRedoPracticeDraftKey,
+  parseRedoPracticeDraft,
+  reconcileRedoPracticeDraft,
+  type RedoPracticeDraft,
+} from "@/lib/redo-practice-draft";
 
 type FavItem = {
   questionId: string;
@@ -178,6 +188,9 @@ export default function FavoritesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [practiceMode, setPracticeMode] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
+  const [practiceDraft, setPracticeDraft] = useState<RedoPracticeDraft | null>(null);
+  const draftKeyRef = useRef<string | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<ReadonlySet<string>>(new Set());
   const favoriteRequestsRef = useRef<Set<string>>(new Set());
   const { toast, toasts } = useToast();
@@ -189,8 +202,24 @@ export default function FavoritesPage() {
         return r.json();
       })
       .then((data) => {
-        setItems(data.items);
-        setFavoriteIds(new Set<string>(data.items.map((item: FavItem) => item.questionId)));
+        const nextItems: FavItem[] = data.items;
+        setItems(nextItems);
+        setFavoriteIds(new Set<string>(nextItems.map((item) => item.questionId)));
+        const draftKey = getRedoPracticeDraftKey(getSessionId(), "favorites");
+        draftKeyRef.current = draftKey;
+        const restored = reconcileRedoPracticeDraft(
+          parseRedoPracticeDraft(localStorage.getItem(draftKey), "favorites"),
+          nextItems.map((item) => item.questionId),
+        );
+        if (restored) {
+          localStorage.setItem(draftKey, JSON.stringify(restored));
+          setPracticeDraft(restored);
+          setShuffle(restored.shuffle);
+          setPracticeMode(true);
+        } else {
+          localStorage.removeItem(draftKey);
+          setPracticeDraft(null);
+        }
         setLoading(false);
       })
       .catch((e) => {
@@ -250,7 +279,36 @@ export default function FavoritesPage() {
     }
   }
 
+  const saveDraft = useCallback((draft: RedoPracticeDraft) => {
+    setPracticeDraft(draft);
+    const key = draftKeyRef.current;
+    if (key) localStorage.setItem(key, JSON.stringify(draft));
+  }, []);
+
+  const startPractice = useCallback(() => {
+    const draft = createRedoPracticeDraft(
+      "favorites",
+      items.map((item) => item.questionId),
+      shuffle,
+    );
+    saveDraft(draft);
+    setPracticeMode(true);
+  }, [items, saveDraft, shuffle]);
+
+  const updatePracticeState = useCallback((state: RedoPracticeState) => {
+    setPracticeDraft((current) => {
+      if (!current) return current;
+      const next = { ...current, ...state, updatedAt: Date.now() };
+      const key = draftKeyRef.current;
+      if (key) localStorage.setItem(key, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   async function exitPractice() {
+    const key = draftKeyRef.current;
+    if (key) localStorage.removeItem(key);
+    setPracticeDraft(null);
     setPracticeMode(false);
     load();
   }
@@ -263,8 +321,12 @@ export default function FavoritesPage() {
   }
 
   // 做題模式
-  if (practiceMode) {
-    const redoItems: RedoItem[] = items.map((it) => ({
+  if (practiceMode && practiceDraft) {
+    const itemById = new Map(items.map((item) => [item.questionId, item]));
+    const orderedItems = practiceDraft.questionIds
+      .map((questionId) => itemById.get(questionId))
+      .filter((item): item is FavItem => item != null);
+    const redoItems: RedoItem[] = orderedItems.map((it) => ({
       questionId: it.questionId,
       paperCode: it.paperCode,
       paperName: it.paperName,
@@ -278,6 +340,9 @@ export default function FavoritesPage() {
           favoriteIds={favoriteIds}
           onToggleFavorite={toggleFavorite}
           onExit={exitPractice}
+          initialState={practiceDraft}
+          onStateChange={updatePracticeState}
+          shuffled={practiceDraft.shuffle}
         />
         <ToastContainer toasts={toasts} />
       </>
@@ -289,9 +354,17 @@ export default function FavoritesPage() {
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <h1 className="text-2xl font-bold">收藏題</h1>
         {items.length > 0 && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">共 {items.length} 題</span>
-            <Button onClick={() => setPracticeMode(true)}>
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <Checkbox
+                checked={shuffle}
+                onCheckedChange={(checked) => setShuffle(checked === true)}
+              />
+              <Shuffle className="w-4 h-4" />
+              亂序
+            </label>
+            <Button onClick={startPractice}>
               <Play className="w-4 h-4 mr-1" />
               練習模式
             </Button>
