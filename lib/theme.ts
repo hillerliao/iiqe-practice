@@ -19,3 +19,11 @@ export function resolveTheme(mode: ThemeMode, systemDark: boolean): ResolvedThem
   if (mode === "system") return systemDark ? "dark" : "light";
   return mode;
 }
+
+/**
+ * 快捷键切换语义：以当前解析后的实际主题为基准，light↔dark 对调。
+ * 「跟随系统」模式下同样按解析结果翻转，并落地为显式模式。
+ */
+export function nextToggledMode(resolved: ResolvedTheme): ThemeMode {
+  return resolved === "dark" ? "light" : "dark";
+}

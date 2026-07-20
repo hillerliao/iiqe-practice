@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  BookOpen,
   Home,
   BarChart3,
   Star,
@@ -16,10 +15,6 @@ interface IconProps {
 }
 
 // Export individual icon components to maintain same import style
-export const NavBookOpen = ({ className }: IconProps) => (
-  <BookOpen className={className} />
-);
-
 export const NavXCircle = ({ className }: IconProps) => (
   <XCircle className={className} />
 );

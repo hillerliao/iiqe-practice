@@ -16,11 +16,11 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import {
   NavHome,
   NavBarChart3,
-  NavBookOpen,
   NavXCircle,
   NavStar,
   NavSettings,
 } from "@/components/NavIcons";
+import { SiteMark } from "@/components/SiteMark";
 import { ExamCountdownBadge } from "@/components/ExamCountdown";
 
 export function GlobalHeader({
@@ -41,11 +41,14 @@ export function GlobalHeader({
         <ExamCountdownBadge>
           <Link
             href="/"
-            className="font-semibold text-base sm:text-lg flex items-center gap-1.5 sm:gap-2 whitespace-nowrap focus:outline-none focus-visible:outline-2 focus-visible:outline-ring rounded-md"
+            className="group text-base sm:text-lg flex items-center gap-1.5 sm:gap-2 whitespace-nowrap focus:outline-none focus-visible:outline-2 focus-visible:outline-ring rounded-md"
           >
-            <NavBookOpen className="w-5 h-5 shrink-0" />
-            <span className="hidden min-[380px]:inline">IIQE 做題家</span>
-            <span className="min-[380px]:hidden">IIQE</span>
+            <SiteMark className="w-6 h-6 shrink-0 text-foreground transition-opacity duration-200 group-hover:opacity-70" />
+            <span className="hidden min-[380px]:inline leading-none">
+              <span className="font-bold tracking-tight">IIQE</span>
+              <span className="ml-1.5 font-medium text-foreground/70">做題家</span>
+            </span>
+            <span className="min-[380px]:hidden font-bold tracking-tight">IIQE</span>
           </Link>
         </ExamCountdownBadge>
         <nav className="flex gap-0.5 sm:gap-1 text-sm items-center flex-1 min-w-0 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
