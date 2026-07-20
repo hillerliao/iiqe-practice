@@ -39,7 +39,7 @@ export function GlobalHeader({
       <div className="max-w-6xl mx-auto px-2 sm:px-4 h-14 flex items-center gap-2 sm:gap-6 min-w-0">
         <Link
           href="/"
-          className="font-semibold text-base sm:text-lg flex items-center gap-1.5 sm:gap-2 shrink-0 whitespace-nowrap"
+          className="font-semibold text-base sm:text-lg flex items-center gap-1.5 sm:gap-2 shrink-0 whitespace-nowrap focus:outline-none focus-visible:outline-2 focus-visible:outline-ring rounded-md"
         >
           <NavBookOpen className="w-5 h-5 shrink-0" />
           <span className="hidden min-[380px]:inline">IIQE 做題家</span>
@@ -48,28 +48,28 @@ export function GlobalHeader({
         <nav className="flex gap-0.5 sm:gap-1 text-sm items-center flex-1 min-w-0 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <Link
             href="/"
-            className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+            className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap focus:outline-none focus-visible:outline-2 focus-visible:outline-ring"
           >
             <NavHome className="w-4 h-4" />
             <span className="hidden md:inline">首頁</span>
           </Link>
           <Link
             href="/stats"
-            className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+            className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap focus:outline-none focus-visible:outline-2 focus-visible:outline-ring"
           >
             <NavBarChart3 className="w-4 h-4" />
             <span className="hidden md:inline">統計</span>
           </Link>
           <Link
             href="/wrongbook"
-            className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+            className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap focus:outline-none focus-visible:outline-2 focus-visible:outline-ring"
           >
             <NavXCircle className="w-4 h-4" />
             <span className="hidden md:inline">錯題本</span>
           </Link>
           <Link
             href="/favorites"
-            className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+            className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap focus:outline-none focus-visible:outline-2 focus-visible:outline-ring"
           >
             <NavStar className="w-4 h-4" />
             <span className="hidden md:inline">收藏</span>
@@ -82,7 +82,7 @@ export function GlobalHeader({
           )}
           <Link
             href="/settings"
-            className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap"
+            className="px-2 sm:px-3 py-1.5 rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap focus:outline-none focus-visible:outline-2 focus-visible:outline-ring"
           >
             <NavSettings className="w-4 h-4" />
             <span className="hidden md:inline">設定</span>

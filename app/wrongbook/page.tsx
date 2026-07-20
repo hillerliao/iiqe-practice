@@ -63,6 +63,12 @@ type WrongItem = {
 
 type WrongbookView = "all" | "repeated";
 
+const PAPER_FILTER_ALL = "all";
+
+function paperFilterLabel(code: string) {
+  return code === "P1" ? "卷一 P1" : code === "P3" ? "卷三 P3" : code;
+}
+
 function WrongItemCard({ item }: { item: WrongItem }) {
   const [revealed, setRevealed] = useState(false);
   const [picked, setPicked] = useState<string | null>(null);
@@ -204,6 +210,7 @@ export default function WrongbookPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<WrongbookView>("all");
+  const [paperFilter, setPaperFilter] = useState<string>(PAPER_FILTER_ALL);
   const [threshold, setThreshold] = useState(DEFAULT_REPEATED_THRESHOLD);
   const [thresholdInput, setThresholdInput] = useState(
     String(DEFAULT_REPEATED_THRESHOLD),
@@ -267,11 +274,23 @@ export default function WrongbookPage() {
       });
   }, []);
 
-  const repeatedItems = useMemo(
-    () => items.filter((item) => item.wrongCount >= threshold),
-    [items, threshold],
+  const paperCodes = useMemo(
+    () => [...new Set(items.map((item) => item.paperCode))].sort(),
+    [items],
   );
-  const visibleItems = view === "all" ? items : repeatedItems;
+  const paperFilteredItems = useMemo(
+    () =>
+      paperFilter === PAPER_FILTER_ALL
+        ? items
+        : items.filter((item) => item.paperCode === paperFilter),
+    [items, paperFilter],
+  );
+  const repeatedItems = useMemo(
+    () => paperFilteredItems.filter((item) => item.wrongCount >= threshold),
+    [paperFilteredItems, threshold],
+  );
+  const visibleItems = view === "all" ? paperFilteredItems : repeatedItems;
+  const isFiltered = paperFilter !== PAPER_FILTER_ALL || view === "repeated";
 
   const practiceItems = useMemo(() => {
     if (!practiceDraft) return [];
@@ -459,7 +478,7 @@ export default function WrongbookPage() {
           <div className="flex items-center gap-3 text-sm flex-wrap justify-end">
             <span className="text-muted-foreground">
               共 {items.length} 題
-              {isRepeatedView ? ` · 篩選後 ${visibleItems.length} 題` : ""}
+              {isFiltered ? ` · 篩選後 ${visibleItems.length} 題` : ""}
             </span>
             <label className="flex items-center gap-2 cursor-pointer">
               <Checkbox
@@ -473,7 +492,9 @@ export default function WrongbookPage() {
               <Play className="w-4 h-4 mr-1" />
               {isRepeatedView
                 ? `重點重做（${visibleItems.length} 題）`
-                : `練習全部（${items.length} 題）`}
+                : paperFilter !== PAPER_FILTER_ALL
+                  ? `練習所選（${visibleItems.length} 題）`
+                  : `練習全部（${items.length} 題）`}
             </Button>
           </div>
         )}
@@ -483,6 +504,29 @@ export default function WrongbookPage() {
         <Card className="mb-4">
           <CardContent>
             <div className="flex items-center gap-3 flex-wrap">
+              {paperCodes.length > 1 && (
+                <div
+                  className="inline-flex rounded-lg border border-border overflow-hidden"
+                  role="group"
+                  aria-label="按卷別篩選"
+                >
+                  {[PAPER_FILTER_ALL, ...paperCodes].map((code, index) => (
+                    <Button
+                      key={code}
+                      type="button"
+                      variant={paperFilter === code ? "secondary" : "ghost"}
+                      size="sm"
+                      className={cn(
+                        "rounded-none border-0",
+                        index > 0 && "border-l border-border",
+                      )}
+                      onClick={() => setPaperFilter(code)}
+                    >
+                      {code === PAPER_FILTER_ALL ? "全部卷別" : paperFilterLabel(code)}
+                    </Button>
+                  ))}
+                </div>
+              )}
               <div className="inline-flex rounded-lg border border-border overflow-hidden" role="group" aria-label="錯題篩選">
                 <Button
                   type="button"
@@ -550,7 +594,11 @@ export default function WrongbookPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground text-sm">
-              目前沒有累計答錯 ≥{threshold} 次的題目。可調低門檻或查看全部錯題。
+              {view === "repeated"
+                ? `目前沒有累計答錯 ≥${threshold} 次的題目。可調低門檻或查看全部錯題。`
+                : paperFilter !== PAPER_FILTER_ALL
+                  ? "此卷別目前沒有錯題。可切換其他卷別或查看全部卷別。"
+                  : "目前沒有符合條件的錯題。"}
             </p>
           </CardContent>
         </Card>

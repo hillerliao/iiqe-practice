@@ -293,10 +293,20 @@ docker compose up -d --build
 ```powershell
 npm run build
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+npm run deploy:vps
+```
+
+等同於：
+
+```powershell
 powershell.exe -ExecutionPolicy Bypass -File .\deploy-remote.ps1
 ```
 
+在 Git Bash 中不要直接輸入 `powershell.exe -File .\deploy-remote.ps1`，MSYS 可能把 `.\` 路徑轉換掉；使用 `npm run deploy:vps` 或絕對 Windows 路径。
+
 不得跳过本机 build，也不得用旧 `.next` 部署。`deploy-remote.ps1` 会将当前工作区的 `.next`、运行时源码、题库数据、Prisma 文件和依赖清单打包上传，因此它可以发布尚未提交的本地修改；执行前应确认这些修改都是本次计划上线的内容。
+
+> PowerShell 5.1 注意：含中文注释的 `.ps1` 必须保存为 **UTF-8 with BOM**，否则可能被按 ANSI/GBK 误读，导致变量解析异常。仓库已通过 `.gitattributes` 要求 `*.ps1` 使用 UTF-8 BOM / CRLF。
 
 ### C.2 脚本行为与验收
 

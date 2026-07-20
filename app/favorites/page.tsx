@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +46,12 @@ type FavItem = {
     sourceLabel: string;
   };
 };
+
+const PAPER_FILTER_ALL = "all";
+
+function paperFilterLabel(code: string) {
+  return code === "P1" ? "卷一 P1" : code === "P3" ? "卷三 P3" : code;
+}
 
 function FavItemCard({
   item,
@@ -189,6 +195,7 @@ export default function FavoritesPage() {
   const [error, setError] = useState<string | null>(null);
   const [practiceMode, setPracticeMode] = useState(false);
   const [shuffle, setShuffle] = useState(false);
+  const [paperFilter, setPaperFilter] = useState<string>(PAPER_FILTER_ALL);
   const [practiceDraft, setPracticeDraft] = useState<RedoPracticeDraft | null>(null);
   const draftKeyRef = useRef<string | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<ReadonlySet<string>>(new Set());
@@ -285,15 +292,27 @@ export default function FavoritesPage() {
     if (key) localStorage.setItem(key, JSON.stringify(draft));
   }, []);
 
+  const paperCodes = useMemo(
+    () => [...new Set(items.map((item) => item.paperCode))].sort(),
+    [items],
+  );
+  const visibleItems = useMemo(
+    () =>
+      paperFilter === PAPER_FILTER_ALL
+        ? items
+        : items.filter((item) => item.paperCode === paperFilter),
+    [items, paperFilter],
+  );
+
   const startPractice = useCallback(() => {
     const draft = createRedoPracticeDraft(
       "favorites",
-      items.map((item) => item.questionId),
+      visibleItems.map((item) => item.questionId),
       shuffle,
     );
     saveDraft(draft);
     setPracticeMode(true);
-  }, [items, saveDraft, shuffle]);
+  }, [visibleItems, saveDraft, shuffle]);
 
   const updatePracticeState = useCallback((state: RedoPracticeState) => {
     setPracticeDraft((current) => {
@@ -355,7 +374,10 @@ export default function FavoritesPage() {
         <h1 className="text-2xl font-bold">收藏題</h1>
         {items.length > 0 && (
           <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">共 {items.length} 題</span>
+            <span className="text-sm text-muted-foreground">
+              共 {items.length} 題
+              {paperFilter !== PAPER_FILTER_ALL ? ` · 篩選後 ${visibleItems.length} 題` : ""}
+            </span>
             <label className="flex items-center gap-2 text-sm cursor-pointer">
               <Checkbox
                 checked={shuffle}
@@ -364,13 +386,42 @@ export default function FavoritesPage() {
               <Shuffle className="w-4 h-4" />
               亂序
             </label>
-            <Button onClick={startPractice}>
+            <Button onClick={startPractice} disabled={visibleItems.length === 0}>
               <Play className="w-4 h-4 mr-1" />
-              練習模式
+              {paperFilter !== PAPER_FILTER_ALL
+                ? `練習所選（${visibleItems.length} 題）`
+                : "練習模式"}
             </Button>
           </div>
         )}
       </div>
+      {items.length > 0 && paperCodes.length > 1 && (
+        <Card className="mb-4">
+          <CardContent>
+            <div
+              className="inline-flex rounded-lg border border-border overflow-hidden"
+              role="group"
+              aria-label="按卷別篩選"
+            >
+              {[PAPER_FILTER_ALL, ...paperCodes].map((code, index) => (
+                <Button
+                  key={code}
+                  type="button"
+                  variant={paperFilter === code ? "secondary" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "rounded-none border-0",
+                    index > 0 && "border-l border-border",
+                  )}
+                  onClick={() => setPaperFilter(code)}
+                >
+                  {code === PAPER_FILTER_ALL ? "全部卷別" : paperFilterLabel(code)}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
       {items.length === 0 ? (
         <Card>
           <CardHeader>
@@ -382,9 +433,20 @@ export default function FavoritesPage() {
             </p>
           </CardContent>
         </Card>
+      ) : visibleItems.length === 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>沒有符合條件的收藏</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground text-sm">
+              此卷別目前沒有收藏題目。可切換其他卷別或查看全部卷別。
+            </p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="space-y-3">
-          {items.map((it) => (
+          {visibleItems.map((it) => (
             <FavItemCard
               key={it.questionId}
               item={it}

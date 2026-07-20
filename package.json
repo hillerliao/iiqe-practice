@@ -23,7 +23,8 @@
     "verify:redo-practice": "tsx scripts/test_redo_practice_draft.mts",
     "verify:wrongbook-filter": "tsx scripts/test_wrongbook_filter.mts",
     "verify:wrongbook-route": "tsx --tsconfig scripts/tsconfig.json scripts/verify-wrongbook-route.ts",
-    "verify:wrongbook-record-route": "tsx --tsconfig scripts/tsconfig.json scripts/verify-wrongbook-record-route.ts"
+    "verify:wrongbook-record-route": "tsx --tsconfig scripts/tsconfig.json scripts/verify-wrongbook-record-route.ts",
+    "deploy:vps": "powershell.exe -ExecutionPolicy Bypass -File deploy-remote.ps1"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
