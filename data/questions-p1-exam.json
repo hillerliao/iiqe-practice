@@ -1976,7 +1976,12 @@
     "number": 117,
     "ref": "3.4.7(b)",
     "question": "以下哪項阻止了保單為被保險人作出彌償?\ni.比例分攤\nii.多於二人有可保權益\niii.免賠額\niv.起賠額",
-    "options": {},
+    "options": {
+      "a": "i,ii",
+      "b": "ii,iii",
+      "c": "i,iii,iv",
+      "d": "以上皆是"
+    },
     "answer": "c",
     "explanation": null,
     "page": 19,
