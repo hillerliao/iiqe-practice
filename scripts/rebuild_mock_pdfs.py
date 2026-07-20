@@ -171,8 +171,22 @@ def starts_new_question(question: ParsedQuestion, text: str) -> bool:
 
     A table anchor occurs in the middle of a question, between option rows. The
     d)-to-next-stem transition is consequently the dependable record boundary.
+
+    However, option d text may wrap to a second visual line in the PDF. Such
+    continuations are short fragments without question markers, so we exclude
+    them from triggering a new question.
     """
-    return question.active_option == "d" and bool(text)
+    if question.active_option != "d" or not text:
+        return False
+    # If option d's accumulated text ends abruptly (mid-word), the next line is
+    # likely a continuation rather than a new question stem.
+    option_d_text = join_text(question.options["d"])
+    if option_d_text and option_d_text[-1] in "不另至因而或及的於與和但卻又且並乃即若如雖因由自到來去起過著得地之其此該各每某別向對把被將從以素金員權力資格":
+        return False
+    # Short fragments without question punctuation are likely continuations.
+    if len(text) <= 15 and not re.search(r"[？?：:]", text):
+        return False
+    return True
 
 
 def consume_content(question: ParsedQuestion, text: str) -> None:

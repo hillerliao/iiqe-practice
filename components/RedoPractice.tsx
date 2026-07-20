@@ -232,14 +232,18 @@ export function RedoPractice({
     : null;
 
   useEffect(() => {
-    const questionIds = items.map((item) => item.questionId).join(",");
-    if (!questionIds) {
+    const ids = items.map((item) => item.questionId);
+    if (ids.length === 0) {
       setNotes({});
       return;
     }
 
     let cancelled = false;
-    authedFetch(`/api/notes?questionIds=${encodeURIComponent(questionIds)}`)
+    authedFetch(`/api/notes/batch`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ questionIds: ids }),
+    })
       .then((response) => (response.ok ? response.json() : { items: [] }))
       .then((data: { items: { questionId: string; content: string }[] }) => {
         if (cancelled) return;

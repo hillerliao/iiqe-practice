@@ -175,9 +175,13 @@ function PracticeInner() {
             setFavorites(favSet);
           });
         // 批量載入此 attempt 所有題目的筆記(避免 N+1)
-        const questionIds = qs.map((q) => q.id).join(",");
-        if (questionIds) {
-          authedFetch(`/api/notes?questionIds=${encodeURIComponent(questionIds)}`)
+        const qIds = qs.map((q) => q.id);
+        if (qIds.length > 0) {
+          authedFetch(`/api/notes/batch`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ questionIds: qIds }),
+          })
             .then((r) => (r.ok ? r.json() : { items: [] }))
             .then((d: { items: { questionId: string; content: string }[] }) => {
               const map: Record<string, string> = {};
