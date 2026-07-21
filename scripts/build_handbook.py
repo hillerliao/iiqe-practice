@@ -1,4 +1,4 @@
-"""
+r"""
 build_handbook.py — 將「保險原理及實務 研習手冊 2024.pdf」轉為
   1) public/handbook/exam1-2024.json  (供 Next.js 動態路由載入)
   2) public/handbook/exam1-2024.html  (單檔離線預覽)
@@ -34,6 +34,20 @@ OUT_DIR = os.path.join(ROOT, "public", "handbook")
 os.makedirs(OUT_DIR, exist_ok=True)
 
 SLUG = "exam1-2024"
+
+# 行數據類型:(plain, markdown, x0, gap_before)
+# 測試及舊呼叫端仍可傳入不含 gap_before 的三元組。
+Line = tuple[str, str, float] | tuple[str, str, float, float]
+# 段落行類型:(markdown, x0)
+ParagraphLine = tuple[str, float]
+
+# 縮進偵測參數(與 P3 一致)
+CONTENT_LEFT_X = 68.0
+INDENT_STEP_X = 36.75
+MAX_INDENT_LEVEL = 3
+MEDIUM_PARAGRAPH_GAP = 23.0
+FIRST_LINE_INDENT_MIN = 24.0
+FIRST_LINE_INDENT_MAX = 55.0
 
 # 已知章節起始 PDF 頁碼(以 1 為起)
 CHAPTER_START_PAGES = {1: 10, 2: 16, 3: 27, 4: 47, 5: 57, 6: 68, 7: 143}
@@ -130,20 +144,56 @@ _SEP_DASH_RE = re.compile(r"^[-–—=~•·*=\s]{3,}$")
 
 # 行首的內文編號子標籤(如 '1.1.2b '),應另起一段,不要黏在上一段
 SUBLABEL_RE = re.compile(r"^\d+\.\d+(\.\d+)?[a-z]?\s")
+# 表格式大寫條目，如「A 人壽及年金 - ...」。限定 A-I 並要求破折號，避免誤切英文句子。
+CAPITAL_TABLE_ITEM_RE = re.compile(r"^[A-I]\s+\S.{0,24}\s+[-–—]\s+")
 
 
-def render_paragraph(lines: list[str], is_mock_exam_zone: bool) -> str:
-    """把一塊連續的非標題文字行轉為 <p>...</p> 或 <ul><li>..."""
+def _indent_level(x0: float) -> int:
+    """將 PDF x 座標映射為縮進層級 (0-3)。"""
+    return max(0, min(MAX_INDENT_LEVEL, round((x0 - CONTENT_LEFT_X) / INDENT_STEP_X)))
+
+
+def _row_x0(chars: list[dict], plain: str) -> float:
+    """取得行縮進座標；結構標記忽略 PDF 為排版加入的前導空格。"""
+    visible_chars = [char for char in chars if str(char.get("text", "")).strip()]
+    if re.match(r"^(?:\([a-zivx]+\)|\(\d+\)|[•·\-*]\s+)", plain):
+        source = visible_chars or chars
+    else:
+        source = chars
+    return min(float(char["x0"]) for char in source)
+
+
+def _paragraph_indent_classes(lines: list[ParagraphLine]) -> str:
+    """分開計算整段縮進與首行縮進。"""
+    x_positions = [x0 for line, x0 in lines if line.strip()]
+    if not x_positions:
+        return ""
+    base_x0 = min(x_positions)
+    block_level = _indent_level(base_x0)
+    classes = [f"handbook-indent-{block_level}"] if block_level else []
+    first_line_delta = lines[0][1] - base_x0
+    if FIRST_LINE_INDENT_MIN <= first_line_delta <= FIRST_LINE_INDENT_MAX:
+        classes.append("handbook-first-line-indent")
+    return f' class="{" ".join(classes)}"' if classes else ""
+
+
+def render_paragraph(lines: list[ParagraphLine], is_mock_exam_zone: bool) -> str:
+    """把一塊連續的非標題文字行轉為 <p>...</p> 或 <ul><li>...
+
+    lines: [(markdown_text, x0)] — 帶 PDF x 座標以決定整段及首行縮進。
+    """
     if not lines:
         return ""
+    markdown_lines = [line for line, _ in lines]
+    indent_class = _paragraph_indent_classes(lines)
     # 純文字合併(移除格式標記後看是否為 bullet 列表)
-    plain_lines = [_strip_markers(line).strip() for line in lines]
+    plain_lines = [_strip_markers(line).strip() for line in markdown_lines]
     plain_lines = [p for p in plain_lines if p]
     if not plain_lines:
         return ""
     # 裝飾性分隔線(整段只有 'o - o - o -' 或一串 -/–/•,可能帶前導 bullet '- ')
     # → 轉為 <hr>。必須在 bullet 偵測之前,且要先去掉前導 bullet 再判斷。
-    joined_md = smart_join_markdown(lines)
+    joined_md = smart_join_markdown(markdown_lines)
     joined_plain = _strip_markers(joined_md).strip()
     joined_nobullet = re.sub(r"^[•·\-\*]\s+", "", joined_plain)
     if _SEP_O_RE.match(joined_nobullet) or _SEP_DASH_RE.match(joined_nobullet):
@@ -151,15 +201,15 @@ def render_paragraph(lines: list[str], is_mock_exam_zone: bool) -> str:
     # bullet 偵測:所有 plain_lines 都以 - • · 開頭
     if all(re.match(r"^[•·\-\*]\s+", p) for p in plain_lines):
         items = []
-        for plain_line, line in zip(plain_lines, [l for l in lines if l.strip()]):
+        for plain_line, line in zip(plain_lines, [l for l in markdown_lines if l.strip()]):
             # 移除開頭的 bullet 標記,保留其餘 markdown 格式
             stripped = re.sub(r"^[•·\-\*]\s+", "", line)
             items.append(f"<li>{_markdown_to_html(stripped)}</li>")
-        return f"<ul>{''.join(items)}</ul>"
+        return f"<ul{indent_class}>{''.join(items)}</ul>"
     # 一般段落:CJK 感知合併各行 markdown,長段落依句號自動切成多段
     inner = _markdown_to_html(joined_md)
     chunks = _split_long_paragraph(inner)
-    return "".join(f"<p>{c}</p>" for c in chunks)
+    return "".join(f"<p{indent_class}>{c}</p>" for c in chunks)
 
 
 # 將 PDF 字型名映射為 (is_bold, is_italic)
@@ -205,11 +255,10 @@ def _spans_to_html(spans: list[tuple[str, str]]) -> str:
     return "".join(out)
 
 
-def extract_pdf_pages() -> list[tuple[int, list[tuple[str, str]]]]:
+def extract_pdf_pages() -> list[tuple[int, list[Line]]]:
     """回傳 [(pdf_page_idx(1-based), lines), ...]
 
-    lines 是 [(plain_text, markdown_text)] 列表,行與行之間以
-    `\\n\\n` 區隔(下游 `build_chapters_and_html` 會依此切段)。
+    lines = [(plain, markdown, x0, gap_before)]，段間用空白 Line 標記。
 
     段分隔策略:
     - 同 y 差距 < LINE_GAP (2.5pt) → 同行內 wrap,合併
@@ -217,9 +266,8 @@ def extract_pdf_pages() -> list[tuple[int, list[tuple[str, str]]]]:
     - y 差距 15-25pt → 大段空白(段與段之間的視覺空行)
     - y 差距 > 25pt → 新段(術語表詞條間距,或章節間距)
     """
-    pages: list[tuple[int, list[tuple[str, str]]]] = []
+    pages: list[tuple[int, list[Line]]] = []
     LINE_GAP = 2.5
-    PARAGRAPH_GAP = 25.0  # pt:y 差距超過此值視為新段
     with pdfplumber.open(PDF_PATH) as pdf:
         for i, page in enumerate(pdf.pages, start=1):
             if i < SKIP_PAGES_BEFORE:
@@ -241,8 +289,8 @@ def extract_pdf_pages() -> list[tuple[int, list[tuple[str, str]]]]:
                     merged[-1] = (y, merged[-1][1] + cs)
                 else:
                     merged.append((y, cs))
-            # 第一階段:把每行合併為 (plain, markdown)
-            row_pairs: list[tuple[float, str, str]] = []
+            # 第一階段:把每行合併為 (plain, markdown, x0)
+            row_pairs: list[tuple[float, str, str, float]] = []
             for y, cs in merged:
                 spans: list[tuple[str, str]] = [
                     (c["text"], c.get("fontname", "")) for c in sorted(cs, key=lambda c: c["x0"])
@@ -252,37 +300,36 @@ def extract_pdf_pages() -> list[tuple[int, list[tuple[str, str]]]]:
                     continue
                 if re.match(r"^\d+\s*/\s*\d+$", plain):
                     continue
-                row_pairs.append((y, plain, _spans_to_markdown(spans)))
-            # 第二階段:依 y 差距切段,用 \n\n 分隔
+                x0 = _row_x0(cs, plain)
+                row_pairs.append((y, plain, _spans_to_markdown(spans), x0))
+            # 第二階段:依 y 差距保留段落幾何資訊並切明顯段界
             if not row_pairs:
                 pages.append((i, []))
                 continue
-            # 合併差距 < 32pt 的行為同一段(line 段),> 32pt 切段
-            # (依實測:內文 wrap 行間距 15.5pt,段內空行 29.5pt,詞條間距 39-43pt,
-            #  故 32pt 為安全分界 — 只切明顯的視覺空行)
-            segments: list[list[tuple[str, str]]] = []
-            current: list[tuple[str, str]] = []
+            # 合併差距 <= 32pt 的行為同一視覺區塊；同時保留 gap_before，
+            # 讓後續以句末、結構及 x0 判斷 23-32pt 的邏輯段落邊界。
+            segments: list[list[Line]] = []
+            current: list[Line] = []
             prev_y: float | None = None
-            for y, plain, mk in row_pairs:
-                if prev_y is None or (y - prev_y) <= 32.0:
-                    current.append((plain, mk))
+            for y, plain, mk, x0 in row_pairs:
+                gap_before = 0.0 if prev_y is None else y - prev_y
+                line = (plain, mk, x0, gap_before)
+                if prev_y is None or gap_before <= 32.0:
+                    current.append(line)
                 else:
                     if current:
                         segments.append(current)
-                    current = [(plain, mk)]
+                    current = [line]
                 prev_y = y
             if current:
                 segments.append(current)
-            # 把段內行用 \n 串接,段間用 \n\n 標記 → 簡化:回傳 (plain_per_line, md_per_line)
-            # 但 build_chapters_and_html 用空行切段,需要 text 字串格式
-            # 改:把每行視為獨立 line_pair,加一個空 pair 標記段邊界
-            line_pairs: list[tuple[str, str]] = []
+            # 把每行視為獨立 Line,加一個空 Line 標記段邊界
+            line_pairs: list[Line] = []
             for seg in segments:
-                for plain, mk in seg:
-                    line_pairs.append((plain, mk))
-                # 段結尾加一個空 pair(空白 plain,空 markdown)作為「段分隔」標記
+                line_pairs.extend(seg)
+                # 段結尾加一個空 Line(空白 plain,空 markdown, x0=0)作為「段分隔」標記
                 if seg is not segments[-1]:
-                    line_pairs.append(("", ""))
+                    line_pairs.append(("", "", 0.0, 0.0))
             pages.append((i, line_pairs))
     return pages
 
@@ -443,6 +490,15 @@ def detect_chapter_for_page(pdf_page: int) -> int | None:
     return None
 
 
+def _line_parts(line: Line) -> tuple[str, str, float, float]:
+    """兼容既有三元組 fixture，統一回傳含 gap_before 的四元組。"""
+    if len(line) == 4:
+        plain, markdown, x0, gap_before = line
+        return plain, markdown, x0, gap_before
+    plain, markdown, x0 = line
+    return plain, markdown, x0, 0.0
+
+
 def _is_structural_line(text: str) -> bool:
     stripped = text.strip()
     return bool(
@@ -451,6 +507,7 @@ def _is_structural_line(text: str) -> bool:
         or H2_RE.match(stripped)
         or H3_RE.match(stripped)
         or SUBLABEL_RE.match(stripped)
+        or CAPITAL_TABLE_ITEM_RE.match(stripped)
         or re.match(
             r"^(?:[•·\-*]\s+|\([a-z]\)|\([ivx]+\)|\(\d+\)|"
             r"[一二三四五六七八九十]+[、.]|\d+\s+[一-鿿])",
@@ -459,17 +516,41 @@ def _is_structural_line(text: str) -> bool:
     )
 
 
+def _starts_logical_paragraph(
+    previous_plain: str,
+    current_plain: str,
+    current_x0: float,
+    gap_before: float,
+    next_x0: float | None,
+) -> bool:
+    """判斷同一視覺區塊內是否應開始新的邏輯段落。"""
+    current = current_plain.strip()
+    previous = previous_plain.strip()
+    if CAPITAL_TABLE_ITEM_RE.match(current):
+        return True
+    if gap_before < MEDIUM_PARAGRAPH_GAP:
+        return False
+    if previous.endswith(("。", "！", "？", "!", "?")):
+        return True
+    if SUBLABEL_RE.match(previous):
+        return True
+    if next_x0 is None:
+        return False
+    first_line_delta = current_x0 - next_x0
+    return FIRST_LINE_INDENT_MIN <= first_line_delta <= FIRST_LINE_INDENT_MAX
+
+
 def _merge_wrapped_heading_lines(
-    pages: list[tuple[int, list[tuple[str, str]]]],
-) -> list[tuple[int, list[tuple[str, str]]]]:
-    merged_pages: list[tuple[int, list[tuple[str, str]]]] = []
+    pages: list[tuple[int, list[Line]]],
+) -> list[tuple[int, list[Line]]]:
+    merged_pages: list[tuple[int, list[Line]]] = []
     for pdf_page, lines in pages:
-        merged_lines: list[tuple[str, str]] = []
+        merged_lines: list[Line] = []
         index = 0
         while index < len(lines):
-            plain, markdown = lines[index]
+            plain, markdown, x0, gap_before = _line_parts(lines[index])
             match = H3_RE.match(plain) or H2_RE.match(plain)
-            next_plain = lines[index + 1][0] if index + 1 < len(lines) else None
+            next_plain = _line_parts(lines[index + 1])[0] if index + 1 < len(lines) else None
             if match:
                 title = match.group(match.lastindex or 0).strip()
                 joined = join_wrapped_heading(
@@ -479,28 +560,28 @@ def _merge_wrapped_heading_lines(
                 )
                 if joined is not None:
                     prefix = plain[:match.start(match.lastindex or 0)]
-                    merged_lines.append((_WRAPPED_HEADING_MARKER + prefix + joined, markdown))
+                    merged_lines.append((_WRAPPED_HEADING_MARKER + prefix + joined, markdown, x0, gap_before))
                     index += 2
                     continue
-            merged_lines.append((plain, markdown))
+            merged_lines.append((plain, markdown, x0, gap_before))
             index += 1
         merged_pages.append((pdf_page, merged_lines))
     return merged_pages
 
 
-def _carry_pages(pages: list[tuple[int, list[tuple[str, str]]]]) -> set[int]:
+def _carry_pages(pages: list[tuple[int, list[Line]]]) -> set[int]:
     result: set[int] = set()
     for (pdf_page, lines), (next_page, next_lines) in zip(pages, pages[1:]):
         if next_page != pdf_page + 1 or next_page in CHAPTER_START_PAGES.values():
             continue
         if pdf_page >= 173:
             continue
-        current_visible = [plain.strip() for plain, _ in lines if plain.strip()]
-        next_visible = [plain.strip() for plain, _ in next_lines if plain.strip()]
+        current_visible = [_line_parts(line) for line in lines if _line_parts(line)[0].strip()]
+        next_visible = [_line_parts(line) for line in next_lines if _line_parts(line)[0].strip()]
         if not current_visible or not next_visible:
             continue
-        last_line = current_visible[-1]
-        first_next = next_visible[0]
+        last_line = current_visible[-1][0].strip()
+        first_next = next_visible[0][0].strip()
         if last_line.endswith(("。", "！", "？", "!", "?")):
             continue
         if _is_structural_line(first_next):
@@ -509,7 +590,7 @@ def _carry_pages(pages: list[tuple[int, list[tuple[str, str]]]]) -> set[int]:
     return result
 
 
-def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> tuple[list[dict], str, list[int]]:
+def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[dict], str, list[int]]:
     pages = _merge_wrapped_heading_lines(pages)
     carry_pages = _carry_pages(pages)
     chapters: list[dict] = []
@@ -519,19 +600,21 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
     current_h1_id: str | None = None
     current_h2_id: str | None = None
     current_h2_num: str | None = None
-    # pending_lines 存 markdown 編碼行(含格式標記)
-    pending_lines: list[str] = []
+    # pending_lines 存 (markdown, x0)，pending_plain_lines 保存相同實體行的純文字。
+    pending_lines: list[ParagraphLine] = []
+    pending_plain_lines: list[str] = []
 
     def flush_paragraph():
-        nonlocal pending_lines
+        nonlocal pending_lines, pending_plain_lines
         if pending_lines:
             is_sub7 = current_h1_id == "ch-7" and current_h2_id is None
             html_parts.append(render_paragraph(pending_lines, is_sub7))
             pending_lines = []
+            pending_plain_lines = []
 
     def flush_vocab():
         """辭彙表專用 flush:把累積的行用 CSS 兩欄排版呈現。"""
-        nonlocal pending_lines
+        nonlocal pending_lines, pending_plain_lines
         if not pending_lines:
             return
         # 分節標題偵測:整行只含 (一)(1)甲 等(可能後接章節編號)
@@ -542,7 +625,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
         )
         SUBSECTION_RE = re.compile(r"^\s*\[[^\]]+\]\s*$")
         items: list[str] = []
-        for line in pending_lines:
+        for line, _x0 in pending_lines:
             plain = re.sub(r"\x01[BI]\x01|[\x01/B\x01|\x01/I\x01]", "", line).strip()
             if not plain:
                 continue
@@ -559,6 +642,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
                 f'<div class="vocab-block">{"<br/>".join(items)}</div>'
             )
         pending_lines = []
+        pending_plain_lines = []
 
     NEW_PARA_START_RE = re.compile(
         r"^(\([a-z]\)|\([ivx]+\)|\(\d+\)|註[:：]|"
@@ -694,8 +778,9 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
         if pdf_page not in pdf_pages_seen:
             pdf_pages_seen.add(pdf_page)
 
-        # 逐行處理:plain 給 regex,markdown 進 pending
-        for plain, markdown in line_pairs:
+        # 逐行處理:plain 給 regex,markdown+x0 進 pending
+        normalized_lines = [_line_parts(line) for line in line_pairs]
+        for line_index, (plain, markdown, x0, gap_before) in enumerate(normalized_lines):
             if not plain:
                 # 空 pair = extract 偵測到的段分隔邊界 → flush 上一段
                 # 但辭彙表內空 pair 是詞條間距,不應切段
@@ -772,14 +857,39 @@ def build_chapters_and_html(pages: list[tuple[int, list[tuple[str, str]]]]) -> t
             is_bullet = bool(BULLET_RE.match(plain))
             is_sublabel = bool(SUBLABEL_RE.match(plain)) if current_h1_id != "apx-vocab" else False
             is_list_item = bool(LIST_ITEM_RE.match(plain)) and current_h1_id != "apx-vocab"
+            is_capital_item = bool(CAPITAL_TABLE_ITEM_RE.match(plain)) and current_h1_id != "apx-vocab"
+            next_x0 = None
+            for next_plain, _next_markdown, candidate_x0, _next_gap in normalized_lines[line_index + 1:]:
+                if next_plain.strip():
+                    next_x0 = candidate_x0
+                    break
+            is_geometry_boundary = bool(
+                pending_plain_lines
+                and current_h1_id != "apx-vocab"
+                and (
+                    (
+                        BULLET_RE.match(pending_plain_lines[0])
+                        and gap_before >= MEDIUM_PARAGRAPH_GAP
+                    )
+                    or _starts_logical_paragraph(
+                        pending_plain_lines[-1],
+                        plain,
+                        x0,
+                        gap_before,
+                        next_x0,
+                    )
+                )
+            )
             # 辭彙表內:把這些視為「分節標題」,不觸發任何 flush(由 flush_vocab 處理)
             # 但仍 append 進 pending,讓 flush_vocab 識別為 vocab-section
-            if (is_new_para or is_bullet or is_sublabel or is_list_item) and pending_lines:
+            if (is_new_para or is_bullet or is_sublabel or is_list_item
+                    or is_capital_item or is_geometry_boundary) and pending_lines:
                 if current_h1_id == "apx-vocab":
                     pass  # 不 flush,留給頁結束
                 else:
                     flush_paragraph()
-            pending_lines.append(markdown)
+            pending_lines.append((markdown, x0))
+            pending_plain_lines.append(plain)
         # 頁結束:只有語意段落確實終止時才 flush；跨頁續行保留整個 pending buffer。
         if pdf_page in carry_pages:
             continue
@@ -1177,13 +1287,12 @@ body {
 }
 :root.dark .content h4 { color: #d1d5db; }
 .content p { margin: 0 0 14px; font-size: 16px; }
-.content .handbook-indent-1 { text-indent: 2em; }
-.content .handbook-indent-2 { text-indent: 4em; }
-.content .handbook-indent-3 { text-indent: 6em; }
-/* a. / b. / c. 列舉項:相對於父級 (ii)/(iii) 再往右推 2em,顯示子層級。
-   同時覆寫 text-indent 並用 padding-left 處理 wrap 續行的對齊。 */
+.content .handbook-indent-1 { padding-left: 2em; }
+.content .handbook-indent-2 { padding-left: 4em; }
+.content .handbook-indent-3 { padding-left: 6em; }
+.content .handbook-first-line-indent { text-indent: 2em; }
+/* a. / b. / c. 列舉項:相對於父級 (ii)/(iii) 再往右推 2em,顯示子層級。 */
 .content p.handbook-list-item {
-  text-indent: 0;
   padding-left: 8em;
 }
 .content ul, .content ol { margin: 12px 0 14px; padding-left: 28px; }
@@ -1312,10 +1421,11 @@ body {
   .content h1 { font-size: 24px; }
   .content h2 { font-size: 20px; }
   .content h3 { font-size: 18px; }
-  .content .handbook-indent-1 { text-indent: 2em; }
-  .content .handbook-indent-2 { text-indent: 4em; }
-  .content .handbook-indent-3 { text-indent: 6em; }
-  .content p.handbook-list-item { text-indent: 0; padding-left: 8em; }
+  .content .handbook-indent-1 { padding-left: 1em; }
+  .content .handbook-indent-2 { padding-left: 2em; }
+  .content .handbook-indent-3 { padding-left: 3em; }
+  .content .handbook-first-line-indent { text-indent: 1em; }
+  .content p.handbook-list-item { padding-left: 8em; }
   .vocab-block { column-count: 1; }
   .back-to-top { right: 16px; bottom: 16px; }
 }

@@ -2,7 +2,9 @@ import unittest
 
 from scripts.build_handbook import (
     _split_long_paragraph as split_p1_paragraph,
+    _row_x0,
     build_chapters_and_html as build_p1,
+    render_paragraph as render_p1_paragraph,
 )
 from scripts.build_handbook_p3 import (
     _indent_level,
@@ -13,6 +15,16 @@ from scripts.build_handbook_p3 import (
 
 
 class HandbookIndentTest(unittest.TestCase):
+    def test_p1_ignores_leading_pdf_spaces_for_structural_items(self) -> None:
+        chars = [
+            {"text": " ", "x0": 68.06},
+            {"text": " ", "x0": 104.06},
+            {"text": "(", "x0": 131.06},
+            {"text": "i", "x0": 136.33},
+        ]
+        self.assertEqual(_row_x0(chars, "(i) 識別；"), 131.06)
+        self.assertEqual(_row_x0(chars, "視乎使用時的場合"), 68.06)
+
     def test_pdf_x_positions_map_to_bounded_indent_levels(self) -> None:
         self.assertEqual(_indent_level(68.1), 0)
         self.assertEqual(_indent_level(104.8), 1)
@@ -76,6 +88,12 @@ class HandbookIndentTest(unittest.TestCase):
         html = "</p><p>".join(chunks)
         self.assertNotIn("<strong>3.</strong></p><p><strong>2</strong>", html)
         self.assertIn("<strong>3.</strong><strong>2</strong>）。", html)
+
+    def test_sentence_end_keeps_following_closing_parenthesis(self) -> None:
+        inner_html = "甲" * 130 + "保險工具其中的一類。）"
+        chunks = split_p1_paragraph(inner_html)
+        self.assertEqual(len(chunks), 1)
+        self.assertTrue(chunks[0].endswith("一類。）"))
 
     def test_consecutive_periods_are_not_split(self) -> None:
         inner_html = "甲" * 130 + "都會說「是的，不過.....」。換句話說。"
@@ -181,16 +199,108 @@ class HandbookIndentTest(unittest.TestCase):
 
     def test_p1_merges_ascii_wrapped_heading(self) -> None:
         pages = [(57, [
-            ("第五章 測試", "第五章 測試"),
-            ("5.5 測試", "5.5 測試"),
-            ("5.5.1 香港保險業聯會（Hong Kong Federation of Insurers", "5.5.1 香港保險業聯會（Hong Kong Federation of Insurers"),
-            ("(“HKFI”))", "(“HKFI”))"),
-            ("正文。", "正文。"),
+            ("第五章 測試", "第五章 測試", 68.1),
+            ("5.5 測試", "5.5 測試", 68.1),
+            ("5.5.1 香港保險業聯會（Hong Kong Federation of Insurers", "5.5.1 香港保險業聯會（Hong Kong Federation of Insurers", 68.1),
+            ("(“HKFI”))", "(“HKFI”))", 104.8),
+            ("正文。", "正文。", 68.1),
         ])]
         chapters, html, _ = build_p1(pages)
         title = next(ch["title"] for ch in chapters if ch["id"] == "ch-5-5-1")
         self.assertIn("Insurers (“HKFI”))", title)
         self.assertNotIn(">(“HKFI”))</p>", html)
+
+    def test_p1_keeps_normal_wrapped_lines_in_one_paragraph(self) -> None:
+        pages = [(10, [
+            ("第一章 測試", "第一章 測試", 68.1, 0.0),
+            ("不少人嘗試給風險下定義，", "不少人嘗試給風險下定義，", 68.06, 15.5),
+            ("風險帶有損失或危險的意思，", "風險帶有損失或危險的意思，", 104.06, 15.5),
+            ("並與潛在損失有關。", "並與潛在損失有關。", 104.06, 15.5),
+        ])]
+        _, html, _ = build_p1(pages)
+        self.assertIn("不少人嘗試給風險下定義，風險帶有損失或危險的意思，並與潛在損失有關。", html)
+
+    def test_p1_keeps_large_hanging_wrap_in_one_paragraph(self) -> None:
+        pages = [(10, [
+            ("第一章 測試", "第一章 測試", 68.1, 0.0),
+            ("(a) 財務上的，例如，一", "(a) 財務上的，例如，一", 105.14, 15.5),
+            ("部照相機被偷走；", "部照相機被偷走；", 309.07, 15.5),
+        ])]
+        _, html, _ = build_p1(pages)
+        self.assertIn("(a) 財務上的，例如，一部照相機被偷走；", html)
+
+    def test_p1_splits_completed_paragraph_at_medium_pdf_gap(self) -> None:
+        pages = [(10, [
+            ("第一章 測試", "第一章 測試", 68.1, 0.0),
+            ("(ii) 投機風險可能有兩種結果。", "(ii) 投機風險可能有兩種結果。", 153.14, 15.5),
+            ("商業保險人所承保的風險主要是純粹風險。", "商業保險人所承保的風險主要是純粹風險。", 195.65, 25.5),
+            ("投機風險一般是不可保的。", "投機風險一般是不可保的。", 153.14, 15.5),
+        ])]
+        _, html, _ = build_p1(pages)
+        self.assertIn("結果。</p>\n<p", html)
+        self.assertNotIn("結果。商業保險人", html)
+
+    def test_p1_splits_sublabel_from_body_at_medium_pdf_gap(self) -> None:
+        pages = [(10, [
+            ("第一章 測試", "第一章 測試", 68.1, 0.0),
+            ("1.1.2a 財務後果", "1.1.2a 財務後果", 152.06, 15.5),
+            ("風險可分為純粹風險和投機風險：", "風險可分為純粹風險和投機風險：", 68.06, 25.5),
+        ])]
+        _, html, _ = build_p1(pages)
+        self.assertIn("財務後果</p>\n<p>風險可分為", html)
+        self.assertNotIn("財務後果風險可分為", html)
+
+    def test_p1_uses_block_and_first_line_indent_separately(self) -> None:
+        html = render_p1_paragraph(
+            [("商業保險人所承保的風險主要是純粹風險。", 195.65), ("投機風險一般是不可保的。", 153.14)],
+            False,
+        )
+        self.assertEqual(
+            html,
+            '<p class="handbook-indent-2 handbook-first-line-indent">商業保險人所承保的風險主要是純粹風險。投機風險一般是不可保的。</p>',
+        )
+
+    def test_p1_splits_capital_letter_table_items(self) -> None:
+        pages = [(57, [
+            ("第五章 測試", "第五章 測試", 68.1, 0.0),
+            ("A 人壽及年金 - 人壽保險及年金。", "A 人壽及年金 - 人壽保險及年金。", 146.42, 15.5),
+            ("B 婚姻及出生 - 這種保險合約在出", "B 婚姻及出生 - 這種保險合約在出", 146.42, 15.5),
+            ("生時提供利益。", "生時提供利益。", 305.71, 15.5),
+        ])]
+        _, html, _ = build_p1(pages)
+        self.assertIn("年金。</p>\n<p", html)
+        self.assertIn("B 婚姻及出生 - 這種保險合約在出生時提供利益。", html)
+
+    def test_p1_does_not_split_medium_gap_without_boundary_signal(self) -> None:
+        pages = [(10, [
+            ("第一章 測試", "第一章 測試", 68.1, 0.0),
+            ("尚未完成的句子", "尚未完成的句子", 104.06, 15.5),
+            ("仍然是同一段內容", "仍然是同一段內容", 104.06, 25.5),
+        ])]
+        _, html, _ = build_p1(pages)
+        self.assertIn("尚未完成的句子仍然是同一段內容", html)
+
+    def test_p1_splits_bullet_after_wrapped_previous_bullet(self) -> None:
+        pages = [(12, [
+            ("第一章 測試", "第一章 測試", 68.1, 0.0),
+            ("- 風險轉移： 把某項損失風險從一方轉移", "- 風險轉移： 把某項損失風險從一方轉移", 173.3, 15.5),
+            ("到另一方身上；", "到另一方身上；", 272.81, 15.5),
+            ("- 風險融資： 無論損失控制措施如何有效。", "- 風險融資： 無論損失控制措施如何有效。", 168.02, 29.5),
+            ("其後仍有剩餘風險。", "其後仍有剩餘風險。", 272.81, 15.5),
+        ])]
+        _, html, _ = build_p1(pages)
+        self.assertIn(
+            '<p class="handbook-indent-3">- 風險融資： 無論損失控制措施如何有效。其後仍有剩餘風險。</p>',
+            html,
+        )
+        self.assertNotIn("到另一方身上；- 風險融資", html)
+
+    def test_p1_bullet_list_preserves_parent_indent(self) -> None:
+        html = render_p1_paragraph([("- 洽談或安排保險合約；", 138.98)], False)
+        self.assertEqual(
+            html,
+            '<ul class="handbook-indent-2"><li>洽談或安排保險合約；</li></ul>',
+        )
 
     def test_closed_heading_does_not_consume_body(self) -> None:
         pages = [(42, [

@@ -72,6 +72,7 @@ def split_long_paragraph(
     hard_limit: int,
     soft_bad_lead: str,
 ) -> list[str]:
+    closing_punctuation = "）)]」』”’》〉】〕〗〙〛"
     def total_visible(s: str) -> int:
         text = re.sub(r"</?[^>]+>", "", s)
         text = re.sub(r"&[a-zA-Z#0-9]+;", "X", text)
@@ -131,6 +132,11 @@ def split_long_paragraph(
                 should_split = False
             elif visible_length >= soft_min:
                 should_split = True
+
+        if should_split:
+            next_visible = _next_visible_char(inner_html, i)
+            if next_visible and next_visible in closing_punctuation:
+                should_split = False
 
         if should_split:
             close = "".join(f"</{tag}>" for tag in reversed(stack))
