@@ -20,6 +20,7 @@ export type HandbookData = {
   slug: string;
   title: string;
   version: string;
+  language?: string;
   chapters: ChapterEntry[];
   html: string;             // 預渲染的內文 HTML(含章節錨點)
   pdfPageStarts: number[];

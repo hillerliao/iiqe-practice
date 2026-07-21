@@ -906,7 +906,15 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
     return chapters, "\n".join(html_parts), sorted(CHAPTER_START_PAGES.values())
 
 
-def make_offline_html(title: str, version: str, chapters: list[dict], body_html: str) -> str:
+def make_offline_html(
+    title: str,
+    version: str,
+    chapters: list[dict],
+    body_html: str,
+    *,
+    language: str = "zh-Hant",
+    labels: dict[str, str] | None = None,
+) -> str:
     """單檔離線預覽 — 「迷你主站」風格:
 
     ┌─ sticky 半透明 header (top-0, h-14) ─────────────────────────────────┐
@@ -920,6 +928,25 @@ def make_offline_html(title: str, version: str, chapters: list[dict], body_html:
     - 返回頂部:右下方圓形按鈕,捲動後出現,rounded-full 對齊主站風格
     - 配色用 CSS variables,值與 globals.css 的 oklch 同步
     """
+    ui = {
+        "brand": "IIQE 做题家",
+        "home": "返回首頁",
+        "handbook": "研習手冊：",
+        "open_toc": "開啟目錄",
+        "toc": "目錄",
+        "switch_theme": "切換主題",
+        "theme": "主題",
+        "light": "淺色",
+        "light_desc": "固定使用淺色模式",
+        "dark": "深色",
+        "dark_desc": "固定使用深色模式",
+        "system": "跟隨系統",
+        "system_desc": "依作業系統設定自動切換",
+        "back_to_top": "返回頂部",
+    }
+    if labels:
+        ui.update(labels)
+
     nav_items: list[str] = []
     for ch in chapters:
         lvl = ch["level"]
@@ -1564,7 +1591,7 @@ body {
     }
 
     return f"""<!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="{esc(language)}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1575,49 +1602,49 @@ body {
 <body>
 <header class="app-header">
   <div class="app-header-inner">
-    <a href="/" class="app-logo" title="返回首頁">
+    <a href="/" class="app-logo" title="{esc(ui['home'])}">
       {icons["book"]}
-      <span>IIQE 做题家</span>
+      <span>{esc(ui['brand'])}</span>
     </a>
     <span class="app-title">
-      研習手冊：<b>{esc(title)}</b>{version_badge}
+      {esc(ui['handbook'])}<b>{esc(title)}</b>{version_badge}
     </span>
     <div class="app-actions">
-      <button type="button" id="menu-toggle" class="icon-btn" aria-label="開啟目錄" title="目錄">
+      <button type="button" id="menu-toggle" class="icon-btn" aria-label="{esc(ui['open_toc'])}" title="{esc(ui['toc'])}">
         {icons["menu"]}
       </button>
       <div class="theme-dropdown">
-        <button type="button" id="theme-btn" class="icon-btn" aria-haspopup="menu" aria-label="切換主題" title="主題">
+        <button type="button" id="theme-btn" class="icon-btn" aria-haspopup="menu" aria-label="{esc(ui['switch_theme'])}" title="{esc(ui['theme'])}">
           {icons["sun"]}
         </button>
         <div class="theme-menu" id="theme-menu">
           <button type="button" class="theme-option" data-value="light" role="menuitemradio">
             {icons["sun"]}
             <span class="theme-option-text">
-              <span class="theme-option-label">淺色</span>
-              <span class="theme-option-desc">固定使用淺色模式</span>
+              <span class="theme-option-label">{esc(ui['light'])}</span>
+              <span class="theme-option-desc">{esc(ui['light_desc'])}</span>
             </span>
             <span class="theme-option-dot" aria-hidden="true"></span>
           </button>
           <button type="button" class="theme-option" data-value="dark" role="menuitemradio">
             {icons["moon"]}
             <span class="theme-option-text">
-              <span class="theme-option-label">深色</span>
-              <span class="theme-option-desc">固定使用深色模式</span>
+              <span class="theme-option-label">{esc(ui['dark'])}</span>
+              <span class="theme-option-desc">{esc(ui['dark_desc'])}</span>
             </span>
             <span class="theme-option-dot" aria-hidden="true"></span>
           </button>
           <button type="button" class="theme-option" data-value="system" role="menuitemradio">
             {icons["monitor"]}
             <span class="theme-option-text">
-              <span class="theme-option-label">跟隨系統</span>
-              <span class="theme-option-desc">依作業系統設定自動切換</span>
+              <span class="theme-option-label">{esc(ui['system'])}</span>
+              <span class="theme-option-desc">{esc(ui['system_desc'])}</span>
             </span>
             <span class="theme-option-dot" aria-hidden="true"></span>
           </button>
         </div>
       </div>
-      <a href="/" class="icon-btn" aria-label="返回首頁" title="返回首頁">
+      <a href="/" class="icon-btn" aria-label="{esc(ui['home'])}" title="{esc(ui['home'])}">
         {icons["external"]}
       </a>
     </div>
@@ -1625,7 +1652,7 @@ body {
 </header>
 <div class="layout" id="top">
   <aside class="sidebar">
-    <h2>目錄</h2>
+    <h2>{esc(ui['toc'])}</h2>
     <nav><ul>
 {nav_html}
     </ul></nav>
@@ -1634,7 +1661,7 @@ body {
 {body_html}
   </main>
 </div>
-<button type="button" id="back-to-top" class="back-to-top" aria-label="返回頂部" title="返回頂部">
+<button type="button" id="back-to-top" class="back-to-top" aria-label="{esc(ui['back_to_top'])}" title="{esc(ui['back_to_top'])}">
   {icons["arrowUp"]}
 </button>
 <script>{runtime_script}</script>
