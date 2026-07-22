@@ -1,9 +1,8 @@
-"""Rebuild IIQE 2025 mock-question JSON from PDF word coordinates.
+"""Rebuild IIQE 2025 mock-question JSON from physical PDF table rows.
 
-The PDF is a table whose question number/reference/answer cells are vertically
-interleaved with question and option text.  This tool extracts words with
-pdfplumber, groups them into visual lines, removes table-only cells by their
-x-coordinate, and reconstructs questions from a/b/c/d option boundaries.
+Each numbered source-table row is one authoritative question boundary. The
+parser extracts the row's number, reference, question content, and answer cells
+independently, then splits the question cell at ordered a/b/c/d markers.
 
 Run an audit before modifying data:
   python scripts/rebuild_mock_pdfs.py --audit-only
@@ -11,7 +10,7 @@ Then rebuild after audit validation succeeds:
   python scripts/rebuild_mock_pdfs.py --rebuild
 
 The audit JSON records source hashes, parser diagnostics, source/current answer
-conflicts, and validation results.  It is intentionally a tracked, reproducible
+conflicts, and validation results. It is intentionally a tracked, reproducible
 artifact rather than a temporary extraction file.
 """
 
@@ -19,10 +18,12 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
+import platform
 import re
+import sys
 from collections import Counter
-from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -55,193 +56,195 @@ SOURCES = (
 )
 
 
-@dataclass
-class VisualLine:
-    """A horizontal PDF text line, ordered by its visual y position."""
-
-    page: int
-    top: float
-    words: list[dict[str, Any]]
-
-    @property
-    def text(self) -> str:
-        return " ".join(word["text"] for word in sorted(self.words, key=lambda word: word["x0"]))
-
-
-@dataclass
-class ParsedQuestion:
-    number: int | None = None
-    ref: str | None = None
-    answer: str | None = None
-    page: int | None = None
-    stem_lines: list[str] = field(default_factory=list)
-    options: dict[str, list[str]] = field(default_factory=lambda: {letter: [] for letter in "abcd"})
-    active_option: str | None = None
-
-    def append_text(self, text: str) -> None:
-        if not text:
-            return
-        if self.active_option is None:
-            self.stem_lines.append(text)
-        else:
-            self.options[self.active_option].append(text)
-
-    def as_source_dict(self) -> dict[str, Any]:
-        return {
-            "number": self.number,
-            "ref": self.ref,
-            "question": join_text(self.stem_lines),
-            "options": {letter: join_text(self.options[letter]) for letter in "abcd"},
-            "answer": self.answer.lower() if self.answer else None,
-            "page": self.page,
-        }
-
-
 def join_text(parts: Iterable[str]) -> str:
     """Normalize PDF line breaks without changing text content or punctuation."""
     return re.sub(r"\s+", " ", " ".join(part.strip() for part in parts if part.strip())).strip()
 
 
-def group_visual_lines(words: list[dict[str, Any]], page_number: int) -> list[VisualLine]:
-    """Group words by nearby y-coordinate, preserving distinct table rows.
+def extract_cell_words(
+    page: Any,
+    cell: tuple[float, float, float, float] | None,
+) -> list[dict[str, Any]]:
+    """Extract words contained in one physical table cell."""
+    if cell is None:
+        return []
+    return page.crop(cell).extract_words(use_text_flow=False, keep_blank_chars=False)
 
-    The source has line fragments at slightly different baselines.  A 1.5 point
-    tolerance joins normal text but keeps the number/ref/answer cells distinct
-    when they are intentionally placed on adjacent visual rows.
-    """
-    lines: list[VisualLine] = []
-    for word in sorted(words, key=lambda word: (word["top"], word["x0"])):
-        if lines and abs(word["top"] - lines[-1].top) <= 1.5:
-            lines[-1].words.append(word)
+
+def join_lines(parts: Iterable[str]) -> str:
+    """Join physical PDF line wraps while preserving semantic list spacing."""
+    result = ""
+    for part in (part.strip() for part in parts if part.strip()):
+        if result and re.match(
+            r"^(?:[ivx]+(?:[.)]|\s|(?=[\u3400-\u9fff]))|[①-⑳])",
+            part,
+            re.IGNORECASE,
+        ):
+            result += " "
+        result += part
+    return result
+
+
+def normalize_pdf_spacing(text: str) -> str:
+    """Remove extraction-only spaces inserted between adjacent Chinese text."""
+    return re.sub(r"(?<=[\u3400-\u9fff]) (?=[\u3400-\u9fff])", "", text)
+
+
+def cell_text(
+    page: Any,
+    cell: tuple[float, float, float, float] | None,
+) -> str:
+    """Return normalized text from one physical table cell."""
+    words = extract_cell_words(page, cell)
+    lines = group_visual_lines(words)
+    return normalize_pdf_spacing(join_lines(line_text(line) for line in lines))
+
+
+def group_visual_lines(words: list[dict[str, Any]]) -> list[list[dict[str, Any]]]:
+    """Group cell words by nearby y-coordinate in visual reading order."""
+    lines: list[list[dict[str, Any]]] = []
+    line_tops: list[float] = []
+    for word in sorted(words, key=lambda item: (item["top"], item["x0"])):
+        if lines and abs(word["top"] - line_tops[-1]) <= 1.5:
+            lines[-1].append(word)
         else:
-            lines.append(VisualLine(page=page_number, top=word["top"], words=[word]))
+            lines.append([word])
+            line_tops.append(word["top"])
     return lines
 
 
-def is_header(line: VisualLine) -> bool:
-    text = line.text
+def line_text(words: list[dict[str, Any]]) -> str:
+    return join_text(word["text"] for word in sorted(words, key=lambda item: item["x0"]))
+
+
+def split_question_content(
+    words: list[dict[str, Any]],
+) -> tuple[str, dict[str, str], list[str]]:
+    """Split one question cell at its ordered, line-leading option markers."""
+    errors: list[str] = []
+    sections: dict[str, list[str]] = {"question": []}
+    sections.update({letter: [] for letter in "abcd"})
+    active = "question"
+    markers: list[str] = []
+
+    for line in group_visual_lines(words):
+        text = line_text(line)
+        match = OPTION_RE.match(text)
+        if match:
+            letter = match.group(1).lower()
+            markers.append(letter)
+            active = letter
+            remainder = match.group(2).strip()
+            if remainder:
+                sections[active].append(remainder)
+        elif text:
+            sections[active].append(text)
+
+    if markers != list("abcd"):
+        errors.append(f"option markers are {markers!r}, expected ['a', 'b', 'c', 'd']")
+
     return (
-        "模擬試題2025年版" in text
-        or text in {"試卷一", "試卷㇐", "試卷三", "⾧期保險", "I I Q E"}
-        or ("題號" in text and "參考章節" in text)
+        normalize_pdf_spacing(join_lines(sections["question"])),
+        {
+            letter: normalize_pdf_spacing(join_lines(sections[letter]))
+            for letter in "abcd"
+        },
+        errors,
     )
 
 
-def extract_anchor(lines: list[VisualLine], index: int) -> tuple[int, str, str | None] | None:
-    """Read number/reference/answer from their dedicated table columns.
+def parse_question_row(
+    page: Any,
+    page_number: int,
+    cells: list[tuple[float, float, float, float] | None],
+) -> tuple[dict[str, Any] | None, list[str]]:
+    """Parse one numbered physical table row without reading adjacent rows."""
+    if len(cells) != 5:
+        return None, [f"page {page_number}: row has {len(cells)} cells, expected 5"]
 
-    Most records place all three cells on one baseline. A few source records
-    wrap the reference cell immediately above and/or below the number cell, so
-    nearby reference-column fragments are joined by y-coordinate as well.
-    """
-    line = lines[index]
-    left = [word["text"] for word in line.words if word["x0"] < 60]
-    number = next((int(text) for text in left if NUMBER_RE.fullmatch(text)), None)
-    if number is None:
-        return None
+    number_text = cell_text(page, cells[0]).replace(" ", "")
+    if not NUMBER_RE.fullmatch(number_text):
+        # Every source page repeats one non-numbered table header row.
+        return None, []
 
-    reference_words: list[dict[str, Any]] = []
-    for nearby in lines:
-        if abs(nearby.top - line.top) <= 8:
-            reference_words.extend(word for word in nearby.words if 60 <= word["x0"] < 135)
-    ref = join_text(word["text"] for word in sorted(reference_words, key=lambda word: (word["top"], word["x0"])))
-    right = [word["text"] for word in line.words if word["x0"] >= 500]
-    answer = next((text for text in right if ANSWER_RE.fullmatch(text)), None)
-    if not ref or not REF_RE.fullmatch(ref.replace(" ", "")):
-        return None
-    return number, ref, answer
+    number = int(number_text)
+    ref = cell_text(page, cells[1])
+    stem, options, content_errors = split_question_content(extract_cell_words(page, cells[2]))
 
+    answer_tokens: list[str] = []
+    for answer_cell in cells[3:]:
+        answer_tokens.extend(
+            word["text"].strip()
+            for word in extract_cell_words(page, answer_cell)
+            if word["text"].strip()
+        )
+    answers = [token.upper() for token in answer_tokens if ANSWER_RE.fullmatch(token.upper())]
 
-def content_text(line: VisualLine, anchor: tuple[int, str, str | None] | None) -> str:
-    """Return visible question-column text after removing table-cell metadata."""
-    kept = []
-    for word in sorted(line.words, key=lambda word: word["x0"]):
-        # The narrow left table columns carry number/reference fragments. The
-        # only legitimate question text there is an option marker on page 2.
-        if word["x0"] < 60 or word["x0"] >= 500:
-            continue
-        if 60 <= word["x0"] < 135 and not OPTION_RE.match(word["text"]):
-            continue
-        kept.append(word["text"])
-    return join_text(kept)
+    errors = [f"page {page_number}, question {number}: {error}" for error in content_errors]
+    if len(answers) != 1:
+        errors.append(
+            f"page {page_number}, question {number}: found answers {answers!r}, expected exactly one"
+        )
 
-
-def starts_new_question(question: ParsedQuestion, text: str) -> bool:
-    """Return whether content follows a completed d) option.
-
-    A table anchor occurs in the middle of a question, between option rows. The
-    d)-to-next-stem transition is consequently the dependable record boundary.
-
-    However, option d text may wrap to a second visual line in the PDF. Such
-    continuations are short fragments without question markers, so we exclude
-    them from triggering a new question.
-    """
-    if question.active_option != "d" or not text:
-        return False
-    # If option d's accumulated text ends abruptly (mid-word), the next line is
-    # likely a continuation rather than a new question stem.
-    option_d_text = join_text(question.options["d"])
-    if option_d_text and option_d_text[-1] in "不另至因而或及的於與和但卻又且並乃即若如雖因由自到來去起過著得地之其此該各每某別向對把被將從以素金員權力資格":
-        return False
-    # Short fragments without question punctuation are likely continuations.
-    if len(text) <= 15 and not re.search(r"[？?：:]", text):
-        return False
-    return True
-
-
-def consume_content(question: ParsedQuestion, text: str) -> None:
-    """Append a line, splitting at a leading a/b/c/d option marker."""
-    if not text:
-        return
-    match = OPTION_RE.match(text)
-    if match:
-        question.active_option = match.group(1).lower()
-        question.append_text(match.group(2).strip())
-    else:
-        question.append_text(text)
+    return (
+        {
+            "number": number,
+            "ref": ref,
+            "question": stem,
+            "options": options,
+            "answer": answers[0].lower() if len(answers) == 1 else None,
+            "page": page_number,
+        },
+        errors,
+    )
 
 
 def parse_pdf(pdf_path: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    """Extract numbered questions in source order, including cross-page content."""
+    """Extract each question from its authoritative physical table row."""
     questions: list[dict[str, Any]] = []
-    current: ParsedQuestion | None = None
-    diagnostics: dict[str, Any] = {"pages": 0, "anchors": [], "orphan_content": []}
+    diagnostics: dict[str, Any] = {
+        "pages": 0,
+        "tablePages": 0,
+        "tables": 0,
+        "rows": 0,
+        "dataRows": 0,
+        "structureErrors": [],
+        "questionPageRanges": [],
+    }
 
     with pdfplumber.open(pdf_path) as pdf:
         diagnostics["pages"] = len(pdf.pages)
         for page_number, page in enumerate(pdf.pages, start=1):
-            visual_lines = group_visual_lines(page.extract_words(use_text_flow=False, keep_blank_chars=False), page_number)
-            for line_index, line in enumerate(visual_lines):
-                if is_header(line):
-                    continue
-                anchor = extract_anchor(visual_lines, line_index)
-                text = content_text(line, anchor)
+            tables = page.find_tables()
+            diagnostics["tables"] += len(tables)
+            if tables:
+                diagnostics["tablePages"] += 1
+            if len(tables) > 1:
+                diagnostics["structureErrors"].append(
+                    f"page {page_number}: found {len(tables)} tables, expected at most one"
+                )
 
-                # The next ordinary content after d) starts the following
-                # question. Keeping state across pages handles continuations.
-                if current is not None and starts_new_question(current, text):
-                    questions.append(current.as_source_dict())
-                    current = ParsedQuestion()
-                if current is None:
-                    current = ParsedQuestion()
+            for table in tables:
+                diagnostics["rows"] += len(table.rows)
+                for row in table.rows:
+                    question, errors = parse_question_row(page, page_number, list(row.cells))
+                    diagnostics["structureErrors"].extend(errors)
+                    if question is None:
+                        continue
+                    diagnostics["dataRows"] += 1
+                    page_ranges = diagnostics["questionPageRanges"]
+                    if page_ranges and page_ranges[-1]["page"] == page_number:
+                        page_ranges[-1]["lastQuestion"] = question["number"]
+                    else:
+                        page_ranges.append(
+                            {
+                                "page": page_number,
+                                "firstQuestion": question["number"],
+                                "lastQuestion": question["number"],
+                            }
+                        )
+                    questions.append(question)
 
-                if anchor:
-                    number, ref, answer = anchor
-                    if current.number is not None:
-                        diagnostics["orphan_content"].append(current.as_source_dict())
-                        current = ParsedQuestion()
-                    current.number = number
-                    current.ref = ref
-                    current.answer = answer
-                    current.page = page_number
-                    diagnostics["anchors"].append({"number": number, "page": page_number, "ref": ref})
-                if text:
-                    consume_content(current, text)
-
-    if current is not None and current.number is not None:
-        questions.append(current.as_source_dict())
-    elif current is not None and (current.stem_lines or any(current.options.values())):
-        diagnostics["orphan_content"].append(current.as_source_dict())
     return questions, diagnostics
 
 
@@ -322,24 +325,25 @@ def sha256(path: Path) -> str:
 def audit_one(source_config: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     source_questions, diagnostics = parse_pdf(source_config["pdf"])
     current = load_current(source_config["target"])
-    validation_errors = validate_source(source_questions, source_config["expected_count"])
+    validation_errors = list(diagnostics["structureErrors"])
+    validation_errors.extend(validate_source(source_questions, source_config["expected_count"]))
     rebuilt, conflicts = reconstruct(source_questions, current, source_config["paper"])
     validation_errors.extend(compare_reparsed(rebuilt, source_questions))
     source_answers = Counter(question["answer"] is not None for question in source_questions)
     return (
         {
             "paper": source_config["paper"],
-            "sourcePdf": str(source_config["pdf"]),
+            "sourcePdf": source_config["pdf"].name,
             "sourcePdfSha256": sha256(source_config["pdf"]),
-            "target": str(source_config["target"]),
+            "target": str(source_config["target"].relative_to(ROOT)).replace("\\", "/"),
             "expectedCount": source_config["expected_count"],
             "currentCount": len(current),
             "extractedCount": len(source_questions),
             "sourceAnswerAvailability": {"available": source_answers[True], "unavailable": source_answers[False]},
             "answerConflicts": conflicts,
             "validationErrors": validation_errors,
-            "valid": not validation_errors,
-            "anchorPages": diagnostics["anchors"],
+            "valid": not validation_errors and not conflicts,
+            "diagnostics": diagnostics,
         },
         rebuilt,
     )
@@ -352,7 +356,26 @@ def main() -> None:
     action.add_argument("--rebuild", action="store_true", help="write validated reconstructed mock datasets")
     args = parser.parse_args()
 
-    audit: dict[str, Any] = {"parser": str(Path(__file__).relative_to(ROOT)), "method": "pdfplumber word coordinates", "papers": []}
+    audit: dict[str, Any] = {
+        "parser": str(Path(__file__).relative_to(ROOT)).replace("\\", "/"),
+        "parserSha256": sha256(Path(__file__)),
+        "method": "pdfplumber physical table rows and cells",
+        "parameters": {
+            "tableDetection": "page.find_tables() defaults",
+            "wordExtraction": {
+                "use_text_flow": False,
+                "keep_blank_chars": False,
+            },
+            "visualLineTolerance": 1.5,
+        },
+        "environment": {
+            "python": sys.version.split()[0],
+            "platform": platform.platform(),
+            "pdfplumber": importlib.metadata.version("pdfplumber"),
+            "pdfminer.six": importlib.metadata.version("pdfminer.six"),
+        },
+        "papers": [],
+    }
     rebuilt_by_target: list[tuple[Path, list[dict[str, Any]]]] = []
     for source_config in SOURCES:
         paper_audit, rebuilt = audit_one(source_config)
@@ -365,9 +388,10 @@ def main() -> None:
     for paper in audit["papers"]:
         print(f"{paper['paper']}: {paper['extractedCount']}/{paper['expectedCount']} extracted; valid={paper['valid']}; answer conflicts={len(paper['answerConflicts'])}")
 
+    if not audit["valid"]:
+        raise SystemExit("Audit validation failed")
+
     if args.rebuild:
-        if not audit["valid"]:
-            raise SystemExit("Refusing rebuild: audit validation failed")
         for target, records in rebuilt_by_target:
             target.write_text(json.dumps(records, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             print(f"Rebuilt: {target} ({len(records)} records)")

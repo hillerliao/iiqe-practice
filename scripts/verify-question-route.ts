@@ -21,8 +21,13 @@ async function main(): Promise<void> {
   assert.equal(validBody.question.id, "P3-mock-106");
   assert.equal(validBody.question.answer, "b");
 
-  await expectJson(await getQuestion("P1-exam-117"), 404, { error: "Question not found" });
-  await expectJson(await getQuestion("P1-mock-594"), 404, { error: "Question not found" });
+  for (const id of ["P1-exam-117", "P1-mock-594"] as const) {
+    const response = await getQuestion(id);
+    assert.equal(response.status, 200);
+    const body = await response.json() as { question: { id: string; answer: string } };
+    assert.equal(body.question.id, id);
+    assert.equal(["a", "b", "c", "d"].includes(body.question.answer), true);
+  }
   await expectJson(await getQuestion("missing-question"), 404, { error: "Question not found" });
   await expectJson(await getQuestion(), 400, { error: "id 必填" });
 

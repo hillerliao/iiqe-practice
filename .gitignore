@@ -105,6 +105,7 @@ scripts/p3_clean.json
 scripts/_mock_*.txt
 scripts/test_question_*.mts
 !scripts/test_question_data.mts
+!scripts/test_question_statements.mts
 GIT_PUSH_REVIEW_*.md
 .cache_paper1.json
 .cache-prod-*.db-shm
