@@ -28,7 +28,7 @@ export async function PATCH(req: NextRequest) {
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   if (!("autoAdvanceDelayMs" in body) || !isAutoAdvanceDelay(body.autoAdvanceDelayMs)) {
     return NextResponse.json(
-      { error: "autoAdvanceDelayMs 只允許 1000、10000 或 null" },
+      { error: "autoAdvanceDelayMs 只允許 1000、20000 或 null" },
       { status: 400 },
     );
   }

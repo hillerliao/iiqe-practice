@@ -739,22 +739,22 @@ function PracticeInner() {
               className={cn(
                 "mt-4 p-4 rounded-lg border max-h-[45vh] overflow-y-auto",
                 isCorrect
-                  ? "bg-green-50 border-green-200"
-                  : "bg-red-50 border-red-200"
+                  ? "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800"
+                  : "bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800"
               )}
             >
               <p className="text-sm font-medium mb-1">
                 {isCorrect ? (
-                  <span className="text-green-700">
+                  <span className="text-green-700 dark:text-green-300">
                     ✓ 答對了
                     {autoNextCountdown != null && (
-                      <span className="text-green-600 ml-2">
+                      <span className="text-green-600 dark:text-green-400 ml-2">
                         （{autoNextCountdown} 秒後進入下一題）
                       </span>
                     )}
                   </span>
                 ) : (
-                  <span className="text-red-700">✗ 答錯。正確答案：{currentQ.answer}</span>
+                  <span className="text-red-700 dark:text-red-300">✗ 答錯。正確答案：{currentQ.answer}</span>
                 )}
               </p>
               {currentQ.explanation && (
@@ -765,7 +765,7 @@ function PracticeInner() {
                   type="button"
                   variant="link"
                   size="sm"
-                  className="mt-2 h-auto p-0 text-green-700"
+                  className="mt-2 h-auto p-0 text-green-700 dark:text-green-300"
                   onClick={() => clearAutoNext()}
                 >
                   取消本題自動跳轉
@@ -776,7 +776,7 @@ function PracticeInner() {
         </CardContent>
       </Card>
 
-      <div className="sticky bottom-0 z-10 -mx-4 mt-4 flex items-center justify-between border-t bg-background/95 px-4 py-3 backdrop-blur">
+      <div className="sticky bottom-0 z-10 -mx-4 mt-4 flex items-center justify-between border-t bg-background/80 px-4 py-3 backdrop-blur">
         <Button
           variant="outline"
           onClick={goPrev}
@@ -1189,7 +1189,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
         </CardContent>
       </Card>
 
-      <div className="sticky bottom-0 z-10 -mx-4 flex items-center justify-center gap-1 border-t bg-background/95 px-4 py-3 backdrop-blur md:gap-2 flex-wrap">
+      <div className="sticky bottom-0 z-10 -mx-4 flex items-center justify-center gap-1 border-t bg-background/80 px-4 py-3 backdrop-blur md:gap-2 flex-wrap">
         <Button
           variant="ghost"
           onClick={toggleFavorite}

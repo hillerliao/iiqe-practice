@@ -375,7 +375,7 @@ export function RedoPractice({
     if (autoNextCountdown == null || autoNextCountdown <= 0) return;
     const id = setTimeout(() => {
       setAutoNextCountdown((countdown) =>
-        countdown != null && countdown > 1 ? countdown - 1 : countdown,
+        countdown != null && countdown > 0 ? countdown - 1 : countdown,
       );
     }, 1000);
     return () => clearTimeout(id);
@@ -879,7 +879,7 @@ export function RedoPractice({
         </CardContent>
       </Card>
 
-      <div className="sticky bottom-0 z-10 -mx-4 mt-4 border-t bg-background/95 px-4 py-3 backdrop-blur">
+      <div className="sticky bottom-0 z-10 -mx-4 mt-4 border-t bg-background/80 px-4 py-3 backdrop-blur">
         <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
           <AutoAdvanceMenu side="top" />
           <Button
@@ -942,16 +942,16 @@ export function RedoPractice({
             <ChevronLeft className="w-4 h-4 mr-1" />
             上一題
           </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={requestRestart}
-              disabled={isPersisting}
-              title="清除本輪答案並回到第 1 題，不影響歷史記錄"
-            >
-              <RotateCcw className="w-3.5 h-3.5 mr-1" />
-              重新開始本輪
-            </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={requestRestart}
+            disabled={isPersisting}
+            title="清除本輪答案並回到第 1 題，不影響歷史記錄"
+          >
+            <RotateCcw className="w-3.5 h-3.5 mr-1" />
+            重新開始本輪
+          </Button>
           {currentIdx < total - 1 ? (
             <Button onClick={goNext} disabled={isPersisting} title="下一題 (→ / Enter)">
               下一題

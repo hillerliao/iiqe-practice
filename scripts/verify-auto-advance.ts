@@ -69,6 +69,14 @@ async function main(): Promise<void> {
       labelPosition < radioGroupEnd,
     "下拉選單標籤位於 Base UI 單選群組內",
   );
+  const radioItemStart = menuSource.indexOf("<DropdownMenuRadioItem");
+  const radioItemTagEnd = menuSource.indexOf(">", radioItemStart);
+  assert(
+    radioItemStart >= 0 &&
+      radioItemTagEnd > radioItemStart &&
+      menuSource.slice(radioItemStart, radioItemTagEnd).includes("closeOnClick"),
+    "選擇自動跳轉選項後會關閉下拉選單",
+  );
 
   const sessionSource = readFileSync(
     path.join(process.cwd(), "lib", "session.ts"),

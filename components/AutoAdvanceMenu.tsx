@@ -49,6 +49,7 @@ export function AutoAdvanceMenu({ side = "bottom" }: { side?: "top" | "bottom" }
             <DropdownMenuRadioItem
               key={autoAdvanceDelayToValue(option.value)}
               value={autoAdvanceDelayToValue(option.value)}
+              closeOnClick
               className="items-start py-2"
             >
               <span>

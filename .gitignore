@@ -98,7 +98,7 @@ rec_out.json
 /-w
 _p3_clean.json
 cleanup-test.mjs
-scripts/cache_paper1.json
+scripts/cache_*.json
 scripts/mock_p1.json
 scripts/mock_p3.json
 scripts/p3_clean.json
