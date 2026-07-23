@@ -41,28 +41,35 @@ export function validateCustomId(customId: string): string {
 }
 
 // 設定自訂 ID:輸入純暱稱,內部自動加前綴避免與隨機 UUID 衝突
-// 若使用者貼入已含前綴的完整 ID(例如從「當前識別碼」複製),自動剝離前綴
+// 若使用者貼入已含前綴的完整 ID(例如從「當前識別碼」複製),自動剝離前綴。
+// 此函式只更新 localStorage；呼叫端必須先重建簽名 Cookie，再發布切換事件。
 export function setCustomSessionId(customId: string): string {
   if (typeof window === "undefined") return "";
   const newId = validateCustomId(customId);
   localStorage.setItem(SESSION_KEY, newId);
-  emitSessionChange(newId);
   return newId;
 }
 
-// 重置為隨機 UUID(放棄自訂 ID)
+// 重置為隨機 UUID(放棄自訂 ID)。只更新 localStorage，不主動發布事件。
 export function resetSessionId(): string {
   if (typeof window === "undefined") return "";
   const id = crypto.randomUUID();
   localStorage.setItem(SESSION_KEY, id);
-  emitSessionChange(id);
   return id;
+}
+
+// 僅供會話切換失敗時還原已驗證的舊識別碼，不發布切換事件。
+export function restoreSessionId(id: string): void {
+  if (typeof window === "undefined") return;
+  const normalized = normalizeSessionId(id);
+  if (!normalized) return;
+  localStorage.setItem(SESSION_KEY, normalized);
 }
 
 // sessionId 變更事件,讓 SetupReminder 等持久掛載的元件即時反應
 export const SESSION_CHANGE_EVENT = "iiqe:sessionchange";
 
-function emitSessionChange(id: string) {
+export function emitSessionChange(id: string) {
   if (typeof window === "undefined") return;
   window.dispatchEvent(
     new CustomEvent(SESSION_CHANGE_EVENT, { detail: { id } })

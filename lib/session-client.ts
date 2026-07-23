@@ -52,7 +52,11 @@ async function establish(force: boolean): Promise<void> {
     }
   })();
   ensured = run;
-  return run;
+  await run;
+  if (_lastSessionError) {
+    ensured = null;
+    if (force) throw new Error(_lastSessionError);
+  }
 }
 
 export function ensureSession(): Promise<void> {

@@ -29,6 +29,8 @@ import {
 } from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
 import { useToast, ToastContainer } from "@/components/useToast";
+import { AutoAdvanceMenu } from "@/components/AutoAdvanceMenu";
+import { useAutoAdvancePreference } from "@/components/auto-advance-provider";
 import { useWindowKeydown } from "@/hooks/use-window-keydown";
 import { writeTextToClipboard } from "@/lib/clipboard";
 import { getChapterInfo } from "@/lib/chapters";
@@ -84,6 +86,9 @@ function PracticeInner() {
   const searchParams = useSearchParams();
   const attemptId = searchParams.get("id") ?? "";
   const { toast, toasts } = useToast();
+  const { delay: autoAdvanceDelay } = useAutoAdvancePreference();
+  const autoAdvanceDelayRef = useRef(autoAdvanceDelay);
+  autoAdvanceDelayRef.current = autoAdvanceDelay;
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [attempt, setAttempt] = useState<AttemptMeta | null>(null);
@@ -103,12 +108,14 @@ function PracticeInner() {
   const answerRequestsRef = useRef<Set<string>>(new Set());
   const favoriteRequestsRef = useRef<Set<string>>(new Set());
   const autoNextTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeAutoNextRef = useRef<{
+    submittedIdx: number;
+    navigationVersion: number;
+  } | null>(null);
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const noteButtonRef = useRef<NoteButtonHandle>(null);
   const reportButtonRef = useRef<ReportButtonHandle>(null);
-
-  const AUTO_NEXT_DELAY = 1200; // 答對後自動跳下一題的延遲(ms)
 
   useEffect(() => {
     if (!attemptId) return;
@@ -241,7 +248,35 @@ function PracticeInner() {
       clearTimeout(autoNextTimerRef.current);
       autoNextTimerRef.current = null;
     }
+    activeAutoNextRef.current = null;
     setAutoNextCountdown(null);
+  }
+
+  function scheduleAutoNext(
+    submittedIdx: number,
+    navigationVersion: number,
+    delay: number,
+  ) {
+    if (autoNextTimerRef.current) clearTimeout(autoNextTimerRef.current);
+    activeAutoNextRef.current = { submittedIdx, navigationVersion };
+    setAutoNextCountdown(Math.max(1, Math.ceil(delay / 1000)));
+    autoNextTimerRef.current = setTimeout(() => {
+      autoNextTimerRef.current = null;
+      activeAutoNextRef.current = null;
+      setAutoNextCountdown(null);
+      if (
+        currentIdxRef.current !== submittedIdx ||
+        navigationVersionRef.current !== navigationVersion
+      ) {
+        return;
+      }
+      const nextIdx = submittedIdx + 1;
+      navigationVersionRef.current += 1;
+      currentIdxRef.current = nextIdx;
+      setCurrentIdx(nextIdx);
+      setShowFeedback(!!answers[questions[nextIdx].id]);
+      questionStartRef.current = Date.now();
+    }, delay);
   }
 
   async function submitAnswer(qId: string, ans: string) {
@@ -302,31 +337,17 @@ function PracticeInner() {
 
     // 只有使用者仍停在本題時才安排自動跳題,避免遲到的請求拉回舊位置。
     const q = questions[submittedIdx];
+    const currentAutoAdvanceDelay = autoAdvanceDelayRef.current;
     if (
       q &&
       ans != null &&
       String(ans).toLowerCase() === String(q.answer ?? "").toLowerCase() &&
+      currentAutoAdvanceDelay != null &&
       submittedIdx < questions.length - 1 &&
       currentIdxRef.current === submittedIdx &&
       navigationVersionRef.current === navigationVersion
     ) {
-      setAutoNextCountdown(Math.ceil(AUTO_NEXT_DELAY / 1000));
-      autoNextTimerRef.current = setTimeout(() => {
-        autoNextTimerRef.current = null;
-        setAutoNextCountdown(null);
-        if (
-          currentIdxRef.current !== submittedIdx ||
-          navigationVersionRef.current !== navigationVersion
-        ) {
-          return;
-        }
-        const nextIdx = submittedIdx + 1;
-        navigationVersionRef.current += 1;
-        currentIdxRef.current = nextIdx;
-        setCurrentIdx(nextIdx);
-        setShowFeedback(!!answers[questions[nextIdx].id]);
-        questionStartRef.current = Date.now();
-      }, AUTO_NEXT_DELAY);
+      scheduleAutoNext(submittedIdx, navigationVersion, currentAutoAdvanceDelay);
     }
   }
 
@@ -366,6 +387,7 @@ function PracticeInner() {
   }
 
   async function handleFinish() {
+    clearAutoNext(true);
     await authedFetch("/api/attempt", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -421,12 +443,28 @@ function PracticeInner() {
     finishRef.current = handleFinish;
   }, [handleFinish]);
 
+  useEffect(() => {
+    const active = activeAutoNextRef.current;
+    if (!active) return;
+    if (autoAdvanceDelay == null) {
+      clearAutoNext();
+      return;
+    }
+    scheduleAutoNext(
+      active.submittedIdx,
+      active.navigationVersion,
+      autoAdvanceDelay,
+    );
+  }, [autoAdvanceDelay]);
+
   // 倒計時顯示 + 卸載清理
   useEffect(() => {
     if (autoNextCountdown == null) return;
     if (autoNextCountdown <= 0) return;
     const id = setTimeout(() => {
-      setAutoNextCountdown((c) => (c != null ? c - 1 : null));
+      setAutoNextCountdown((countdown) =>
+        countdown != null && countdown > 1 ? countdown - 1 : countdown,
+      );
     }, 1000);
     return () => clearTimeout(id);
   }, [autoNextCountdown]);
@@ -579,6 +617,7 @@ function PracticeInner() {
                 {String(mm).padStart(2, "0")}:{String(ss).padStart(2, "0")}
               </Badge>
             )}
+            <AutoAdvanceMenu />
             <Button
               variant="ghost"
               size="sm"
@@ -710,7 +749,7 @@ function PracticeInner() {
                     ✓ 答對了
                     {autoNextCountdown != null && (
                       <span className="text-green-600 ml-2">
-                        （{autoNextCountdown}s 後跳下一題…）
+                        （{autoNextCountdown} 秒後進入下一題）
                       </span>
                     )}
                   </span>
@@ -720,6 +759,17 @@ function PracticeInner() {
               </p>
               {currentQ.explanation && (
                 <Explanation text={currentQ.explanation} className="text-sm" />
+              )}
+              {autoNextCountdown != null && (
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  className="mt-2 h-auto p-0 text-green-700"
+                  onClick={() => clearAutoNext()}
+                >
+                  取消本題自動跳轉
+                </Button>
               )}
             </div>
           )}

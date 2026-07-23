@@ -22,17 +22,19 @@ import {
   ListChecks,
   Check,
   Star,
+  Copy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getChapterInfo } from "@/lib/chapters";
-import { QuestionActions } from "@/components/QuestionActions";
 import { NoteButton, type NoteButtonHandle } from "@/components/NoteButton";
 import { QuestionStem } from "@/components/QuestionStem";
 import { Explanation } from "@/components/Explanation";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
-import { buildSearchQuery } from "@/components/QuestionSearchButtons";
+import { buildSearchQuery, QuestionSearchMenu } from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
 import { useToast, ToastContainer } from "@/components/useToast";
+import { AutoAdvanceMenu } from "@/components/AutoAdvanceMenu";
+import { useAutoAdvancePreference } from "@/components/auto-advance-provider";
 import { authedFetch } from "@/lib/session-client";
 import { writeTextToClipboard } from "@/lib/clipboard";
 import {
@@ -96,8 +98,6 @@ type RedoPracticeProps = {
 
 export type AnswerMap = Record<string, string>;
 
-/** 答對後自動跳下一題的延遲(毫秒) */
-const AUTO_NEXT_DELAY = 1200;
 const EMPTY_FAVORITE_IDS: ReadonlySet<string> = new Set();
 
 export function RedoPractice({
@@ -114,6 +114,7 @@ export function RedoPractice({
   onToggleFavorite,
 }: RedoPracticeProps) {
   const { toast, toasts } = useToast();
+  const { delay: autoAdvanceDelay } = useAutoAdvancePreference();
   const initialCurrentIdx = initialState?.currentQuestionId
     ? Math.max(0, items.findIndex((item) => item.questionId === initialState.currentQuestionId))
     : 0;
@@ -126,7 +127,13 @@ export function RedoPractice({
   const [isRestartConfirmOpen, setIsRestartConfirmOpen] = useState(false);
   const [isFinishConfirmOpen, setIsFinishConfirmOpen] = useState(false);
   const [reviewQuestionId, setReviewQuestionId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const autoNextTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoNextVersionRef = useRef(0);
+  const activeAutoNextRef = useRef<{
+    currentIdx: number;
+    version: number;
+  } | null>(null);
   const noteButtonRef = useRef<NoteButtonHandle>(null);
 
   // —— 重做結果持久化 ——
@@ -186,6 +193,7 @@ export function RedoPractice({
 
   // 結束重做:先記錄結果,成功後才進入總結頁。
   const finishPractice = useCallback(async () => {
+    clearAutoNext(true);
     if (persistenceActionRef.current) return;
     persistenceActionRef.current = true;
     setIsPersisting(true);
@@ -261,12 +269,35 @@ export function RedoPractice({
     };
   }, [items]);
 
-  function clearAutoNext() {
+  function clearAutoNext(invalidatePending = false) {
+    if (invalidatePending) autoNextVersionRef.current += 1;
     if (autoNextTimerRef.current) {
       clearTimeout(autoNextTimerRef.current);
       autoNextTimerRef.current = null;
     }
+    activeAutoNextRef.current = null;
     setAutoNextCountdown(null);
+  }
+
+  function scheduleAutoNext(fromIdx: number, version: number, delay: number) {
+    if (autoNextTimerRef.current) clearTimeout(autoNextTimerRef.current);
+    activeAutoNextRef.current = { currentIdx: fromIdx, version };
+    setAutoNextCountdown(Math.max(1, Math.ceil(delay / 1000)));
+    autoNextTimerRef.current = setTimeout(() => {
+      autoNextTimerRef.current = null;
+      activeAutoNextRef.current = null;
+      setAutoNextCountdown(null);
+      if (
+        autoNextVersionRef.current !== version ||
+        stateRef.current.currentIdx !== fromIdx
+      ) {
+        return;
+      }
+      const nextIdx = Math.min(fromIdx + 1, total - 1);
+      autoNextVersionRef.current += 1;
+      setCurrentIdx(nextIdx);
+      emitState({ currentQuestionId: items[nextIdx]?.questionId ?? null });
+    }, delay);
   }
 
   // 切題時若該題已有作答,保留紀錄(可隨時回頭重看)
@@ -276,22 +307,19 @@ export function RedoPractice({
     answersRef.current = nextAnswers;
     setAnswers(nextAnswers);
     emitState({ answers: nextAnswers, currentQuestionId: current.questionId });
-    // 答對且非最後一題 → 延遲自動跳下一題
-    if (letter === correctLetter && currentIdx < total - 1) {
-      clearAutoNext();
-      setAutoNextCountdown(Math.ceil(AUTO_NEXT_DELAY / 1000));
-      autoNextTimerRef.current = setTimeout(() => {
-        autoNextTimerRef.current = null;
-        setAutoNextCountdown(null);
-        const nextIdx = Math.min(currentIdx + 1, total - 1);
-        setCurrentIdx(nextIdx);
-        emitState({ currentQuestionId: items[nextIdx]?.questionId ?? null });
-      }, AUTO_NEXT_DELAY);
+    // 答對且非最後一題 → 依偏好延遲自動跳下一題
+    if (
+      letter === correctLetter &&
+      autoAdvanceDelay != null &&
+      currentIdx < total - 1
+    ) {
+      clearAutoNext(true);
+      scheduleAutoNext(currentIdx, autoNextVersionRef.current, autoAdvanceDelay);
     }
   }
 
   function goPrev() {
-    clearAutoNext();
+    clearAutoNext(true);
     if (currentIdx === 0) return;
     const nextIdx = currentIdx - 1;
     setCurrentIdx(nextIdx);
@@ -299,7 +327,7 @@ export function RedoPractice({
   }
 
   function goNext() {
-    clearAutoNext();
+    clearAutoNext(true);
     if (currentIdx >= total - 1) {
       if (answeredCount < total) setIsFinishConfirmOpen(true);
       else void finishPractice();
@@ -311,7 +339,7 @@ export function RedoPractice({
   }
 
   function restart() {
-    clearAutoNext();
+    clearAutoNext(true);
     setAnswers({});
     answersRef.current = {};
     setCurrentIdx(0);
@@ -346,7 +374,9 @@ export function RedoPractice({
   useEffect(() => {
     if (autoNextCountdown == null || autoNextCountdown <= 0) return;
     const id = setTimeout(() => {
-      setAutoNextCountdown((c) => (c != null ? c - 1 : null));
+      setAutoNextCountdown((countdown) =>
+        countdown != null && countdown > 1 ? countdown - 1 : countdown,
+      );
     }, 1000);
     return () => clearTimeout(id);
   }, [autoNextCountdown]);
@@ -378,9 +408,39 @@ export function RedoPractice({
     handbookHref,
   };
 
+  useEffect(() => {
+    const active = activeAutoNextRef.current;
+    if (!active) return;
+    if (autoAdvanceDelay == null) {
+      clearAutoNext(true);
+      return;
+    }
+    scheduleAutoNext(active.currentIdx, active.version, autoAdvanceDelay);
+  }, [autoAdvanceDelay]);
+
   // pickAnswer 透過 ref 暴露,鍵盤 handler 復用同一份邏輯(包含自動跳題)
   const pickAnswerRef = useRef<(letter: string) => void>(() => {});
   pickAnswerRef.current = pickAnswer;
+
+  // 複製目前題目;底部按鈕與鍵盤快捷鍵 X 共用。讀 stateRef 以取得最新題目。
+  function handleCopy(showToast = false) {
+    const cur = stateRef.current.current;
+    if (!cur) return;
+    const text = formatQuestionText({
+      number: cur.question.number,
+      question: cur.question.question,
+      options: cur.question.options,
+      ref: cur.question.ref || undefined,
+      paper: cur.paperCode || undefined,
+    });
+    void writeTextToClipboard(text).then((ok) => {
+      if (showToast) toast(ok ? "已複製題目" : "複製失敗");
+      if (ok) {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1200);
+      }
+    });
+  }
 
   useWindowKeydown(
     (event) => {
@@ -391,7 +451,7 @@ export function RedoPractice({
       if (noModifiers(event) && key === "ArrowLeft") {
         event.preventDefault();
         if (state.currentIdx === 0) return;
-        clearAutoNext();
+        clearAutoNext(true);
         const nextIdx = state.currentIdx - 1;
         setCurrentIdx(nextIdx);
         emitState({ currentQuestionId: items[nextIdx]?.questionId ?? null });
@@ -405,11 +465,11 @@ export function RedoPractice({
       ) {
         event.preventDefault();
         if (state.currentIdx >= state.total - 1) {
-          clearAutoNext();
+          clearAutoNext(true);
           if (Object.keys(answersRef.current).length < state.total) setIsFinishConfirmOpen(true);
           else void finishPractice();
         } else {
-          clearAutoNext();
+          clearAutoNext(true);
           const nextIdx = state.currentIdx + 1;
           setCurrentIdx(nextIdx);
           emitState({ currentQuestionId: items[nextIdx]?.questionId ?? null });
@@ -463,16 +523,7 @@ export function RedoPractice({
 
       if (key === "x") {
         event.preventDefault();
-        const text = formatQuestionText({
-          number: state.current.question.number,
-          question: state.current.question.question,
-          options: state.current.question.options,
-          ref: state.current.question.ref || undefined,
-          paper: state.current.paperCode || undefined,
-        });
-        void writeTextToClipboard(text).then((copied) => {
-          toast(copied ? "已複製題目" : "複製失敗");
-        });
+        handleCopy(true);
       }
     },
     { enabled: !finished }
@@ -741,17 +792,6 @@ export function RedoPractice({
             <span className="text-xs text-muted-foreground">
               {current.question.sourceLabel}
             </span>
-            <div className="ml-auto">
-              <QuestionActions
-                number={current.question.number}
-                question={current.question.question}
-                options={current.question.options}
-                ref={current.question.ref || undefined}
-                paper={current.paperCode || undefined}
-                size="xs"
-                showShortcutHints
-              />
-            </div>
           </div>
           <CardTitle className="text-base leading-relaxed mt-2">
             <QuestionStem text={current.question.question} />
@@ -800,7 +840,7 @@ export function RedoPractice({
                     答對了
                     {autoNextCountdown != null && (
                       <span className="text-green-600 dark:text-green-400 ml-2 font-normal">
-                        （{autoNextCountdown}s 後跳下一題…）
+                        （{autoNextCountdown} 秒後進入下一題）
                       </span>
                     )}
                   </>
@@ -823,6 +863,17 @@ export function RedoPractice({
               {current.question.explanation && (
                 <Explanation text={current.question.explanation} prefix="💡" className="text-xs mt-2" />
               )}
+              {autoNextCountdown != null && (
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  className="mt-2 h-auto p-0 text-green-700 dark:text-green-300"
+                  onClick={() => clearAutoNext(true)}
+                >
+                  取消本題自動跳轉
+                </Button>
+              )}
             </div>
           )}
         </CardContent>
@@ -830,6 +881,7 @@ export function RedoPractice({
 
       <div className="sticky bottom-0 z-10 -mx-4 mt-4 border-t bg-background/95 px-4 py-3 backdrop-blur">
         <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
+          <AutoAdvanceMenu side="top" />
           <Button
             variant="ghost"
             onClick={() => void onToggleFavorite?.(current.questionId)}
@@ -843,6 +895,25 @@ export function RedoPractice({
               )}
             />
             <span className="hidden md:inline">{isFavorite ? "已收藏" : "收藏"}</span>
+          </Button>
+          <QuestionSearchMenu
+            number={current.question.number}
+            question={current.question.question}
+            options={current.question.options}
+            ref={current.question.ref || undefined}
+            paper={current.paperCode || undefined}
+            side="top"
+            size="default"
+            labelMode="desktop"
+            showShortcutHints
+          />
+          <Button variant="ghost" onClick={() => handleCopy()} title="複製題目 (X)">
+            {copied ? (
+              <Check className="w-4 h-4 md:mr-1 text-green-600 dark:text-green-400" />
+            ) : (
+              <Copy className="w-4 h-4 md:mr-1" />
+            )}
+            <span className="hidden md:inline">{copied ? "已複製" : "複製"}</span>
           </Button>
           <NoteButton
             ref={noteButtonRef}

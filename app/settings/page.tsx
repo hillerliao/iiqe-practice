@@ -10,12 +10,15 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Save, RotateCcw, Copy, Check, AlertTriangle } from "lucide-react";
 import { ThemeSettings } from "@/components/ThemeSettings";
+import { AutoAdvanceSettings } from "@/components/AutoAdvanceSettings";
 import {
   getSessionId,
   isCustomSessionId,
   getCustomIdDisplay,
   setCustomSessionId,
   resetSessionId,
+  restoreSessionId,
+  emitSessionChange,
   validateCustomId,
 } from "@/lib/session";
 import { authedFetch, reestablishSession } from "@/lib/session-client";
@@ -78,10 +81,16 @@ export default function SettingsPage() {
         }
       }
 
-      // 遷移成功,寫入 localStorage 切換 ID,並強制重建會話 Cookie 使 sid 同步
-      setCustomSessionId(inputId);
-      await reestablishSession();
-      setCurrentId(getSessionId());
+      // 遷移成功後先更新 localStorage，再重建簽名 Cookie；只有兩者一致時才通知全局元件。
+      const switchedId = setCustomSessionId(inputId);
+      try {
+        await reestablishSession();
+      } catch (error) {
+        if (oldId) restoreSessionId(oldId);
+        throw error;
+      }
+      emitSessionChange(switchedId);
+      setCurrentId(switchedId);
       setSaved(true);
       setTimeout(() => {
         setSaved(false);
@@ -96,9 +105,17 @@ export default function SettingsPage() {
   }
 
   async function handleReset() {
-    resetSessionId();
-    await reestablishSession();
-    setCurrentId(getSessionId());
+    const oldId = currentId;
+    const newId = resetSessionId();
+    try {
+      await reestablishSession();
+    } catch (error) {
+      if (oldId) restoreSessionId(oldId);
+      setError(error instanceof Error ? error.message : "重置失敗");
+      return;
+    }
+    emitSessionChange(newId);
+    setCurrentId(newId);
     setInputId("");
     setConfirmReset(false);
     setSaved(false);
@@ -133,6 +150,7 @@ export default function SettingsPage() {
       <h1 className="text-2xl font-bold tracking-tight mb-6">設定</h1>
 
       <ThemeSettings />
+      <AutoAdvanceSettings />
 
       <Card className="mb-4">
         <CardHeader>

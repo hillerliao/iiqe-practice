@@ -20,6 +20,7 @@
     "verify:question-route": "tsx --tsconfig scripts/tsconfig.json scripts/verify-question-route.ts",
     "verify:keyboard-search": "tsx scripts/verify-keyboard-search.ts",
     "verify:theme-shortcut": "tsx scripts/verify-theme-shortcut.ts",
+    "verify:auto-advance": "tsx scripts/verify-auto-advance.ts",
     "verify:chapter-refs": "tsx scripts/test_chapter_refs.mts",
     "verify:stats-chapters": "tsx scripts/test_stats_chapter_aggregation.mts",
     "verify:handbook-integrity": "tsx scripts/test_handbook_integrity.mts",

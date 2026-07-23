@@ -319,6 +319,7 @@ export const kv: KVClient = hasUpstashEnv()
   : createInMemoryClient();
 
 import type { StorageBackend } from "@/lib/storage-backend";
+import type { AutoAdvanceDelay } from "@/lib/auto-advance";
 // 在顶层 import 一次 storage-backend,避免循环依赖问题(getPrisma -> lib/db -> 不会反向依赖 kv)
 import { pickStorageBackend } from "@/lib/storage-backend";
 import * as sqlite from "@/lib/kv-sqlite";
@@ -370,6 +371,11 @@ export type NoteRecord = {
   updatedAt: string;
 };
 
+export type UserPreferencesRecord = {
+  autoAdvanceDelayMs: AutoAdvanceDelay;
+  updatedAt: string;
+};
+
 export type FeedbackCategory =
   | "question_error"
   | "answer_error"
@@ -397,6 +403,7 @@ const SESS_AT = "session:attempts:";
 const SESS_FAV = "session:favs:";
 const SESS_FAV_META = "session:favs-meta:";
 const SESS_NOTES = "session:notes:";
+const SESS_PREFS = "session:preferences:";
 const TOOL_CALL = "tool-call:";
 const FB = "feedback:";
 const SESS_FB = "feedback:session:";
@@ -406,6 +413,7 @@ function sessAttemptsKey(sid: string) { return `${SESS_AT}${sid}`; }
 function sessFavsKey(sid: string) { return `${SESS_FAV}${sid}`; }
 function sessFavMetaKey(sid: string) { return `${SESS_FAV_META}${sid}`; }
 function sessNotesKey(sid: string) { return `${SESS_NOTES}${sid}`; }
+function sessPreferencesKey(sid: string) { return `${SESS_PREFS}${sid}`; }
 function toolCallKey(sid: string, id: string) { return `${TOOL_CALL}${sid}:${id}`; }
 function feedbackKey(id: string) { return `${FB}${id}`; }
 function sessFeedbackKey(sid: string) { return `${SESS_FB}${sid}`; }
@@ -584,6 +592,19 @@ export async function listNotes(sessionId: string, questionIds?: string[]): Prom
   return filtered;
 }
 
+export async function getPreferences(sessionId: string): Promise<UserPreferencesRecord | null> {
+  if (backend() === "sqlite") return sqlite.getPreferencesSqlite(sessionId);
+  return kv.get<UserPreferencesRecord>(sessPreferencesKey(sessionId));
+}
+
+export async function savePreferences(
+  sessionId: string,
+  preferences: UserPreferencesRecord
+): Promise<void> {
+  if (backend() === "sqlite") return sqlite.savePreferencesSqlite(sessionId, preferences);
+  await kv.set(sessPreferencesKey(sessionId), preferences);
+}
+
 export async function migrateSession(fromSessionId: string, toSessionId: string): Promise<{ attempts: number; favorites: number; notes: number }> {
   if (backend() === "sqlite") return sqlite.migrateSessionSqlite(fromSessionId, toSessionId);
   const result = { attempts: 0, favorites: 0, notes: 0 };
@@ -644,6 +665,13 @@ export async function migrateSession(fromSessionId: string, toSessionId: string)
     }
     await kv.del(sessNotesKey(fromSessionId));
     result.notes = Object.keys(notes).length;
+  }
+
+  const fromPreferences = await getPreferences(fromSessionId);
+  if (fromPreferences) {
+    const toPreferences = await getPreferences(toSessionId);
+    if (!toPreferences) await savePreferences(toSessionId, fromPreferences);
+    await kv.del(sessPreferencesKey(fromSessionId));
   }
 
   return result;

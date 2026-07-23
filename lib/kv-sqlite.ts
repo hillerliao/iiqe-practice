@@ -5,7 +5,7 @@
 // 表与字段由 prisma/schema.prisma 决定;这里用 Prisma client 操作,避免写裸 SQL。
 
 import { getPrisma } from "@/lib/db";
-import type { AttemptRecord, AnswerRecord, FavoriteRecord, NoteRecord, FeedbackRecord, ToolCallRecord } from "@/lib/kv";
+import type { AttemptRecord, AnswerRecord, FavoriteRecord, NoteRecord, FeedbackRecord, ToolCallRecord, UserPreferencesRecord } from "@/lib/kv";
 import type { QuestionData } from "@/lib/data";
 import type { Prisma } from "@/lib/generated/prisma";
 
@@ -682,6 +682,37 @@ export async function listNotesSqlite(
   return out;
 }
 
+export async function getPreferencesSqlite(
+  sessionId: string
+): Promise<UserPreferencesRecord | null> {
+  const row = await getPrisma().sessionPreference.findUnique({
+    where: { sessionId },
+  });
+  if (!row) return null;
+  return {
+    autoAdvanceDelayMs: row.autoAdvanceDelayMs as UserPreferencesRecord["autoAdvanceDelayMs"],
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+export async function savePreferencesSqlite(
+  sessionId: string,
+  preferences: UserPreferencesRecord
+): Promise<void> {
+  await getPrisma().sessionPreference.upsert({
+    where: { sessionId },
+    create: {
+      sessionId,
+      autoAdvanceDelayMs: preferences.autoAdvanceDelayMs,
+      updatedAt: new Date(preferences.updatedAt),
+    },
+    update: {
+      autoAdvanceDelayMs: preferences.autoAdvanceDelayMs,
+      updatedAt: new Date(preferences.updatedAt),
+    },
+  });
+}
+
 export async function createFeedbackSqlite(rec: FeedbackRecord): Promise<void> {
   const prisma = getPrisma();
   await prisma.feedback.upsert({
@@ -780,6 +811,24 @@ export async function migrateSessionSqlite(
         noteCount++;
       } else {
         await tx.note.delete({ where: { id: n.id } });
+      }
+    }
+
+    // Preferences:若目標已有設定則保留目標值,否則遷移來源值。
+    const fromPreferences = await tx.sessionPreference.findUnique({
+      where: { sessionId: fromSessionId },
+    });
+    if (fromPreferences) {
+      const toPreferences = await tx.sessionPreference.findUnique({
+        where: { sessionId: toSessionId },
+      });
+      if (!toPreferences) {
+        await tx.sessionPreference.update({
+          where: { sessionId: fromSessionId },
+          data: { sessionId: toSessionId },
+        });
+      } else {
+        await tx.sessionPreference.delete({ where: { sessionId: fromSessionId } });
       }
     }
 
