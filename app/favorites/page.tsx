@@ -13,6 +13,7 @@ import {
   Shuffle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Explanation } from "@/components/Explanation";
 import { authedFetch } from "@/lib/session-client";
 import { QuestionActions } from "@/components/QuestionActions";
 import { QuestionStem } from "@/components/QuestionStem";
@@ -176,9 +177,7 @@ function FavItemCard({
               </span>
             </p>
             {q.explanation && (
-              <p className="text-muted-foreground text-xs mt-2 leading-relaxed">
-                💡 {q.explanation}
-              </p>
+              <Explanation text={q.explanation} prefix="💡" className="text-muted-foreground text-xs mt-2" />
             )}
           </div>
         )}

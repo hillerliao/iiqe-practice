@@ -8,6 +8,7 @@ from scripts.build_handbook import (
 )
 from scripts.build_handbook_p3 import (
     _indent_level,
+    _row_x0 as p3_row_x0,
     _split_long_paragraph as split_p3_paragraph,
     build_chapters_and_html as build_p3,
     render_paragraph,
@@ -25,6 +26,42 @@ class HandbookIndentTest(unittest.TestCase):
         self.assertEqual(_row_x0(chars, "(i) 識別；"), 131.06)
         self.assertEqual(_row_x0(chars, "視乎使用時的場合"), 68.06)
 
+    def test_p1_ignores_leading_pdf_spaces_for_bare_numbered_items(self) -> None:
+        padded_chars = [
+            {"text": " ", "x0": 68.064},
+            {"text": " ", "x0": 104.06},
+            {"text": "1", "x0": 138.98},
+            {"text": " ", "x0": 146.3},
+            {"text": "無", "x0": 174.38},
+        ]
+        unpadded_chars = [
+            {"text": "3", "x0": 138.98},
+            {"text": " ", "x0": 146.3},
+            {"text": "不", "x0": 174.38},
+        ]
+
+        self.assertEqual(_row_x0(padded_chars, "1 無效的合約"), 138.98)
+        self.assertEqual(_row_x0(unpadded_chars, "3 不能強制執行的合約"), 138.98)
+
+    def test_p1_bare_numbered_peer_items_share_structural_indent(self) -> None:
+        pages = [
+            (16, [("第二章 測試", "第二章 測試", 68.1, 0.0)]),
+            (17, [
+                ("1 無效的合約：正文。", "1 無效的合約：正文。", 138.98, 29.5),
+                ("2 可使無效的合約：正文；", "2 可使無效的合約：正文；", 138.98, 29.5),
+                ("3 不能強制執行的合約：正文。", "3 不能強制執行的合約：正文。", 138.98, 29.5),
+            ]),
+        ]
+
+        _, html, _ = build_p1(pages)
+
+        for text in (
+            "1 無效的合約：正文。",
+            "2 可使無效的合約：正文；",
+            "3 不能強制執行的合約：正文。",
+        ):
+            self.assertIn(f'<p class="handbook-indent-2">{text}</p>', html)
+
     def test_pdf_x_positions_map_to_bounded_indent_levels(self) -> None:
         self.assertEqual(_indent_level(68.1), 0)
         self.assertEqual(_indent_level(104.8), 1)
@@ -41,6 +78,66 @@ class HandbookIndentTest(unittest.TestCase):
             html,
             '<p class="handbook-indent-2">(i) 受養人的生活開支；續行內容。</p>',
         )
+
+    def test_p3_separates_block_and_first_line_indent(self) -> None:
+        html = render_paragraph(
+            [
+                ("單位相連長期保單也稱為相連長期保單，", 141.62),
+                ("其價值直接與投資表現相連。", 104.78),
+            ],
+            False,
+        )
+        self.assertEqual(
+            html,
+            '<p class="handbook-indent-1 handbook-first-line-indent">'
+            "單位相連長期保單也稱為相連長期保單，"
+            "其價值直接與投資表現相連。</p>",
+        )
+        self.assertNotIn("handbook-indent-2", html)
+
+    def test_p3_lettered_item_keeps_marker_as_block_indent(self) -> None:
+        html = render_paragraph(
+            [
+                ("(a) 共同原則：單位相連保單可以各種形式出現，", 104.54),
+                ("但是，它們皆擁有一個共同的特點。", 141.02),
+            ],
+            False,
+        )
+        self.assertEqual(
+            html,
+            '<p class="handbook-indent-1">'
+            "(a) 共同原則：單位相連保單可以各種形式出現，"
+            "但是，它們皆擁有一個共同的特點。</p>",
+        )
+
+    def test_p3_section_prose_and_lettered_items_share_parent_indent(self) -> None:
+        pages = [
+            (24, [("第二章 測試", "第二章 測試", 68.1)]),
+            (31, [
+                ("2.2 測試", "2.2 測試", 68.1),
+                ("2.2.2 單位相連長期保險", "2.2.2 單位相連長期保險", 68.1),
+                ("單位相連長期保單也稱為相連長期保單，", "單位相連長期保單也稱為相連長期保單，", 141.62),
+                ("其價值直接與投資表現相連。", "其價值直接與投資表現相連。", 104.78),
+                ("(a) 共同原則：正文。", "(a) 共同原則：正文。", 104.54),
+                ("(b) 基金類型：正文。", "(b) 基金類型：正文。", 104.54),
+                ("(c) 保單類型：正文。", "(c) 保單類型：正文。", 104.54),
+            ]),
+        ]
+
+        _, html = build_p3(pages)
+
+        self.assertIn(
+            '<p class="handbook-indent-1 handbook-first-line-indent">'
+            "單位相連長期保單也稱為相連長期保單，"
+            "其價值直接與投資表現相連。</p>",
+            html,
+        )
+        for text in (
+            "(a) 共同原則：正文。",
+            "(b) 基金類型：正文。",
+            "(c) 保單類型：正文。",
+        ):
+            self.assertIn(f'<p class="handbook-indent-1">{text}</p>', html)
 
     def test_baseline_paragraph_has_no_indent_class(self) -> None:
         html = render_paragraph([("一般正文。", 68.1)], False)
@@ -125,6 +222,42 @@ class HandbookIndentTest(unittest.TestCase):
         _, html = build_p3(pages)
         self.assertIn(
             "<p>「甲」類問題</p>\n<p>1 「保險公司承諾當被保險人死亡時支付保險金的保險。」這段引述是：</p>",
+            html,
+        )
+
+    def test_p3_splits_medium_gap_paragraph_after_sentence_end(self) -> None:
+        pages = [(24, [
+            ("第二章 測試", "第二章 測試", 68.1, 0.0),
+            ("2.3.1 年金", "2.3.1 年金", 68.1, 16.0),
+            ("按照簡單的年金計劃，", "按照簡單的年金計劃，", 138.98, 16.0),
+            ("誘惑。", "誘惑。", 103.46, 15.5),
+            ("須注意的年金特點包括：", "須注意的年金特點包括：", 68.06, 29.5),
+            ("(a) 即期年金：正文。", "(a) 即期年金：正文。", 104.54, 16.0),
+        ])]
+
+        _, html = build_p3(pages)
+
+        self.assertIn(
+            '<p class="handbook-indent-1 handbook-first-line-indent">'
+            "按照簡單的年金計劃，誘惑。</p>\n"
+            "<p>須注意的年金特點包括：</p>",
+            html,
+        )
+        self.assertIn('<p class="handbook-indent-1">(a) 即期年金：正文。</p>', html)
+
+    def test_p3_keeps_wrapped_lines_without_medium_gap_in_one_paragraph(self) -> None:
+        pages = [(24, [
+            ("第二章 測試", "第二章 測試", 68.1, 0.0),
+            ("2.3.1 年金", "2.3.1 年金", 68.1, 16.0),
+            ("按照簡單的年金計劃，", "按照簡單的年金計劃，", 138.98, 16.0),
+            ("誘惑。", "誘惑。", 103.46, 15.5),
+        ])]
+
+        _, html = build_p3(pages)
+
+        self.assertIn(
+            '<p class="handbook-indent-1 handbook-first-line-indent">'
+            "按照簡單的年金計劃，誘惑。</p>",
             html,
         )
 
@@ -313,6 +446,39 @@ class HandbookIndentTest(unittest.TestCase):
         title = next(ch["title"] for ch in chapters if ch["id"] == "ch-3-1-1")
         self.assertEqual(title, "完整標題(Test)")
         self.assertIn("<p>正文。</p>", html)
+
+    def test_p3_row_x0_ignores_invisible_spaces_for_sublabel(self) -> None:
+        # 1.3.2a 標籤行：不可見前導空格在 68.1/104.8，可見編號從 138.9 開始
+        cs = [
+            {"text": " ", "x0": 68.1},
+            {"text": " ", "x0": 104.8},
+            {"text": "1", "x0": 138.9},
+            {"text": ".", "x0": 146.2},
+            {"text": "3", "x0": 150.5},
+        ]
+        self.assertAlmostEqual(p3_row_x0(cs, "1.3.2a 自然保費（釐定）制度"), 138.9)
+
+    def test_p3_row_x0_keeps_raw_min_for_prose(self) -> None:
+        cs = [
+            {"text": " ", "x0": 68.1},
+            {"text": "正", "x0": 104.8},
+            {"text": "文", "x0": 120.0},
+        ]
+        self.assertAlmostEqual(p3_row_x0(cs, "正文內容"), 68.1)
+
+    def test_p3_sublabels_with_same_visible_x0_align(self) -> None:
+        # 1.3.2a 與 1.3.2b 的可見編號都在 x0≈138.9，應同屬 indent-2
+        pages = [(24, [
+            ("第二章 測試", "第二章 測試", 68.1, 0.0),
+            ("2.3.2 定價制度", "2.3.2 定價制度", 68.1, 16.0),
+            ("2.3.2a 自然保費（釐定）制度", "2.3.2a 自然保費（釐定）制度", 138.9, 16.0),
+            ("(a) 保費：正文。", "(a) 保費：正文。", 141.6, 16.0),
+            ("2.3.2b 均衡保費（釐定）制度", "2.3.2b 均衡保費（釐定）制度", 138.9, 29.5),
+            ("(a) 基本概念：正文。", "(a) 基本概念：正文。", 141.0, 16.0),
+        ])]
+        _, html = build_p3(pages)
+        self.assertIn('class="handbook-indent-2">2.3.2a 自然保費（釐定）制度', html)
+        self.assertIn('class="handbook-indent-2">2.3.2b 均衡保費（釐定）制度', html)
 
 
 if __name__ == "__main__":

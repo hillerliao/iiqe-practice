@@ -22,6 +22,7 @@ import { authedFetch } from "@/lib/session-client";
 import { NoteButton, type NoteButtonHandle } from "@/components/NoteButton";
 import { ReportButton, type ReportButtonHandle } from "@/components/ReportButton";
 import { QuestionStem } from "@/components/QuestionStem";
+import { Explanation } from "@/components/Explanation";
 import {
   buildSearchQuery,
   QuestionSearchMenu,
@@ -697,7 +698,7 @@ function PracticeInner() {
           {showFeedback && isAnswered && (
             <div
               className={cn(
-                "mt-4 p-4 rounded-lg border",
+                "mt-4 p-4 rounded-lg border max-h-[45vh] overflow-y-auto",
                 isCorrect
                   ? "bg-green-50 border-green-200"
                   : "bg-red-50 border-red-200"
@@ -718,16 +719,14 @@ function PracticeInner() {
                 )}
               </p>
               {currentQ.explanation && (
-                <p className="text-sm text-foreground leading-relaxed">
-                  {currentQ.explanation}
-                </p>
+                <Explanation text={currentQ.explanation} className="text-sm" />
               )}
             </div>
           )}
         </CardContent>
       </Card>
 
-      <div className="mt-4 flex items-center justify-between">
+      <div className="sticky bottom-0 z-10 -mx-4 mt-4 flex items-center justify-between border-t bg-background/95 px-4 py-3 backdrop-blur">
         <Button
           variant="outline"
           onClick={goPrev}
@@ -1118,7 +1117,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
           {isAnswered && (
             <div
               className={cn(
-                "mt-4 p-4 rounded-lg border",
+                "mt-4 p-4 rounded-lg border max-h-[45vh] overflow-y-auto",
                 isCorrect
                   ? "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800"
                   : "bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800"
@@ -1133,16 +1132,14 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
                 {isCorrect ? "✓ 答對了" : `✗ 答錯。正確答案：${correctLetter.toUpperCase()}`}
               </p>
               {question.explanation && (
-                <p className="text-sm text-foreground leading-relaxed">
-                  {question.explanation}
-                </p>
+                <Explanation text={question.explanation} className="text-sm" />
               )}
             </div>
           )}
         </CardContent>
       </Card>
 
-      <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
+      <div className="sticky bottom-0 z-10 -mx-4 flex items-center justify-center gap-1 border-t bg-background/95 px-4 py-3 backdrop-blur md:gap-2 flex-wrap">
         <Button
           variant="ghost"
           onClick={toggleFavorite}

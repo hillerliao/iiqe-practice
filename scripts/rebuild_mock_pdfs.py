@@ -4,7 +4,9 @@ Each numbered source-table row is one authoritative question boundary. The
 parser extracts the row's number, reference, question content, and answer cells
 independently, then splits the question cell at ordered a/b/c/d markers.
 
-Run an audit before modifying data:
+Run a read-only source/dataset consistency check:
+  python scripts/rebuild_mock_pdfs.py --check
+Write a refreshed audit without modifying datasets:
   python scripts/rebuild_mock_pdfs.py --audit-only
 Then rebuild after audit validation succeeds:
   python scripts/rebuild_mock_pdfs.py --rebuild
@@ -277,7 +279,7 @@ def validate_source(questions: list[dict[str, Any]], expected_count: int) -> lis
 
 
 def reconstruct(source_questions: list[dict[str, Any]], current: list[dict[str, Any]], paper: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Overlay source truth while preserving the established mock JSON fields."""
+    """Overlay PDF-authoritative fields while preserving non-PDF metadata."""
     current_by_number = {record.get("number"): record for record in current if isinstance(record.get("number"), int)}
     records: list[dict[str, Any]] = []
     conflicts: list[dict[str, Any]] = []
@@ -289,7 +291,8 @@ def reconstruct(source_questions: list[dict[str, Any]], current: list[dict[str, 
         if source_answer and old_answer and source_answer != old_answer:
             conflicts.append({"number": number, "current": old_answer, "source": source_answer})
         answer = source_answer or old_answer
-        records.append(
+        record = dict(old)
+        record.update(
             {
                 "id": f"{paper}-mock-{number}",
                 "number": number,
@@ -303,6 +306,7 @@ def reconstruct(source_questions: list[dict[str, Any]], current: list[dict[str, 
                 "sourceLabel": "2025模擬試題",
             }
         )
+        records.append(record)
     return records, conflicts
 
 
@@ -318,6 +322,22 @@ def compare_reparsed(records: list[dict[str, Any]], source_questions: list[dict[
     return errors
 
 
+def compare_current(current: list[dict[str, Any]], rebuilt: list[dict[str, Any]]) -> list[str]:
+    """Report dataset records that differ from the authoritative PDF rebuild."""
+    current_by_number = {record.get("number"): record for record in current}
+    rebuilt_by_number = {record.get("number"): record for record in rebuilt}
+    errors: list[str] = []
+    for number in sorted(set(current_by_number) | set(rebuilt_by_number)):
+        if current_by_number.get(number) != rebuilt_by_number.get(number):
+            errors.append(f"question {number}: current dataset differs from rebuilt PDF record")
+    return errors
+
+
+def json_sha256(value: Any) -> str:
+    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -329,6 +349,7 @@ def audit_one(source_config: dict[str, Any]) -> tuple[dict[str, Any], list[dict[
     validation_errors.extend(validate_source(source_questions, source_config["expected_count"]))
     rebuilt, conflicts = reconstruct(source_questions, current, source_config["paper"])
     validation_errors.extend(compare_reparsed(rebuilt, source_questions))
+    dataset_differences = compare_current(current, rebuilt)
     source_answers = Counter(question["answer"] is not None for question in source_questions)
     return (
         {
@@ -338,9 +359,12 @@ def audit_one(source_config: dict[str, Any]) -> tuple[dict[str, Any], list[dict[
             "target": str(source_config["target"].relative_to(ROOT)).replace("\\", "/"),
             "expectedCount": source_config["expected_count"],
             "currentCount": len(current),
+            "currentDatasetSha256": json_sha256(current),
             "extractedCount": len(source_questions),
+            "rebuiltDatasetSha256": json_sha256(rebuilt),
             "sourceAnswerAvailability": {"available": source_answers[True], "unavailable": source_answers[False]},
             "answerConflicts": conflicts,
+            "datasetDifferences": dataset_differences,
             "validationErrors": validation_errors,
             "valid": not validation_errors and not conflicts,
             "diagnostics": diagnostics,
@@ -349,12 +373,13 @@ def audit_one(source_config: dict[str, Any]) -> tuple[dict[str, Any], list[dict[
     )
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     action = parser.add_mutually_exclusive_group(required=True)
+    action.add_argument("--check", action="store_true", help="validate PDFs and datasets without writing files")
     action.add_argument("--audit-only", action="store_true", help="parse and write audit only; do not alter datasets")
     action.add_argument("--rebuild", action="store_true", help="write validated reconstructed mock datasets")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     audit: dict[str, Any] = {
         "parser": str(Path(__file__).relative_to(ROOT)).replace("\\", "/"),
@@ -383,13 +408,24 @@ def main() -> None:
         rebuilt_by_target.append((source_config["target"], rebuilt))
 
     audit["valid"] = all(paper["valid"] for paper in audit["papers"])
-    AUDIT_PATH.write_text(json.dumps(audit, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Wrote audit: {AUDIT_PATH}")
+    if not args.check:
+        AUDIT_PATH.write_text(json.dumps(audit, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print(f"Wrote audit: {AUDIT_PATH}")
     for paper in audit["papers"]:
-        print(f"{paper['paper']}: {paper['extractedCount']}/{paper['expectedCount']} extracted; valid={paper['valid']}; answer conflicts={len(paper['answerConflicts'])}")
+        print(
+            f"{paper['paper']}: {paper['extractedCount']}/{paper['expectedCount']} extracted; "
+            f"valid={paper['valid']}; answer conflicts={len(paper['answerConflicts'])}; "
+            f"dataset differences={len(paper['datasetDifferences'])}"
+        )
 
     if not audit["valid"]:
         raise SystemExit("Audit validation failed")
+
+    if args.check:
+        differences = sum(len(paper["datasetDifferences"]) for paper in audit["papers"])
+        if differences:
+            raise SystemExit(f"Dataset check failed with {differences} differences")
+        return
 
     if args.rebuild:
         for target, records in rebuilt_by_target:

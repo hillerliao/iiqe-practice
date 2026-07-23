@@ -1,6 +1,6 @@
 {
   "parser": "scripts/rebuild_mock_pdfs.py",
-  "parserSha256": "c1ea2b9e07289d36a66795e53a5b27102a39019ec61373530ceb918c6206e4f0",
+  "parserSha256": "af3b3da60fdf2b9b3d31a19d85870e283584b2427ab67148ac0538c7f03157ea",
   "method": "pdfplumber physical table rows and cells",
   "parameters": {
     "tableDetection": "page.find_tables() defaults",
@@ -24,12 +24,15 @@
       "target": "data/questions-p1-mock.json",
       "expectedCount": 919,
       "currentCount": 919,
+      "currentDatasetSha256": "18719f21599cf13cd82429ec07946e2a1032b8036188fa2bcde7cd8a8cad7f75",
       "extractedCount": 919,
+      "rebuiltDatasetSha256": "18719f21599cf13cd82429ec07946e2a1032b8036188fa2bcde7cd8a8cad7f75",
       "sourceAnswerAvailability": {
         "available": 919,
         "unavailable": 0
       },
       "answerConflicts": [],
+      "datasetDifferences": [],
       "validationErrors": [],
       "valid": true,
       "diagnostics": {
@@ -880,12 +883,15 @@
       "target": "data/questions-p3-mock.json",
       "expectedCount": 865,
       "currentCount": 865,
+      "currentDatasetSha256": "55790c47f897431f823f4035881811b2530de2ed6b4db6e8010963c1ae58e123",
       "extractedCount": 865,
+      "rebuiltDatasetSha256": "55790c47f897431f823f4035881811b2530de2ed6b4db6e8010963c1ae58e123",
       "sourceAnswerAvailability": {
         "available": 865,
         "unavailable": 0
       },
       "answerConflicts": [],
+      "datasetDifferences": [],
       "validationErrors": [],
       "valid": true,
       "diagnostics": {

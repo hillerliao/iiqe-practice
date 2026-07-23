@@ -156,7 +156,7 @@ def _indent_level(x0: float) -> int:
 def _row_x0(chars: list[dict], plain: str) -> float:
     """取得行縮進座標；結構標記忽略 PDF 為排版加入的前導空格。"""
     visible_chars = [char for char in chars if str(char.get("text", "")).strip()]
-    if re.match(r"^(?:\([a-zivx]+\)|\(\d+\)|[•·\-*]\s+)", plain):
+    if re.match(r"^(?:\([a-zivx]+\)|\(\d+\)|[•·\-*]\s+|\d+\s+[一-鿿])", plain):
         source = visible_chars or chars
     else:
         source = chars

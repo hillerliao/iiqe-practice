@@ -10,6 +10,7 @@ import { CheckCircle2, XCircle, Play } from "lucide-react";
 import { QuestionActions } from "@/components/QuestionActions";
 import { QuestionStem } from "@/components/QuestionStem";
 import { NoteSection } from "@/components/NoteSection";
+import { Explanation } from "@/components/Explanation";
 import { authedFetch } from "@/lib/session-client";
 
 type AnswerData = {
@@ -196,9 +197,7 @@ function ResultInner() {
                     </span>
                   </p>
                   {a.question.explanation && (
-                    <p className="text-muted-foreground text-xs mt-2 leading-relaxed">
-                      💡 {a.question.explanation}
-                    </p>
+                    <Explanation text={a.question.explanation} prefix="💡" className="text-muted-foreground text-xs mt-2" />
                   )}
                 </div>
                 <NoteSection content={a.note} className="mt-2" compact />

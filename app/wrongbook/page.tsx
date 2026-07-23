@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { authedFetch } from "@/lib/session-client";
+import { Explanation } from "@/components/Explanation";
 import { QuestionActions } from "@/components/QuestionActions";
 import { QuestionStem } from "@/components/QuestionStem";
 import { NoteSection } from "@/components/NoteSection";
@@ -192,9 +193,7 @@ function WrongItemCard({ item }: { item: WrongItem }) {
               </span>
             </p>
             {q.explanation && (
-              <p className="text-muted-foreground text-xs mt-2 leading-relaxed">
-                💡 {q.explanation}
-              </p>
+              <Explanation text={q.explanation} prefix="💡" className="text-muted-foreground text-xs mt-2" />
             )}
           </div>
         )}

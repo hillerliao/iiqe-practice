@@ -28,6 +28,7 @@ import { getChapterInfo } from "@/lib/chapters";
 import { QuestionActions } from "@/components/QuestionActions";
 import { NoteButton, type NoteButtonHandle } from "@/components/NoteButton";
 import { QuestionStem } from "@/components/QuestionStem";
+import { Explanation } from "@/components/Explanation";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
 import { buildSearchQuery } from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
@@ -662,9 +663,7 @@ export function RedoPractice({
                       {reviewCorrectLetter.toUpperCase()}
                     </p>
                     {reviewItem.question.explanation && (
-                      <p className="mt-2 text-xs leading-relaxed text-foreground">
-                        💡 {reviewItem.question.explanation}
-                      </p>
+                      <Explanation text={reviewItem.question.explanation} prefix="💡" className="mt-2 text-xs" />
                     )}
                   </div>
                 </div>
@@ -781,7 +780,7 @@ export function RedoPractice({
               role="status"
               aria-live="polite"
               className={cn(
-                "mt-2 p-3 rounded-lg border text-sm",
+                "mt-2 p-3 rounded-lg border text-sm max-h-[45vh] overflow-y-auto",
                 isCorrect
                   ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800"
                   : "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800"
@@ -822,83 +821,83 @@ export function RedoPractice({
                 </p>
               ) : null}
               {current.question.explanation && (
-                <p className="text-xs text-foreground mt-2 leading-relaxed">
-                  💡 {current.question.explanation}
-                </p>
+                <Explanation text={current.question.explanation} prefix="💡" className="text-xs mt-2" />
               )}
             </div>
           )}
         </CardContent>
       </Card>
 
-      <div className="mt-4 flex items-center justify-center gap-1 md:gap-2 flex-wrap">
-        <Button
-          variant="ghost"
-          onClick={() => void onToggleFavorite?.(current.questionId)}
-          disabled={!onToggleFavorite || isPersisting}
-          title={isFavorite ? "取消收藏 (F)" : "收藏 (F)"}
-        >
-          <Star
-            className={cn(
-              "w-4 h-4 md:mr-1",
-              isFavorite && "fill-yellow-400 text-yellow-400"
-            )}
-          />
-          <span className="hidden md:inline">{isFavorite ? "已收藏" : "收藏"}</span>
-        </Button>
-        <NoteButton
-          ref={noteButtonRef}
-          questionId={current.questionId}
-          content={currentNote}
-          onChange={(newContent) => {
-            setNotes((previous) => {
-              const next = { ...previous };
-              if (newContent === null) delete next[current.questionId];
-              else next[current.questionId] = newContent;
-              return next;
-            });
-            toast(newContent === null ? "筆記已刪除" : "筆記已儲存");
-          }}
-          size="sm"
-        />
-      </div>
-
-      <div className="mt-4 flex items-center justify-between">
-        <Button
-          variant="outline"
-          onClick={goPrev}
-          disabled={currentIdx === 0 || isPersisting}
-          title="上一題 (←)"
-        >
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          上一題
-        </Button>
+      <div className="sticky bottom-0 z-10 -mx-4 mt-4 border-t bg-background/95 px-4 py-3 backdrop-blur">
+        <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
           <Button
             variant="ghost"
+            onClick={() => void onToggleFavorite?.(current.questionId)}
+            disabled={!onToggleFavorite || isPersisting}
+            title={isFavorite ? "取消收藏 (F)" : "收藏 (F)"}
+          >
+            <Star
+              className={cn(
+                "w-4 h-4 md:mr-1",
+                isFavorite && "fill-yellow-400 text-yellow-400"
+              )}
+            />
+            <span className="hidden md:inline">{isFavorite ? "已收藏" : "收藏"}</span>
+          </Button>
+          <NoteButton
+            ref={noteButtonRef}
+            questionId={current.questionId}
+            content={currentNote}
+            onChange={(newContent) => {
+              setNotes((previous) => {
+                const next = { ...previous };
+                if (newContent === null) delete next[current.questionId];
+                else next[current.questionId] = newContent;
+                return next;
+              });
+              toast(newContent === null ? "筆記已刪除" : "筆記已儲存");
+            }}
             size="sm"
-            onClick={requestRestart}
-            disabled={isPersisting}
-            title="清除本輪答案並回到第 1 題，不影響歷史記錄"
-          >
-            <RotateCcw className="w-3.5 h-3.5 mr-1" />
-            重新開始本輪
-          </Button>
-        {currentIdx < total - 1 ? (
-          <Button onClick={goNext} disabled={isPersisting} title="下一題 (→ / Enter)">
-            下一題
-            <ChevronRight className="w-4 h-4 ml-1" />
-          </Button>
-        ) : (
+          />
+        </div>
+
+        <div className="mt-2 flex items-center justify-between">
           <Button
-            onClick={goNext}
-            variant="default"
-            disabled={isPersisting}
-            title="完成 (→ / Enter)"
+            variant="outline"
+            onClick={goPrev}
+            disabled={currentIdx === 0 || isPersisting}
+            title="上一題 (←)"
           >
-            {isPersisting ? "儲存中..." : "完成"}
-            <Check className="w-4 h-4 ml-1" />
+            <ChevronLeft className="w-4 h-4 mr-1" />
+            上一題
           </Button>
-        )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={requestRestart}
+              disabled={isPersisting}
+              title="清除本輪答案並回到第 1 題，不影響歷史記錄"
+            >
+              <RotateCcw className="w-3.5 h-3.5 mr-1" />
+              重新開始本輪
+            </Button>
+          {currentIdx < total - 1 ? (
+            <Button onClick={goNext} disabled={isPersisting} title="下一題 (→ / Enter)">
+              下一題
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          ) : (
+            <Button
+              onClick={goNext}
+              variant="default"
+              disabled={isPersisting}
+              title="完成 (→ / Enter)"
+            >
+              {isPersisting ? "儲存中..." : "完成"}
+              <Check className="w-4 h-4 ml-1" />
+            </Button>
+          )}
+        </div>
       </div>
 
       <ToastContainer toasts={toasts} />

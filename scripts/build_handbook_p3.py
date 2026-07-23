@@ -76,12 +76,15 @@ H3_MAX_LEN = 60
 WRAPPED_HEADING_MAX_LEN = 140
 _WRAPPED_HEADING_MARKER = "\x02"
 
-Line = tuple[str, str, float]
+Line = tuple[str, str, float] | tuple[str, str, float, float]
 ParagraphLine = tuple[str, float]
 
 CONTENT_LEFT_X = 68.0
 INDENT_STEP_X = 36.75
 MAX_INDENT_LEVEL = 3
+FIRST_LINE_INDENT_MIN = 24.0
+FIRST_LINE_INDENT_MAX = 55.0
+MEDIUM_PARAGRAPH_GAP = 23.0
 
 # 列舉項 a. / b. / c. …:PDF 中每項常獨立成行,但 build script 把它們
 # 跟上一段合併成同一個 <p>。在行首偵測 [a-h]\. + 空白 + CJK 字元
@@ -158,20 +161,62 @@ def _is_standalone_lettered_subheading(
     normalized = re.sub(r"\s+", " ", text.strip())
     if next_line is None or normalized not in STANDALONE_LETTERED_SUBHEADINGS:
         return False
-    next_plain, _, next_x0 = next_line
+    next_plain, _, next_x0, _ = _line_parts(next_line)
     return bool(next_plain.strip()) and _indent_level(next_x0) > _indent_level(x0)
+
+
+def _line_parts(line: Line | tuple[str, str, float, float]) -> tuple[str, str, float, float]:
+    """兼容既有三元組 fixture，統一回傳含 gap_before 的四元組。"""
+    if len(line) == 4:
+        plain, markdown, x0, gap_before = line
+        return plain, markdown, x0, gap_before
+    plain, markdown, x0 = line
+    return plain, markdown, x0, 0.0
+
+
+def _starts_logical_paragraph(
+    previous_plain: str,
+    gap_before: float,
+) -> bool:
+    """判斷同一視覺區塊內是否應開始新的邏輯段落。"""
+    previous = previous_plain.strip()
+    if gap_before < MEDIUM_PARAGRAPH_GAP:
+        return False
+    return previous.endswith(("。", "！", "？", "!", "?"))
+
+
+def _paragraph_indent_classes(lines: list[ParagraphLine]) -> list[str]:
+    """分開計算整段縮進與首行縮進，並保留結構項目的懸掛縮進。"""
+    meaningful_lines = [
+        (line, x0) for line, x0 in lines if _strip_markers(line).strip()
+    ]
+    if not meaningful_lines:
+        return []
+
+    first_plain = _strip_markers(meaningful_lines[0][0]).strip()
+    is_structural_item = _is_structural_line(first_plain)
+    base_x0 = meaningful_lines[0][1] if is_structural_item else min(
+        x0 for _, x0 in meaningful_lines
+    )
+    indent_level = _indent_level(base_x0)
+    classes = [f"handbook-indent-{indent_level}"] if indent_level else []
+
+    first_line_delta = meaningful_lines[0][1] - base_x0
+    if (
+        not is_structural_item
+        and FIRST_LINE_INDENT_MIN <= first_line_delta <= FIRST_LINE_INDENT_MAX
+    ):
+        classes.append("handbook-first-line-indent")
+    return classes
 
 
 def render_paragraph(lines: list[ParagraphLine], is_mock_exam_zone: bool) -> str:
     if not lines:
         return ""
     markdown_lines = [line for line, _ in lines]
-    indent_level = _indent_level(lines[0][1])
+    classes = _paragraph_indent_classes(lines)
     # 列舉項 a. / b. / c. …:相對於父級 (ii)/(iii) 再深一級,用 padding-left 推 2em
     is_list_item = bool(LIST_ITEM_RE.match(_strip_markers(markdown_lines[0]).strip()))
-    classes: list[str] = []
-    if indent_level:
-        classes.append(f"handbook-indent-{indent_level}")
     if is_list_item:
         classes.append("handbook-list-item")
     paragraph_class = f' class="{" ".join(classes)}"' if classes else ""
@@ -238,11 +283,20 @@ def _spans_to_html(spans: list[tuple[str, str]]) -> str:
     return "".join(out)
 
 
-def extract_pdf_pages() -> list[tuple[int, list[Line]]]:
+def _row_x0(cs: list[dict], plain: str) -> float:
+    """結構行以可見字符的最小 x0 為準，忽略不可見前導空格（與卷一 _row_x0 同策略）。"""
+    if _is_structural_line(plain):
+        visible = [c for c in cs if str(c.get("text", "")).strip()]
+        if visible:
+            return min(float(c["x0"]) for c in visible)
+    return min(float(c["x0"]) for c in cs)
+
+
+def extract_pdf_pages() -> list[tuple[int, list[tuple[str, str, float, float]]]]:
     """回傳 [(pdf_page_idx(1-based), lines), ...]
-    lines = [(plain, markdown, x0)] 段間用 ('', '', 0.0) 標記
+    lines = [(plain, markdown, x0, gap_before)] 段間用 ('', '', 0.0, 0.0) 標記
     """
-    pages: list[tuple[int, list[Line]]] = []
+    pages: list[tuple[int, list[tuple[str, str, float, float]]]] = []
     LINE_GAP = 2.5
     with pdfplumber.open(PDF_PATH) as pdf:
         for i, page in enumerate(pdf.pages, start=1):
@@ -275,7 +329,7 @@ def extract_pdf_pages() -> list[tuple[int, list[Line]]]:
                     continue
                 if re.match(r"^\d+\s*/\s*\d+$", plain):
                     continue
-                x0 = min(float(c["x0"]) for c in cs)
+                x0 = _row_x0(cs, plain)
                 row_pairs.append((y, plain, _spans_to_markdown(spans), x0))
             if not row_pairs:
                 pages.append((i, []))
@@ -284,12 +338,14 @@ def extract_pdf_pages() -> list[tuple[int, list[Line]]]:
             current: list[Line] = []
             prev_y: float | None = None
             for y, plain, mk, x0 in row_pairs:
-                if prev_y is None or (y - prev_y) <= 32.0:
-                    current.append((plain, mk, x0))
+                gap_before = 0.0 if prev_y is None else y - prev_y
+                line = (plain, mk, x0, gap_before)
+                if prev_y is None or gap_before <= 32.0:
+                    current.append(line)
                 else:
                     if current:
                         segments.append(current)
-                    current = [(plain, mk, x0)]
+                    current = [line]
                 prev_y = y
             if current:
                 segments.append(current)
@@ -297,7 +353,7 @@ def extract_pdf_pages() -> list[tuple[int, list[Line]]]:
             for seg in segments:
                 line_pairs.extend(seg)
                 if seg is not segments[-1]:
-                    line_pairs.append(("", "", 0.0))
+                    line_pairs.append(("", "", 0.0, 0.0))
             pages.append((i, line_pairs))
     return pages
 
@@ -461,9 +517,9 @@ def _merge_wrapped_heading_lines(
         merged_lines: list[Line] = []
         index = 0
         while index < len(lines):
-            plain, markdown, x0 = lines[index]
+            plain, markdown, x0, gap_before = _line_parts(lines[index])
             match = H3_RE.match(plain) or H2_RE.match(plain)
-            next_plain = lines[index + 1][0] if index + 1 < len(lines) else None
+            next_plain = _line_parts(lines[index + 1])[0] if index + 1 < len(lines) else None
             if match:
                 title_group = match.lastindex or 0
                 title = match.group(title_group).strip()
@@ -474,10 +530,10 @@ def _merge_wrapped_heading_lines(
                 )
                 if joined is not None:
                     prefix = plain[:match.start(title_group)]
-                    merged_lines.append((_WRAPPED_HEADING_MARKER + prefix + joined, markdown, x0))
+                    merged_lines.append((_WRAPPED_HEADING_MARKER + prefix + joined, markdown, x0, gap_before))
                     index += 2
                     continue
-            merged_lines.append((plain, markdown, x0))
+            merged_lines.append((plain, markdown, x0, gap_before))
             index += 1
         merged_pages.append((pdf_page, merged_lines))
     return merged_pages
@@ -490,8 +546,16 @@ def _carry_pages(pages: list[tuple[int, list[Line]]]) -> set[int]:
             continue
         if pdf_page >= APPENDIX_START_PAGE:
             continue
-        current_visible = [(plain.strip(), x0) for plain, _, x0 in lines if plain.strip()]
-        next_visible = [(plain.strip(), x0) for plain, _, x0 in next_lines if plain.strip()]
+        current_visible = [
+            (_line_parts(line)[0].strip(), _line_parts(line)[2])
+            for line in lines
+            if _line_parts(line)[0].strip()
+        ]
+        next_visible = [
+            (_line_parts(line)[0].strip(), _line_parts(line)[2])
+            for line in next_lines
+            if _line_parts(line)[0].strip()
+        ]
         if not current_visible or not next_visible:
             continue
         last_line, last_x0 = current_visible[-1]
@@ -515,17 +579,19 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
     current_h2_id: str | None = None
     current_h2_num: str | None = None
     pending_lines: list[ParagraphLine] = []
+    pending_plain_lines: list[str] = []
 
     def flush_paragraph():
-        nonlocal pending_lines
+        nonlocal pending_lines, pending_plain_lines
         if pending_lines:
             is_zone = current_h1_id in ("apx-vocab", "apx-glossary", "apx-mock-answers")
             html_parts.append(render_paragraph(pending_lines, is_zone))
             pending_lines = []
+            pending_plain_lines = []
 
     def flush_glossary():
         """術語解釋/辭彙表:每行是一個術語 + 解釋。辭彙表按字母分節(粗體)。"""
-        nonlocal pending_lines
+        nonlocal pending_lines, pending_plain_lines
         if not pending_lines:
             return
         out_items: list[str] = []
@@ -537,6 +603,7 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
         if out_items:
             html_parts.append(f'<div class="glossary-block">{"".join(out_items)}</div>')
         pending_lines = []
+        pending_plain_lines = []
 
     def page_badge(pdf_page: int) -> str:
         anchor_id = ""
@@ -666,7 +733,11 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
 
     attachment_titles: dict[str, str] = {}
     for _, attachment_lines in pages:
-        visible_lines = [plain.strip() for plain, _, _ in attachment_lines if plain.strip()]
+        visible_lines = [
+            _line_parts(line)[0].strip()
+            for line in attachment_lines
+            if _line_parts(line)[0].strip()
+        ]
         for index, line in enumerate(visible_lines):
             match = ATTACHMENT_RE.match(line)
             if not match or match.group(1) in attachment_titles:
@@ -687,7 +758,8 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
         chap = detect_chapter_for_page(pdf_page)
         is_app_zone_now = chap is None
 
-        for line_index, (plain, markdown, x0) in enumerate(line_pairs):
+        normalized_lines = [_line_parts(line) for line in line_pairs]
+        for line_index, (plain, markdown, x0, gap_before) in enumerate(normalized_lines):
             if not plain:
                 if pending_lines and current_h1_id not in ("apx-vocab", "apx-glossary", "apx-mock-answers"):
                     flush_paragraph()
@@ -788,14 +860,20 @@ def build_chapters_and_html(pages: list[tuple[int, list[Line]]]) -> tuple[list[d
             is_list_item = bool(LIST_ITEM_RE.match(plain)) and current_h1_id not in (
                 "apx-vocab", "apx-glossary", "apx-mock-answers",
             )
+            is_geometry_boundary = bool(
+                pending_plain_lines
+                and current_h1_id not in ("apx-vocab", "apx-glossary", "apx-mock-answers")
+                and _starts_logical_paragraph(pending_plain_lines[-1], gap_before)
+            )
 
-            if (is_new_para or is_bullet or is_list_item) and pending_lines:
+            if (is_new_para or is_bullet or is_list_item or is_geometry_boundary) and pending_lines:
                 if current_h1_id in ("apx-vocab", "apx-glossary", "apx-mock-answers"):
                     pass
                 else:
                     flush_paragraph()
             pending_lines.append((markdown, x0))
-            next_line = line_pairs[line_index + 1] if line_index + 1 < len(line_pairs) else None
+            pending_plain_lines.append(plain)
+            next_line = normalized_lines[line_index + 1] if line_index + 1 < len(normalized_lines) else None
             if (
                 current_h1_id not in ("apx-vocab", "apx-glossary", "apx-mock-answers")
                 and _is_standalone_lettered_subheading(plain, x0, next_line)

@@ -1,6 +1,10 @@
-"""Fix truncated options caused by rebuild_mock_pdfs.py's starts_new_question() heuristic.
+"""Legacy one-off repair for flattened layout-parser output.
 
-Root cause: When option text wraps to a second visual line in the PDF,
+Do not run this script against production datasets. Its input lacks physical PDF
+row boundaries and cannot reliably distinguish a wrapped option from the next
+question stem. Rebuild from source with ``rebuild_mock_pdfs.py`` instead.
+
+Historical heuristic and failure mode:
 the parser incorrectly treats the continuation as a new question's stem.
 
 Detection: In the raw layout file, a genuine continuation line appears

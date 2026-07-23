@@ -1,7 +1,11 @@
-"""
-解析 IIQE 模擬題 PDF (layout 模式)。
+"""Legacy diagnostic parser for flattened mock-PDF layout text.
 
-Layout 模式文字的垂直結構:
+Do not use this parser to rebuild production question data. PDF question numbers
+are vertically centered within physical table rows, so flattened text does not
+preserve logical question boundaries and can append the next stem to option d.
+Use ``rebuild_mock_pdfs.py`` instead; it parses physical table rows and cells.
+
+The legacy layout assumptions are documented below for historical diagnosis:
   [上一題 c)]
   [上一題 d)]
   [本題 題幹(可能多行)]
