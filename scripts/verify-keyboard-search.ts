@@ -31,7 +31,7 @@ function keyboardEvent(
   };
 }
 
-assert.equal(QUESTION_SEARCH_PROVIDERS.length, 6);
+assert.equal(QUESTION_SEARCH_PROVIDERS.length, 9);
 for (const provider of QUESTION_SEARCH_PROVIDERS) {
   const shiftOnlyEvent = keyboardEvent(provider.shortcutKey, { shiftKey: true });
   assert.equal(
@@ -191,6 +191,9 @@ const expectedUrls: Record<QuestionSearchProviderId, string> = {
   kimi: `https://www.kimi.com/?prefill_prompt=${encodedQuery}&send_immediately=true`,
   xiaohongshu: `https://www.xiaohongshu.com/ai_chat?keyword=${encodedQuery}`,
   felo: `https://felo.ai/search?q=${encodedQuery}`,
+  sogou: `https://www.sogou.com/aimode/search?sourceid=5_00_19&query=${encodedQuery}`,
+  bing: `https://www.bing.com/search?q=${encodedQuery}&iscopilotedu=1&form=MA13G7`,
+  zhihu: `https://zhida.zhihu.com/search?q=${encodedQuery}`,
 };
 
 for (const provider of QUESTION_SEARCH_PROVIDERS) {

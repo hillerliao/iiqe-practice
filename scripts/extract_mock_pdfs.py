@@ -1,7 +1,10 @@
-"""
-抽取模擬題 PDF 為純文字(使用 layout=True 處理雙欄排版)。
+"""Legacy diagnostic extractor for flattened mock-PDF layout text.
 
-用法:
+Do not use its output to rebuild production question data. Flattening a physical
+PDF table into visual text lines loses authoritative row boundaries. Use
+``rebuild_mock_pdfs.py`` instead; it parses physical table rows and cells.
+
+Diagnostic usage only:
   python scripts/extract_mock_pdfs.py
 """
 import os

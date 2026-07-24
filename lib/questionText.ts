@@ -5,8 +5,11 @@
 
 const ROMAN_NUMERALS = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"];
 const ROMAN_SOURCE = "viii|vii|vi|iv|ix|v|iii|ii|i|x";
+// 裸羅馬數字後接空白、行尾或中日韓字符均視為分項標記
+// (OCR 常丟失分隔號, 如 "iii保險人" — 中文正文不會出現羅馬數字, 故安全)
+const CJK_LOOKAHEAD = "[\\u4e00-\\u9fff\\u3400-\\u4dbf\\uf900-\\ufaff]";
 const ROMAN_MARKER_RE = new RegExp(
-  `(^|[\\s:：;；,，])((?:[(（]\\s*)?(?:${ROMAN_SOURCE})\\s*[)）]|(?:${ROMAN_SOURCE})[.．]|(?:${ROMAN_SOURCE})(?=\\s|$))`,
+  `(^|[\\s:：;；,，])((?:[(（]\\s*)?(?:${ROMAN_SOURCE})\\s*[)）]|(?:${ROMAN_SOURCE})[.．]|(?:${ROMAN_SOURCE})(?=\\s|$|${CJK_LOOKAHEAD}))`,
   "gi",
 );
 

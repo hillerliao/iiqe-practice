@@ -16,6 +16,8 @@ type KVClient = {
   exists(key: string): Promise<boolean>;
   rename(key: string, newKey: string): Promise<void>;
   expire(key: string, seconds: number): Promise<void>;
+  createAttemptIfAbsent(record: AttemptRecord, attemptKey: string, indexKey: string): Promise<boolean>;
+  ensureAttemptIndexed(attemptId: string, indexKey: string): Promise<void>;
 };
 
 const inMemoryStore = new Map<string, string>();
@@ -100,6 +102,37 @@ function createInMemoryClient(): KVClient {
       }
     },
     async expire(_key: string, _seconds: number): Promise<void> {},
+    async createAttemptIfAbsent(record: AttemptRecord, recordKey: string, indexKey: string) {
+      if (inMemoryStore.has(recordKey)) return false;
+      const rawIndex = inMemoryStore.get(indexKey);
+      let ids: string[] = [];
+      if (rawIndex) {
+        try {
+          const parsed = JSON.parse(rawIndex) as unknown;
+          if (Array.isArray(parsed)) ids = parsed.filter((id): id is string => typeof id === "string");
+        } catch {
+          ids = [];
+        }
+      }
+      inMemoryStore.set(recordKey, JSON.stringify(record));
+      inMemoryStore.set(indexKey, JSON.stringify([record.id, ...ids.filter((id) => id !== record.id)]));
+      return true;
+    },
+    async ensureAttemptIndexed(attemptId: string, indexKey: string) {
+      const rawIndex = inMemoryStore.get(indexKey);
+      let ids: string[] = [];
+      if (rawIndex) {
+        try {
+          const parsed = JSON.parse(rawIndex) as unknown;
+          if (Array.isArray(parsed)) ids = parsed.filter((id): id is string => typeof id === "string");
+        } catch {
+          ids = [];
+        }
+      }
+      if (!ids.includes(attemptId)) {
+        inMemoryStore.set(indexKey, JSON.stringify([attemptId, ...ids]));
+      }
+    },
   };
 }
 
@@ -159,6 +192,39 @@ function createUpstashClient(): KVClient {
   const writeJSON = async (key: string, value: unknown): Promise<void> => {
     await exec("SET", key, JSON.stringify(value));
   };
+
+  const CREATE_ATTEMPT_SCRIPT = `
+local attemptKey = KEYS[1]
+local indexKey = KEYS[2]
+if redis.call('EXISTS', attemptKey) == 1 then return 0 end
+local ids = {}
+local raw = redis.call('GET', indexKey)
+if raw then
+  local ok, decoded = pcall(cjson.decode, raw)
+  if ok and type(decoded) == 'table' then ids = decoded end
+end
+local nextIds = {ARGV[1]}
+for _, id in ipairs(ids) do
+  if id ~= ARGV[1] then table.insert(nextIds, id) end
+end
+redis.call('SET', attemptKey, ARGV[2])
+redis.call('SET', indexKey, cjson.encode(nextIds))
+return 1
+`;
+  const ENSURE_ATTEMPT_INDEXED_SCRIPT = `
+local raw = redis.call('GET', KEYS[1])
+local ids = {}
+if raw then
+  local ok, decoded = pcall(cjson.decode, raw)
+  if ok and type(decoded) == 'table' then ids = decoded end
+end
+for _, id in ipairs(ids) do
+  if id == ARGV[1] then return 0 end
+end
+table.insert(ids, 1, ARGV[1])
+redis.call('SET', KEYS[1], cjson.encode(ids))
+return 1
+`;
 
   return {
     async get<T>(key: string) {
@@ -230,6 +296,21 @@ function createUpstashClient(): KVClient {
     async expire(key: string, seconds: number) {
       await exec("EXPIRE", key, String(seconds));
     },
+    async createAttemptIfAbsent(record: AttemptRecord, recordKey: string, indexKey: string) {
+      const result = await exec<number>(
+        "EVAL",
+        CREATE_ATTEMPT_SCRIPT,
+        "2",
+        recordKey,
+        indexKey,
+        record.id,
+        JSON.stringify(record),
+      );
+      return result === 1;
+    },
+    async ensureAttemptIndexed(attemptId: string, indexKey: string) {
+      await exec<number>("EVAL", ENSURE_ATTEMPT_INDEXED_SCRIPT, "1", indexKey, attemptId);
+    },
   };
 }
 
@@ -238,6 +319,7 @@ export const kv: KVClient = hasUpstashEnv()
   : createInMemoryClient();
 
 import type { StorageBackend } from "@/lib/storage-backend";
+import type { AutoAdvanceDelay } from "@/lib/auto-advance";
 // 在顶层 import 一次 storage-backend,避免循环依赖问题(getPrisma -> lib/db -> 不会反向依赖 kv)
 import { pickStorageBackend } from "@/lib/storage-backend";
 import * as sqlite from "@/lib/kv-sqlite";
@@ -289,6 +371,11 @@ export type NoteRecord = {
   updatedAt: string;
 };
 
+export type UserPreferencesRecord = {
+  autoAdvanceDelayMs: AutoAdvanceDelay;
+  updatedAt: string;
+};
+
 export type FeedbackCategory =
   | "question_error"
   | "answer_error"
@@ -316,6 +403,7 @@ const SESS_AT = "session:attempts:";
 const SESS_FAV = "session:favs:";
 const SESS_FAV_META = "session:favs-meta:";
 const SESS_NOTES = "session:notes:";
+const SESS_PREFS = "session:preferences:";
 const TOOL_CALL = "tool-call:";
 const FB = "feedback:";
 const SESS_FB = "feedback:session:";
@@ -325,6 +413,7 @@ function sessAttemptsKey(sid: string) { return `${SESS_AT}${sid}`; }
 function sessFavsKey(sid: string) { return `${SESS_FAV}${sid}`; }
 function sessFavMetaKey(sid: string) { return `${SESS_FAV_META}${sid}`; }
 function sessNotesKey(sid: string) { return `${SESS_NOTES}${sid}`; }
+function sessPreferencesKey(sid: string) { return `${SESS_PREFS}${sid}`; }
 function toolCallKey(sid: string, id: string) { return `${TOOL_CALL}${sid}:${id}`; }
 function feedbackKey(id: string) { return `${FB}${id}`; }
 function sessFeedbackKey(sid: string) { return `${SESS_FB}${sid}`; }
@@ -333,6 +422,20 @@ export async function createAttempt(record: AttemptRecord): Promise<void> {
   if (backend() === "sqlite") return sqlite.createAttemptSqlite(record);
   await kv.set(attemptKey(record.id), record);
   await kv.lpush(sessAttemptsKey(record.sessionId), record.id);
+}
+
+export async function createAttemptIfAbsent(record: AttemptRecord): Promise<boolean> {
+  if (backend() === "sqlite") return sqlite.createAttemptIfAbsentSqlite(record);
+  return kv.createAttemptIfAbsent(
+    record,
+    attemptKey(record.id),
+    sessAttemptsKey(record.sessionId),
+  );
+}
+
+export async function ensureAttemptIndexed(sessionId: string, attemptId: string): Promise<void> {
+  if (backend() === "sqlite") return;
+  await kv.ensureAttemptIndexed(attemptId, sessAttemptsKey(sessionId));
 }
 
 export async function getAttempt(id: string): Promise<AttemptRecord | null> {
@@ -400,10 +503,10 @@ export async function upsertAnswer(
 
 export async function findUnfinishedAttempt(sessionId: string, paperId?: string, source?: string): Promise<AttemptRecord | null> {
   if (backend() === "sqlite") return sqlite.findUnfinishedAttemptSqlite(sessionId, paperId, source);
-  const ids = await kv.lrange<string>(sessAttemptsKey(sessionId), 0, -1);
+  const ids = [...new Set(await kv.lrange<string>(sessAttemptsKey(sessionId), 0, -1))];
   for (const id of ids) {
     const at = await getAttempt(id);
-    if (at && at.finishedAt == null) {
+    if (at && at.sessionId === sessionId && at.finishedAt == null) {
       if (paperId && at.paperId !== paperId) continue;
       if (source && at.source !== source) continue;
       return at;
@@ -414,11 +517,11 @@ export async function findUnfinishedAttempt(sessionId: string, paperId?: string,
 
 export async function listAttempts(sessionId: string): Promise<AttemptRecord[]> {
   if (backend() === "sqlite") return sqlite.listAttemptsSqlite(sessionId);
-  const ids = await kv.lrange<string>(sessAttemptsKey(sessionId), 0, -1);
+  const ids = [...new Set(await kv.lrange<string>(sessAttemptsKey(sessionId), 0, -1))];
   const results: AttemptRecord[] = [];
   for (const id of ids) {
     const at = await getAttempt(id);
-    if (at) results.push(at);
+    if (at && at.sessionId === sessionId) results.push(at);
   }
   return results;
 }
@@ -489,6 +592,19 @@ export async function listNotes(sessionId: string, questionIds?: string[]): Prom
   return filtered;
 }
 
+export async function getPreferences(sessionId: string): Promise<UserPreferencesRecord | null> {
+  if (backend() === "sqlite") return sqlite.getPreferencesSqlite(sessionId);
+  return kv.get<UserPreferencesRecord>(sessPreferencesKey(sessionId));
+}
+
+export async function savePreferences(
+  sessionId: string,
+  preferences: UserPreferencesRecord
+): Promise<void> {
+  if (backend() === "sqlite") return sqlite.savePreferencesSqlite(sessionId, preferences);
+  await kv.set(sessPreferencesKey(sessionId), preferences);
+}
+
 export async function migrateSession(fromSessionId: string, toSessionId: string): Promise<{ attempts: number; favorites: number; notes: number }> {
   if (backend() === "sqlite") return sqlite.migrateSessionSqlite(fromSessionId, toSessionId);
   const result = { attempts: 0, favorites: 0, notes: 0 };
@@ -549,6 +665,13 @@ export async function migrateSession(fromSessionId: string, toSessionId: string)
     }
     await kv.del(sessNotesKey(fromSessionId));
     result.notes = Object.keys(notes).length;
+  }
+
+  const fromPreferences = await getPreferences(fromSessionId);
+  if (fromPreferences) {
+    const toPreferences = await getPreferences(toSessionId);
+    if (!toPreferences) await savePreferences(toSessionId, fromPreferences);
+    await kv.del(sessPreferencesKey(fromSessionId));
   }
 
   return result;

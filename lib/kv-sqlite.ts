@@ -5,11 +5,18 @@
 // 表与字段由 prisma/schema.prisma 决定;这里用 Prisma client 操作,避免写裸 SQL。
 
 import { getPrisma } from "@/lib/db";
-import type { AttemptRecord, AnswerRecord, FavoriteRecord, NoteRecord, FeedbackRecord, ToolCallRecord } from "@/lib/kv";
+import type { AttemptRecord, AnswerRecord, FavoriteRecord, NoteRecord, FeedbackRecord, ToolCallRecord, UserPreferencesRecord } from "@/lib/kv";
 import type { QuestionData } from "@/lib/data";
 import type { Prisma } from "@/lib/generated/prisma";
 
 type TransactionClient = Prisma.TransactionClient;
+
+function isUniqueConstraintError(error: unknown): boolean {
+  return (
+    (typeof error === "object" && error !== null && "code" in error && error.code === "P2002") ||
+    (error instanceof Error && /unique constraint/i.test(error.message))
+  );
+}
 
 function parseQuestionIds(value: string): string[] {
   try {
@@ -291,6 +298,52 @@ export async function createAttemptSqlite(record: AttemptRecord): Promise<void> 
       });
     }
   });
+}
+
+export async function createAttemptIfAbsentSqlite(record: AttemptRecord): Promise<boolean> {
+  const prisma = getPrisma();
+  try {
+    await prisma.$transaction(async (tx: TransactionClient) => {
+      await tx.attempt.create({
+        data: {
+          id: record.id,
+          sessionId: record.sessionId,
+          paperId: record.paperId,
+          mode: record.mode,
+          source: record.source ?? "exam",
+          startedAt: new Date(record.startedAt),
+          finishedAt: record.finishedAt ? new Date(record.finishedAt) : null,
+          durationSec: record.durationSec,
+          totalQ: record.totalQ,
+          questionIds: JSON.stringify(record.questionIds),
+          correct: record.correct,
+        },
+      });
+      for (const ans of record.answers) {
+        await tx.answer.create({
+          data: {
+            id: `${record.id}::${ans.questionId}`,
+            attemptId: record.id,
+            questionId: ans.questionId,
+            userAnswer: ans.userAnswer,
+            isCorrect: ans.isCorrect,
+            timeSpentMs: ans.timeSpentMs,
+            createdAt: new Date(ans.createdAt),
+          },
+        });
+      }
+    });
+    return true;
+  } catch (error) {
+    if (isUniqueConstraintError(error)) {
+      const existing = await prisma.attempt.findUnique({
+        where: { id: record.id },
+        select: { id: true },
+      });
+      if (existing) return false;
+    }
+    throw error;
+  }
 }
 
 export async function getAttemptSqlite(id: string): Promise<AttemptRecord | null> {
@@ -629,6 +682,37 @@ export async function listNotesSqlite(
   return out;
 }
 
+export async function getPreferencesSqlite(
+  sessionId: string
+): Promise<UserPreferencesRecord | null> {
+  const row = await getPrisma().sessionPreference.findUnique({
+    where: { sessionId },
+  });
+  if (!row) return null;
+  return {
+    autoAdvanceDelayMs: row.autoAdvanceDelayMs as UserPreferencesRecord["autoAdvanceDelayMs"],
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+export async function savePreferencesSqlite(
+  sessionId: string,
+  preferences: UserPreferencesRecord
+): Promise<void> {
+  await getPrisma().sessionPreference.upsert({
+    where: { sessionId },
+    create: {
+      sessionId,
+      autoAdvanceDelayMs: preferences.autoAdvanceDelayMs,
+      updatedAt: new Date(preferences.updatedAt),
+    },
+    update: {
+      autoAdvanceDelayMs: preferences.autoAdvanceDelayMs,
+      updatedAt: new Date(preferences.updatedAt),
+    },
+  });
+}
+
 export async function createFeedbackSqlite(rec: FeedbackRecord): Promise<void> {
   const prisma = getPrisma();
   await prisma.feedback.upsert({
@@ -727,6 +811,24 @@ export async function migrateSessionSqlite(
         noteCount++;
       } else {
         await tx.note.delete({ where: { id: n.id } });
+      }
+    }
+
+    // Preferences:若目標已有設定則保留目標值,否則遷移來源值。
+    const fromPreferences = await tx.sessionPreference.findUnique({
+      where: { sessionId: fromSessionId },
+    });
+    if (fromPreferences) {
+      const toPreferences = await tx.sessionPreference.findUnique({
+        where: { sessionId: toSessionId },
+      });
+      if (!toPreferences) {
+        await tx.sessionPreference.update({
+          where: { sessionId: fromSessionId },
+          data: { sessionId: toSessionId },
+        });
+      } else {
+        await tx.sessionPreference.delete({ where: { sessionId: fromSessionId } });
       }
     }
 

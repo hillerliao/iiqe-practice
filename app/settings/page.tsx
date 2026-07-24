@@ -10,12 +10,15 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Save, RotateCcw, Copy, Check, AlertTriangle } from "lucide-react";
 import { ThemeSettings } from "@/components/ThemeSettings";
+import { AutoAdvanceSettings } from "@/components/AutoAdvanceSettings";
 import {
   getSessionId,
   isCustomSessionId,
   getCustomIdDisplay,
   setCustomSessionId,
   resetSessionId,
+  restoreSessionId,
+  emitSessionChange,
   validateCustomId,
 } from "@/lib/session";
 import { authedFetch, reestablishSession } from "@/lib/session-client";
@@ -78,10 +81,16 @@ export default function SettingsPage() {
         }
       }
 
-      // 遷移成功,寫入 localStorage 切換 ID,並強制重建會話 Cookie 使 sid 同步
-      setCustomSessionId(inputId);
-      await reestablishSession();
-      setCurrentId(getSessionId());
+      // 遷移成功後先更新 localStorage，再重建簽名 Cookie；只有兩者一致時才通知全局元件。
+      const switchedId = setCustomSessionId(inputId);
+      try {
+        await reestablishSession();
+      } catch (error) {
+        if (oldId) restoreSessionId(oldId);
+        throw error;
+      }
+      emitSessionChange(switchedId);
+      setCurrentId(switchedId);
       setSaved(true);
       setTimeout(() => {
         setSaved(false);
@@ -96,9 +105,17 @@ export default function SettingsPage() {
   }
 
   async function handleReset() {
-    resetSessionId();
-    await reestablishSession();
-    setCurrentId(getSessionId());
+    const oldId = currentId;
+    const newId = resetSessionId();
+    try {
+      await reestablishSession();
+    } catch (error) {
+      if (oldId) restoreSessionId(oldId);
+      setError(error instanceof Error ? error.message : "重置失敗");
+      return;
+    }
+    emitSessionChange(newId);
+    setCurrentId(newId);
     setInputId("");
     setConfirmReset(false);
     setSaved(false);
@@ -133,6 +150,7 @@ export default function SettingsPage() {
       <h1 className="text-2xl font-bold tracking-tight mb-6">設定</h1>
 
       <ThemeSettings />
+      <AutoAdvanceSettings />
 
       <Card className="mb-4">
         <CardHeader>
@@ -186,7 +204,7 @@ export default function SettingsPage() {
               type="text"
               value={inputId}
               onChange={(e) => setInputId(e.target.value)}
-              placeholder="例如:hillerliao 或 you@example.com"
+              placeholder="例如：you@example.com"
               maxLength={64}
             />
             <p className="text-xs text-muted-foreground">
@@ -260,7 +278,7 @@ export default function SettingsPage() {
           <div className="space-y-1">
             <p className="font-medium text-foreground">步驟:</p>
             <ol className="list-decimal list-inside space-y-1 ml-2">
-              <li>在第一個瀏覽器設定一個自訂 ID(例如 <code className="text-xs bg-muted px-1 rounded">hillerliao</code> 或 <code className="text-xs bg-muted px-1 rounded">you@example.com</code>)</li>
+              <li>在第一個瀏覽器設定一個自訂 ID（例如 <code className="text-xs bg-muted px-1 rounded">you@example.com</code>）</li>
               <li>作答、收藏等資料會綁定到這個 ID</li>
               <li>在另一個瀏覽器打開本頁,輸入同樣的自訂 ID</li>
               <li>儲存後即會切換到同一份資料,繼續之前的進度</li>

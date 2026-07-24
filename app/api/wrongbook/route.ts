@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { listAttempts, updateAttempt } from "@/lib/kv";
 import { getQuestionById, getPapers } from "@/lib/data";
 import { requireSession } from "@/lib/auth";
+import { buildWrongbookItems } from "@/lib/wrongbook";
 
 export async function GET(req: NextRequest) {
   const session = requireSession(req);
@@ -9,60 +10,7 @@ export async function GET(req: NextRequest) {
   const sessionId = session.sessionId;
 
   const attempts = await listAttempts(sessionId);
-  const papers = getPapers();
-
-  const wrongAnswers = attempts.flatMap((at) =>
-    at.answers
-      .filter((a) => !a.isCorrect)
-      .map((a) => ({
-        ...a,
-        paperId: at.paperId,
-        startedAt: at.startedAt,
-      }))
-  );
-
-  const wrongCountMap = new Map<string, number>();
-  for (const a of wrongAnswers) {
-    wrongCountMap.set(a.questionId, (wrongCountMap.get(a.questionId) ?? 0) + 1);
-  }
-
-  const seen = new Set<string>();
-  const unique: typeof wrongAnswers = [];
-  for (const a of wrongAnswers) {
-    if (seen.has(a.questionId)) continue;
-    seen.add(a.questionId);
-    unique.push(a);
-  }
-
-  const items = unique.map((a) => {
-    const q = getQuestionById(a.questionId);
-    if (!q) return null;
-    const paper = papers.find((p) => p.id === q.id.split("-")[0]);
-    return {
-      questionId: a.questionId,
-      userAnswer: a.userAnswer,
-      correctAnswer: q.answer?.toLowerCase() ?? "",
-      lastWrongAt: a.createdAt ?? a.startedAt,
-      wrongCount: wrongCountMap.get(a.questionId) ?? 1,
-      paperCode: paper?.code ?? "",
-      paperName: paper?.name ?? "",
-      note: null,
-      question: {
-        id: q.id,
-        number: q.number,
-        ref: q.ref,
-        question: q.question,
-        options: q.options,
-        answer: q.answer?.toLowerCase() ?? "",
-        explanation: q.explanation,
-        page: q.page,
-        source: q.source,
-        sourceLabel: q.sourceLabel,
-      },
-    };
-  }).filter((it): it is NonNullable<typeof it> => it != null);
-
-  items.sort((a, b) => b.wrongCount - a.wrongCount);
+  const items = buildWrongbookItems(attempts, getQuestionById, getPapers());
 
   return NextResponse.json({
     count: items.length,

@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AutoAdvancePreferenceProvider } from "@/components/auto-advance-provider";
+import { ThemeShortcut } from "@/components/theme-shortcut";
 import { SetupReminder } from "@/components/SetupReminder";
 import { Analytics } from "@/components/Analytics";
 import { GlobalHeader } from "@/components/GlobalHeader";
+import { SiteMark } from "@/components/SiteMark";
 import { listHandbookEntries } from "@/lib/handbook";
 
 // 本地字型檔 (.woff2): 用於建置環境無法訪問 fonts.gstatic.com 時的後備方案。
@@ -81,16 +84,22 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider>
-          <GlobalHeader
-            defaultSlug={defaultSlug}
-            handbookEntries={handbookEntries}
-          />
-          <SetupReminder />
-          <Analytics />
-          <main className="flex-1">{children}</main>
-          <footer className="border-t py-3 text-center text-xs text-muted-foreground">
-            IIQE 做題家 · 讓練習更簡單
-          </footer>
+          <AutoAdvancePreferenceProvider>
+            <GlobalHeader
+              defaultSlug={defaultSlug}
+              handbookEntries={handbookEntries}
+            />
+            <SetupReminder />
+            <Analytics />
+            <ThemeShortcut />
+            <main className="flex-1">{children}</main>
+            <footer className="border-t py-3 text-center text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <SiteMark className="w-4 h-4" />
+                IIQE 做題家 · 讓練習更簡單
+              </span>
+            </footer>
+          </AutoAdvancePreferenceProvider>
         </ThemeProvider>
       </body>
     </html>

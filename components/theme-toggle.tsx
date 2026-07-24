@@ -8,8 +8,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { THEME_SHORTCUT_LABEL } from "@/components/theme-shortcut";
 
 const OPTIONS: {
   value: ThemeMode;
@@ -85,6 +88,11 @@ export function ThemeToggle() {
             </DropdownMenuItem>
           );
         })}
+        <DropdownMenuSeparator />
+        <div className="flex items-center justify-between px-2.5 py-1.5 text-xs text-muted-foreground">
+          <span>快速切換淺/深色</span>
+          <DropdownMenuShortcut>{THEME_SHORTCUT_LABEL}</DropdownMenuShortcut>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

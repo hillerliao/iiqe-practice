@@ -65,7 +65,7 @@ export function HandbookNavLink({
     <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
-          "rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap text-sm",
+          "rounded-md hover:bg-muted hover:text-foreground flex items-center gap-1.5 shrink-0 whitespace-nowrap text-sm focus:outline-none focus-visible:outline-2 focus-visible:outline-ring",
           isEmbedded
             ? "h-9 px-2.5"
             : "px-2 sm:px-3 py-1.5",

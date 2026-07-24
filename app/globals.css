@@ -139,3 +139,33 @@
 @utility grid-cols-15 {
   grid-template-columns: repeat(15, minmax(0, 1fr));
 }
+
+/* 考試倒數徽章:緊急(≤7天)時的呼吸光暈 */
+@keyframes countdown-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 oklch(0.637 0.237 25.331 / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 5px oklch(0.637 0.237 25.331 / 0);
+  }
+}
+.animate-countdown-pulse {
+  animation: countdown-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 倒數設定面板入場動畫 */
+@keyframes countdown-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-countdown-pop-in {
+  animation: countdown-pop-in 0.16s ease-out both;
+  transform-origin: top left;
+}

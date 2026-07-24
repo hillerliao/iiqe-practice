@@ -1,7 +1,11 @@
-"""
-解析 IIQE 模擬題 PDF (layout 模式)。
+"""Legacy diagnostic parser for flattened mock-PDF layout text.
 
-Layout 模式文字的垂直結構:
+Do not use this parser to rebuild production question data. PDF question numbers
+are vertically centered within physical table rows, so flattened text does not
+preserve logical question boundaries and can append the next stem to option d.
+Use ``rebuild_mock_pdfs.py`` instead; it parses physical table rows and cells.
+
+The legacy layout assumptions are documented below for historical diagnosis:
   [上一題 c)]
   [上一題 d)]
   [本題 題幹(可能多行)]
@@ -131,6 +135,7 @@ def parse_file(text_path: str) -> list[dict]:
         # 往前取「連續選項塊」補齊(遇到非選項行即停,避免誤採前題遺留)。
         options: dict[str, str] = {}
         answer: str | None = None
+        current_letter: str | None = None
 
         for k in range(start, next_start):
             _, ln = cleaned[k]
@@ -164,6 +169,15 @@ def parse_file(text_path: str) -> list[dict]:
                         answer = ans
                 else:
                     options[letter] = txt
+                # 記住目前正在組裝的選項字母，用於接續換行
+                current_letter = letter
+            else:
+                # 非選項行：若上一步仍在組裝某選項，且本行不是題號/答案尾，
+                # 則視為該選項跨行續接的文字（修復選項跨兩行被截斷的問題）
+                if current_letter is not None and current_letter in options:
+                    s_ln = ln.strip()
+                    if s_ln and not TAG_RE.match(s_ln) and not s_ln.endswith(("A", "B", "C", "D")):
+                        options[current_letter] = (options[current_letter] + s_ln).strip()
             # 非選項行忽略(下一題的題幹)
 
         # 補齊缺漏選項:從題號行往前取「連續選項塊」(遇到非選項行即停)

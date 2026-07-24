@@ -45,18 +45,20 @@ def _next_visible_char(s: str, from_idx: int) -> str:
     return ""
 
 
-def _is_non_sentence_period(prev: str, nxt: str) -> bool:
+def _is_non_sentence_period(s: str, index: int, prev: str, nxt: str) -> bool:
     if prev == "." or nxt == ".":
         return True
     if prev.isdigit() and nxt.isdigit():
         return True
-    return (
-        bool(prev)
-        and bool(nxt)
-        and prev.isascii()
-        and prev.isalpha()
+
+    prefix = re.sub(r"<[^>]+>", "", s[max(0, index - 100):index])
+    if prev.isascii() and prev in "abcdefgh" and s[index + 1:index + 2].isspace():
+        return True
+    return bool(
+        nxt
         and nxt.isascii()
         and (nxt.isalnum() or nxt in "/_-#")
+        and re.search(r"(?:https?://|www\.)[^\s]*$", prefix, re.IGNORECASE)
     )
 
 
@@ -70,6 +72,7 @@ def split_long_paragraph(
     hard_limit: int,
     soft_bad_lead: str,
 ) -> list[str]:
+    closing_punctuation = "）)]」』”’》〉】〕〗〙〛"
     def total_visible(s: str) -> int:
         text = re.sub(r"</?[^>]+>", "", s)
         text = re.sub(r"&[a-zA-Z#0-9]+;", "X", text)
@@ -118,7 +121,9 @@ def split_long_paragraph(
         if ch in primary_end and visible_length >= target:
             prev = _previous_visible_char(inner_html, i)
             nxt = _next_visible_char(inner_html, i)
-            should_split = not (ch == "." and _is_non_sentence_period(prev, nxt))
+            should_split = not (
+                ch == "." and _is_non_sentence_period(inner_html, i, prev, nxt)
+            )
         elif ch in soft_end:
             nxt = _next_visible_char(inner_html, i)
             if visible_length >= hard_limit:
@@ -127,6 +132,11 @@ def split_long_paragraph(
                 should_split = False
             elif visible_length >= soft_min:
                 should_split = True
+
+        if should_split:
+            next_visible = _next_visible_char(inner_html, i)
+            if next_visible and next_visible in closing_punctuation:
+                should_split = False
 
         if should_split:
             close = "".join(f"</{tag}>" for tag in reversed(stack))

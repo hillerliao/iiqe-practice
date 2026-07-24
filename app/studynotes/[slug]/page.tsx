@@ -134,11 +134,11 @@ export default async function HandbookPage({
               margin-top: 0 !important;
               margin-bottom: 14px !important;
             }
-            .handbook-content .handbook-indent-1 { text-indent: 2em !important; }
-            .handbook-content .handbook-indent-2 { text-indent: 4em !important; }
-            .handbook-content .handbook-indent-3 { text-indent: 6em !important; }
+            .handbook-content .handbook-indent-1 { padding-left: 2em !important; }
+            .handbook-content .handbook-indent-2 { padding-left: 4em !important; }
+            .handbook-content .handbook-indent-3 { padding-left: 6em !important; }
+            .handbook-content .handbook-first-line-indent { text-indent: 2em !important; }
             .handbook-content p.handbook-list-item {
-              text-indent: 0 !important;
               padding-left: 8em !important;
             }
             .handbook-content ul,
@@ -220,11 +220,11 @@ export default async function HandbookPage({
             }
             @media (max-width: 768px) {
               .handbook-content .vocab-block { column-count: 1; }
-              .handbook-content .handbook-indent-1 { text-indent: 2em !important; }
-              .handbook-content .handbook-indent-2 { text-indent: 4em !important; }
-              .handbook-content .handbook-indent-3 { text-indent: 6em !important; }
+              .handbook-content .handbook-indent-1 { padding-left: 1em !important; }
+              .handbook-content .handbook-indent-2 { padding-left: 2em !important; }
+              .handbook-content .handbook-indent-3 { padding-left: 3em !important; }
+              .handbook-content .handbook-first-line-indent { text-indent: 1em !important; }
               .handbook-content p.handbook-list-item {
-                text-indent: 0 !important;
                 padding-left: 6em !important;
               }
             }

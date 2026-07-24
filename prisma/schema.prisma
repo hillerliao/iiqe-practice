@@ -115,6 +115,14 @@ model Note {
   @@map("Note")
 }
 
+model SessionPreference {
+  sessionId          String   @id
+  autoAdvanceDelayMs Int?
+  updatedAt          DateTime @updatedAt
+
+  @@map("SessionPreference")
+}
+
 model Feedback {
   id          String   @id
   sessionId   String

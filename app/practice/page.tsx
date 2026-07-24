@@ -14,7 +14,6 @@ import {
   ChevronLeft,
   ChevronRight,
   List,
-  Search,
   Copy,
   Check,
 } from "lucide-react";
@@ -23,10 +22,15 @@ import { authedFetch } from "@/lib/session-client";
 import { NoteButton, type NoteButtonHandle } from "@/components/NoteButton";
 import { ReportButton, type ReportButtonHandle } from "@/components/ReportButton";
 import { QuestionStem } from "@/components/QuestionStem";
-import { ShortcutHints } from "@/components/ShortcutHints";
-import { buildSearchQuery } from "@/components/QuestionSearchButtons";
+import { Explanation } from "@/components/Explanation";
+import {
+  buildSearchQuery,
+  QuestionSearchMenu,
+} from "@/components/QuestionSearchButtons";
 import { formatQuestionText } from "@/components/CopyQuestionButton";
 import { useToast, ToastContainer } from "@/components/useToast";
+import { AutoAdvanceMenu } from "@/components/AutoAdvanceMenu";
+import { useAutoAdvancePreference } from "@/components/auto-advance-provider";
 import { useWindowKeydown } from "@/hooks/use-window-keydown";
 import { writeTextToClipboard } from "@/lib/clipboard";
 import { getChapterInfo } from "@/lib/chapters";
@@ -39,10 +43,7 @@ import {
   normalizeKey,
   parseAnswerKey,
 } from "@/lib/practice-shortcuts";
-import {
-  matchQuestionSearchProvider,
-  QUESTION_SEARCH_PROVIDERS,
-} from "@/lib/question-search";
+import { matchQuestionSearchProvider } from "@/lib/question-search";
 
 type Question = {
   id: string;
@@ -85,6 +86,9 @@ function PracticeInner() {
   const searchParams = useSearchParams();
   const attemptId = searchParams.get("id") ?? "";
   const { toast, toasts } = useToast();
+  const { delay: autoAdvanceDelay } = useAutoAdvancePreference();
+  const autoAdvanceDelayRef = useRef(autoAdvanceDelay);
+  autoAdvanceDelayRef.current = autoAdvanceDelay;
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [attempt, setAttempt] = useState<AttemptMeta | null>(null);
@@ -104,14 +108,14 @@ function PracticeInner() {
   const answerRequestsRef = useRef<Set<string>>(new Set());
   const favoriteRequestsRef = useRef<Set<string>>(new Set());
   const autoNextTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeAutoNextRef = useRef<{
+    submittedIdx: number;
+    navigationVersion: number;
+  } | null>(null);
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
   const noteButtonRef = useRef<NoteButtonHandle>(null);
   const reportButtonRef = useRef<ReportButtonHandle>(null);
-
-  const AUTO_NEXT_DELAY = 1200; // 答對後自動跳下一題的延遲(ms)
 
   useEffect(() => {
     if (!attemptId) return;
@@ -179,9 +183,13 @@ function PracticeInner() {
             setFavorites(favSet);
           });
         // 批量載入此 attempt 所有題目的筆記(避免 N+1)
-        const questionIds = qs.map((q) => q.id).join(",");
-        if (questionIds) {
-          authedFetch(`/api/notes?questionIds=${encodeURIComponent(questionIds)}`)
+        const qIds = qs.map((q) => q.id);
+        if (qIds.length > 0) {
+          authedFetch(`/api/notes/batch`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ questionIds: qIds }),
+          })
             .then((r) => (r.ok ? r.json() : { items: [] }))
             .then((d: { items: { questionId: string; content: string }[] }) => {
               const map: Record<string, string> = {};
@@ -240,7 +248,35 @@ function PracticeInner() {
       clearTimeout(autoNextTimerRef.current);
       autoNextTimerRef.current = null;
     }
+    activeAutoNextRef.current = null;
     setAutoNextCountdown(null);
+  }
+
+  function scheduleAutoNext(
+    submittedIdx: number,
+    navigationVersion: number,
+    delay: number,
+  ) {
+    if (autoNextTimerRef.current) clearTimeout(autoNextTimerRef.current);
+    activeAutoNextRef.current = { submittedIdx, navigationVersion };
+    setAutoNextCountdown(Math.max(1, Math.ceil(delay / 1000)));
+    autoNextTimerRef.current = setTimeout(() => {
+      autoNextTimerRef.current = null;
+      activeAutoNextRef.current = null;
+      setAutoNextCountdown(null);
+      if (
+        currentIdxRef.current !== submittedIdx ||
+        navigationVersionRef.current !== navigationVersion
+      ) {
+        return;
+      }
+      const nextIdx = submittedIdx + 1;
+      navigationVersionRef.current += 1;
+      currentIdxRef.current = nextIdx;
+      setCurrentIdx(nextIdx);
+      setShowFeedback(!!answers[questions[nextIdx].id]);
+      questionStartRef.current = Date.now();
+    }, delay);
   }
 
   async function submitAnswer(qId: string, ans: string) {
@@ -301,31 +337,17 @@ function PracticeInner() {
 
     // 只有使用者仍停在本題時才安排自動跳題,避免遲到的請求拉回舊位置。
     const q = questions[submittedIdx];
+    const currentAutoAdvanceDelay = autoAdvanceDelayRef.current;
     if (
       q &&
       ans != null &&
       String(ans).toLowerCase() === String(q.answer ?? "").toLowerCase() &&
+      currentAutoAdvanceDelay != null &&
       submittedIdx < questions.length - 1 &&
       currentIdxRef.current === submittedIdx &&
       navigationVersionRef.current === navigationVersion
     ) {
-      setAutoNextCountdown(Math.ceil(AUTO_NEXT_DELAY / 1000));
-      autoNextTimerRef.current = setTimeout(() => {
-        autoNextTimerRef.current = null;
-        setAutoNextCountdown(null);
-        if (
-          currentIdxRef.current !== submittedIdx ||
-          navigationVersionRef.current !== navigationVersion
-        ) {
-          return;
-        }
-        const nextIdx = submittedIdx + 1;
-        navigationVersionRef.current += 1;
-        currentIdxRef.current = nextIdx;
-        setCurrentIdx(nextIdx);
-        setShowFeedback(!!answers[questions[nextIdx].id]);
-        questionStartRef.current = Date.now();
-      }, AUTO_NEXT_DELAY);
+      scheduleAutoNext(submittedIdx, navigationVersion, currentAutoAdvanceDelay);
     }
   }
 
@@ -365,6 +387,7 @@ function PracticeInner() {
   }
 
   async function handleFinish() {
+    clearAutoNext(true);
     await authedFetch("/api/attempt", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -420,12 +443,28 @@ function PracticeInner() {
     finishRef.current = handleFinish;
   }, [handleFinish]);
 
+  useEffect(() => {
+    const active = activeAutoNextRef.current;
+    if (!active) return;
+    if (autoAdvanceDelay == null) {
+      clearAutoNext();
+      return;
+    }
+    scheduleAutoNext(
+      active.submittedIdx,
+      active.navigationVersion,
+      autoAdvanceDelay,
+    );
+  }, [autoAdvanceDelay]);
+
   // 倒計時顯示 + 卸載清理
   useEffect(() => {
     if (autoNextCountdown == null) return;
     if (autoNextCountdown <= 0) return;
     const id = setTimeout(() => {
-      setAutoNextCountdown((c) => (c != null ? c - 1 : null));
+      setAutoNextCountdown((countdown) =>
+        countdown != null && countdown > 1 ? countdown - 1 : countdown,
+      );
     }, 1000);
     return () => clearTimeout(id);
   }, [autoNextCountdown]);
@@ -435,18 +474,6 @@ function PracticeInner() {
       if (autoNextTimerRef.current) clearTimeout(autoNextTimerRef.current);
     };
   }, []);
-
-  // 搜尋 dropdown 點擊外部關閉
-  useEffect(() => {
-    if (!searchOpen) return;
-    function onClick(e: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setSearchOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [searchOpen]);
 
   useWindowKeydown(
     (event) => {
@@ -590,6 +617,7 @@ function PracticeInner() {
                 {String(mm).padStart(2, "0")}:{String(ss).padStart(2, "0")}
               </Badge>
             )}
+            <AutoAdvanceMenu />
             <Button
               variant="ghost"
               size="sm"
@@ -709,37 +737,46 @@ function PracticeInner() {
           {showFeedback && isAnswered && (
             <div
               className={cn(
-                "mt-4 p-4 rounded-lg border",
+                "mt-4 p-4 rounded-lg border max-h-[45vh] overflow-y-auto",
                 isCorrect
-                  ? "bg-green-50 border-green-200"
-                  : "bg-red-50 border-red-200"
+                  ? "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800"
+                  : "bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800"
               )}
             >
               <p className="text-sm font-medium mb-1">
                 {isCorrect ? (
-                  <span className="text-green-700">
+                  <span className="text-green-700 dark:text-green-300">
                     ✓ 答對了
                     {autoNextCountdown != null && (
-                      <span className="text-green-600 ml-2">
-                        （{autoNextCountdown}s 後跳下一題…）
+                      <span className="text-green-600 dark:text-green-400 ml-2">
+                        （{autoNextCountdown} 秒後進入下一題）
                       </span>
                     )}
                   </span>
                 ) : (
-                  <span className="text-red-700">✗ 答錯。正確答案：{currentQ.answer}</span>
+                  <span className="text-red-700 dark:text-red-300">✗ 答錯。正確答案：{currentQ.answer}</span>
                 )}
               </p>
               {currentQ.explanation && (
-                <p className="text-sm text-foreground leading-relaxed">
-                  {currentQ.explanation}
-                </p>
+                <Explanation text={currentQ.explanation} className="text-sm" />
+              )}
+              {autoNextCountdown != null && (
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  className="mt-2 h-auto p-0 text-green-700 dark:text-green-300"
+                  onClick={() => clearAutoNext()}
+                >
+                  取消本題自動跳轉
+                </Button>
               )}
             </div>
           )}
         </CardContent>
       </Card>
 
-      <div className="mt-4 flex items-center justify-between">
+      <div className="sticky bottom-0 z-10 -mx-4 mt-4 flex items-center justify-between border-t bg-background/80 px-4 py-3 backdrop-blur">
         <Button
           variant="outline"
           onClick={goPrev}
@@ -763,36 +800,17 @@ function PracticeInner() {
             />
             <span className="hidden md:inline">{favorites.has(currentQ.id) ? "已收藏" : "收藏"}</span>
           </Button>
-          <div ref={searchRef} className="relative">
-            <Button
-              variant="ghost"
-              onClick={() => setSearchOpen((v) => !v)}
-              title="搜尋這題"
-            >
-              <Search className="w-4 h-4 md:mr-1" />
-              <span className="hidden md:inline">搜尋</span>
-            </Button>
-            {searchOpen && (() => {
-              const query = buildSearchQuery({ number: currentQ.number, question: currentQ.question, options: currentQ.options, ref: currentQ.ref || undefined, paper: attempt?.paperCode || undefined });
-              return (
-                <div className="absolute bottom-full right-0 mb-1 z-50 min-w-[130px] rounded-lg border border-border bg-popover shadow-lg py-1">
-                  {QUESTION_SEARCH_PROVIDERS.map((provider) => (
-                    <a
-                      key={provider.id}
-                      href={provider.buildUrl(query)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => setSearchOpen(false)}
-                      title={`用 ${provider.label} 搜尋這題 (${provider.shortcutLabel})`}
-                      className={cn("flex items-center gap-2 px-3 py-1.5 text-sm", provider.className)}
-                    >
-                      {provider.label}
-                    </a>
-                  ))}
-                </div>
-              );
-            })()}
-          </div>
+          <QuestionSearchMenu
+            number={currentQ.number}
+            question={currentQ.question}
+            options={currentQ.options}
+            ref={currentQ.ref || undefined}
+            paper={attempt?.paperCode || undefined}
+            side="top"
+            size="default"
+            labelMode="desktop"
+            showShortcutHints
+          />
           <Button variant="ghost" onClick={() => void handleCopy()} title="複製題目 (X)">
             {copied ? (
               <Check className="w-4 h-4 md:mr-1 text-green-600 dark:text-green-400" />
@@ -838,31 +856,6 @@ function PracticeInner() {
         )}
       </div>
 
-      <ShortcutHints
-        className="hidden md:flex mt-3"
-        hints={[
-          { id: "previous", key: "←", label: "上一題" },
-          {
-            id: "next",
-            key: "→",
-            label: currentIdx < questions.length - 1 ? "下一題" : "交卷",
-          },
-          ...(currentIdx >= questions.length - 1
-            ? [{ id: "enter", key: "Enter", label: "交卷" }]
-            : []),
-          { id: "answer", key: "1-4 / A-D", label: "選答" },
-          { id: "favorite", key: "F", label: "收藏" },
-          { id: "note", key: "N", label: "筆記" },
-          { id: "report", key: "R", label: "報錯" },
-          { id: "jump", key: "G", label: "跳題" },
-          { id: "copy", key: "X", label: "複製" },
-          ...(handbookHref
-            ? [{ id: "handbook", key: "H", label: "研習手冊" }]
-            : []),
-        ]}
-        includeSearchProviders
-      />
-
       <ToastContainer toasts={toasts} />
     </div>
   );
@@ -891,9 +884,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
   const [picked, setPicked] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [note, setNote] = useState<string>("");
-  const [searchOpen, setSearchOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
   const noteButtonRef = useRef<NoteButtonHandle>(null);
   const reportButtonRef = useRef<ReportButtonHandle>(null);
   const favoriteRequestRef = useRef(false);
@@ -998,17 +989,6 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
     setTimeout(() => setCopied(false), 1200);
     if (showToast) toast("已複製題目");
   }
-
-  useEffect(() => {
-    if (!searchOpen) return;
-    function onClick(event: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setSearchOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, [searchOpen]);
 
   useWindowKeydown(
     (event) => {
@@ -1125,45 +1105,15 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
             <CardTitle className="text-base leading-relaxed flex-1 min-w-0">
               <QuestionStem text={question.question} />
             </CardTitle>
-            <div ref={searchRef} className="relative shrink-0">
-              <Button
-                type="button"
-                variant="ghost"
-                size="xs"
-                onClick={() => setSearchOpen((value) => !value)}
-                title="搜尋這題"
-                aria-expanded={searchOpen}
-              >
-                <Search className="w-3 h-3 mr-1" />
-                搜尋
-              </Button>
-              {searchOpen && (() => {
-                const query = buildSearchQuery({
-                  number: question.number,
-                  question: question.question,
-                  options: question.options,
-                  ref: question.ref || undefined,
-                  paper: paperCode || undefined,
-                });
-                return (
-                  <div className="absolute right-0 top-full mt-1 z-50 min-w-[140px] rounded-lg border border-border bg-popover shadow-lg py-1">
-                    {QUESTION_SEARCH_PROVIDERS.map((provider) => (
-                      <a
-                        key={provider.id}
-                        href={provider.buildUrl(query)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => setSearchOpen(false)}
-                        title={`用 ${provider.label} 搜尋這題 (${provider.shortcutLabel})`}
-                        className={cn("flex items-center gap-2 w-full px-3 py-1.5 text-sm", provider.className)}
-                      >
-                        {provider.label}
-                      </a>
-                    ))}
-                  </div>
-                );
-              })()}
-            </div>
+            <QuestionSearchMenu
+              number={question.number}
+              question={question.question}
+              options={question.options}
+              ref={question.ref || undefined}
+              paper={paperCode || undefined}
+              showShortcutHints
+              className="shrink-0"
+            />
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -1217,7 +1167,7 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
           {isAnswered && (
             <div
               className={cn(
-                "mt-4 p-4 rounded-lg border",
+                "mt-4 p-4 rounded-lg border max-h-[45vh] overflow-y-auto",
                 isCorrect
                   ? "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800"
                   : "bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800"
@@ -1232,16 +1182,14 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
                 {isCorrect ? "✓ 答對了" : `✗ 答錯。正確答案：${correctLetter.toUpperCase()}`}
               </p>
               {question.explanation && (
-                <p className="text-sm text-foreground leading-relaxed">
-                  {question.explanation}
-                </p>
+                <Explanation text={question.explanation} className="text-sm" />
               )}
             </div>
           )}
         </CardContent>
       </Card>
 
-      <div className="flex items-center justify-center gap-1 md:gap-2 flex-wrap">
+      <div className="sticky bottom-0 z-10 -mx-4 flex items-center justify-center gap-1 border-t bg-background/80 px-4 py-3 backdrop-blur md:gap-2 flex-wrap">
         <Button
           variant="ghost"
           onClick={toggleFavorite}
@@ -1282,20 +1230,6 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
           onSubmitted={() => toast("已收到您的回報,感謝!")}
         />
       </div>
-
-      <ShortcutHints
-        hints={[
-          { id: "answer", key: "1-4 / A-D", label: "選答" },
-          { id: "favorite", key: "F", label: "收藏" },
-          { id: "note", key: "N", label: "筆記" },
-          { id: "report", key: "R", label: "報錯" },
-          { id: "copy", key: "X", label: "複製" },
-          ...(handbookHref
-            ? [{ id: "handbook", key: "H", label: "研習手冊" }]
-            : []),
-        ]}
-        includeSearchProviders
-      />
 
       <ToastContainer toasts={toasts} />
     </div>

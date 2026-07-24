@@ -1,4 +1,4 @@
-# 部署到 VPS:PowerShell 端流程。
+﻿# 部署到 VPS:PowerShell 端流程。
 # 流程:
 #  1) 在本机 pnpm/npm build 产出 .next(由调用方在 deploy 前完成)
 #  2) 打包 .next + 运行时文件到 iiqe-runtime-update.tar.gz

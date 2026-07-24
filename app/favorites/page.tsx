@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,15 +10,26 @@ import {
   EyeOff,
   RotateCcw,
   Play,
+  Shuffle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Explanation } from "@/components/Explanation";
 import { authedFetch } from "@/lib/session-client";
 import { QuestionActions } from "@/components/QuestionActions";
 import { QuestionStem } from "@/components/QuestionStem";
 import { NoteSection } from "@/components/NoteSection";
 import { PracticeOption, type OptionLetter } from "@/components/PracticeOption";
-import { RedoPractice, type RedoItem } from "@/components/RedoPractice";
+import { RedoPractice, type RedoItem, type RedoPracticeState } from "@/components/RedoPractice";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ToastContainer, useToast } from "@/components/useToast";
+import { getSessionId } from "@/lib/session";
+import {
+  createRedoPracticeDraft,
+  getRedoPracticeDraftKey,
+  parseRedoPracticeDraft,
+  reconcileRedoPracticeDraft,
+  type RedoPracticeDraft,
+} from "@/lib/redo-practice-draft";
 
 type FavItem = {
   questionId: string;
@@ -36,6 +47,12 @@ type FavItem = {
     sourceLabel: string;
   };
 };
+
+const PAPER_FILTER_ALL = "all";
+
+function paperFilterLabel(code: string) {
+  return code === "P1" ? "卷一 P1" : code === "P3" ? "卷三 P3" : code;
+}
 
 function FavItemCard({
   item,
@@ -160,9 +177,7 @@ function FavItemCard({
               </span>
             </p>
             {q.explanation && (
-              <p className="text-muted-foreground text-xs mt-2 leading-relaxed">
-                💡 {q.explanation}
-              </p>
+              <Explanation text={q.explanation} prefix="💡" className="text-muted-foreground text-xs mt-2" />
             )}
           </div>
         )}
@@ -178,6 +193,10 @@ export default function FavoritesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [practiceMode, setPracticeMode] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
+  const [paperFilter, setPaperFilter] = useState<string>(PAPER_FILTER_ALL);
+  const [practiceDraft, setPracticeDraft] = useState<RedoPracticeDraft | null>(null);
+  const draftKeyRef = useRef<string | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<ReadonlySet<string>>(new Set());
   const favoriteRequestsRef = useRef<Set<string>>(new Set());
   const { toast, toasts } = useToast();
@@ -189,8 +208,24 @@ export default function FavoritesPage() {
         return r.json();
       })
       .then((data) => {
-        setItems(data.items);
-        setFavoriteIds(new Set<string>(data.items.map((item: FavItem) => item.questionId)));
+        const nextItems: FavItem[] = data.items;
+        setItems(nextItems);
+        setFavoriteIds(new Set<string>(nextItems.map((item) => item.questionId)));
+        const draftKey = getRedoPracticeDraftKey(getSessionId(), "favorites");
+        draftKeyRef.current = draftKey;
+        const restored = reconcileRedoPracticeDraft(
+          parseRedoPracticeDraft(localStorage.getItem(draftKey), "favorites"),
+          nextItems.map((item) => item.questionId),
+        );
+        if (restored) {
+          localStorage.setItem(draftKey, JSON.stringify(restored));
+          setPracticeDraft(restored);
+          setShuffle(restored.shuffle);
+          setPracticeMode(true);
+        } else {
+          localStorage.removeItem(draftKey);
+          setPracticeDraft(null);
+        }
         setLoading(false);
       })
       .catch((e) => {
@@ -250,7 +285,48 @@ export default function FavoritesPage() {
     }
   }
 
+  const saveDraft = useCallback((draft: RedoPracticeDraft) => {
+    setPracticeDraft(draft);
+    const key = draftKeyRef.current;
+    if (key) localStorage.setItem(key, JSON.stringify(draft));
+  }, []);
+
+  const paperCodes = useMemo(
+    () => [...new Set(items.map((item) => item.paperCode))].sort(),
+    [items],
+  );
+  const visibleItems = useMemo(
+    () =>
+      paperFilter === PAPER_FILTER_ALL
+        ? items
+        : items.filter((item) => item.paperCode === paperFilter),
+    [items, paperFilter],
+  );
+
+  const startPractice = useCallback(() => {
+    const draft = createRedoPracticeDraft(
+      "favorites",
+      visibleItems.map((item) => item.questionId),
+      shuffle,
+    );
+    saveDraft(draft);
+    setPracticeMode(true);
+  }, [visibleItems, saveDraft, shuffle]);
+
+  const updatePracticeState = useCallback((state: RedoPracticeState) => {
+    setPracticeDraft((current) => {
+      if (!current) return current;
+      const next = { ...current, ...state, updatedAt: Date.now() };
+      const key = draftKeyRef.current;
+      if (key) localStorage.setItem(key, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   async function exitPractice() {
+    const key = draftKeyRef.current;
+    if (key) localStorage.removeItem(key);
+    setPracticeDraft(null);
     setPracticeMode(false);
     load();
   }
@@ -263,8 +339,12 @@ export default function FavoritesPage() {
   }
 
   // 做題模式
-  if (practiceMode) {
-    const redoItems: RedoItem[] = items.map((it) => ({
+  if (practiceMode && practiceDraft) {
+    const itemById = new Map(items.map((item) => [item.questionId, item]));
+    const orderedItems = practiceDraft.questionIds
+      .map((questionId) => itemById.get(questionId))
+      .filter((item): item is FavItem => item != null);
+    const redoItems: RedoItem[] = orderedItems.map((it) => ({
       questionId: it.questionId,
       paperCode: it.paperCode,
       paperName: it.paperName,
@@ -278,6 +358,9 @@ export default function FavoritesPage() {
           favoriteIds={favoriteIds}
           onToggleFavorite={toggleFavorite}
           onExit={exitPractice}
+          initialState={practiceDraft}
+          onStateChange={updatePracticeState}
+          shuffled={practiceDraft.shuffle}
         />
         <ToastContainer toasts={toasts} />
       </>
@@ -289,15 +372,55 @@ export default function FavoritesPage() {
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <h1 className="text-2xl font-bold">收藏題</h1>
         {items.length > 0 && (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">共 {items.length} 題</span>
-            <Button onClick={() => setPracticeMode(true)}>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">
+              共 {items.length} 題
+              {paperFilter !== PAPER_FILTER_ALL ? ` · 篩選後 ${visibleItems.length} 題` : ""}
+            </span>
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <Checkbox
+                checked={shuffle}
+                onCheckedChange={(checked) => setShuffle(checked === true)}
+              />
+              <Shuffle className="w-4 h-4" />
+              亂序
+            </label>
+            <Button onClick={startPractice} disabled={visibleItems.length === 0}>
               <Play className="w-4 h-4 mr-1" />
-              練習模式
+              {paperFilter !== PAPER_FILTER_ALL
+                ? `練習所選（${visibleItems.length} 題）`
+                : "練習模式"}
             </Button>
           </div>
         )}
       </div>
+      {items.length > 0 && paperCodes.length > 1 && (
+        <Card className="mb-4">
+          <CardContent>
+            <div
+              className="inline-flex rounded-lg border border-border overflow-hidden"
+              role="group"
+              aria-label="按卷別篩選"
+            >
+              {[PAPER_FILTER_ALL, ...paperCodes].map((code, index) => (
+                <Button
+                  key={code}
+                  type="button"
+                  variant={paperFilter === code ? "secondary" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "rounded-none border-0",
+                    index > 0 && "border-l border-border",
+                  )}
+                  onClick={() => setPaperFilter(code)}
+                >
+                  {code === PAPER_FILTER_ALL ? "全部卷別" : paperFilterLabel(code)}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
       {items.length === 0 ? (
         <Card>
           <CardHeader>
@@ -309,9 +432,20 @@ export default function FavoritesPage() {
             </p>
           </CardContent>
         </Card>
+      ) : visibleItems.length === 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>沒有符合條件的收藏</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground text-sm">
+              此卷別目前沒有收藏題目。可切換其他卷別或查看全部卷別。
+            </p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="space-y-3">
-          {items.map((it) => (
+          {visibleItems.map((it) => (
             <FavItemCard
               key={it.questionId}
               item={it}
