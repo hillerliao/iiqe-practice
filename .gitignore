@@ -113,3 +113,15 @@ GIT_PUSH_REVIEW_*.md
 
 # local deploy helper (may contain hardcoded IP)
 deploy-with-ip.ps1
+
+# ad-hoc handbook artifacts (transient; see deploy workflow + DEPLOY.md).
+# The repo's EPUB builder is scripts/build_handbook_epub.py which writes
+# public/handbook/exam{1-2024-en,3-2022-en}.epub.  The two files below have a
+# different naming convention (full study-notes title); they were dropped in as
+# one-off downloads and don't belong in the deployed tarball.  Narrow, by name,
+# so future, properly-named EPUBs are still picked up.
+public/handbook/IIQE_P1_Principles_and_Practice_of_Insurance_Study_Notes_2024_English.epub
+public/handbook/IIQE_P3_Long_Term_Insurance_Study_Notes_2022_English.epub
+# Companion script left around but not part of the active handbook pipeline
+# (the canonical handbook builders are build_handbook.py / _p3.py / _en.py).
+scripts/build_handbook_epub.py
