@@ -10,12 +10,19 @@ export const PUBLIC_SITE_ORIGIN = "https://iiqe.liaozh.top";
  * P1 → exam1-2024(保險原理及實務 2024)
  * P3 → exam3-2022(長期保險 2022 年版)
  * 其它/未知 → 回傳 null,呼叫端 fallback 不跳
+ *
+ * @param language "zh"(預設,中文手冊) 或 "en"(英文手冊,slug 加 -en 後綴)
  */
-export function getHandbookSlugByPaper(paperCode: string | null | undefined): string | null {
+export function getHandbookSlugByPaper(
+  paperCode: string | null | undefined,
+  language: "zh" | "en" = "zh",
+): string | null {
   if (!paperCode) return null;
   const code = paperCode.trim().toUpperCase();
-  if (code === "P1" || code.startsWith("卷一")) return "exam1-2024";
-  if (code === "P3" || code.startsWith("卷三")) return "exam3-2022";
+  if (code === "P1" || code.startsWith("卷一"))
+    return language === "en" ? "exam1-2024-en" : "exam1-2024";
+  if (code === "P3" || code.startsWith("卷三"))
+    return language === "en" ? "exam3-2022-en" : "exam3-2022";
   return null;
 }
 
@@ -56,13 +63,16 @@ export function getHandbookHref(
  * 一站式:給定 paperCode 與 ref,直接產生正確的研習手冊錨點 URL。
  * - 找不到對應 slug 或 ref 格式不對 → 回傳 null
  * - chapterIds 傳入時會順手驗證錨點是否存在
+ *
+ * @param language "zh"(預設,中文手冊) 或 "en"(英文手冊);英文與中文章節錨點 id 同形
  */
 export function getHandbookHrefForQuestion(
   paperCode: string | null | undefined,
   ref: string,
   chapterIdsBySlug?: Record<string, Iterable<string>>,
+  language: "zh" | "en" = "zh",
 ): string | null {
-  const slug = getHandbookSlugByPaper(paperCode);
+  const slug = getHandbookSlugByPaper(paperCode, language);
   if (!slug) return null;
   const ids = chapterIdsBySlug?.[slug];
   return getHandbookHref(slug, ref, ids);

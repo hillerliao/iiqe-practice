@@ -43,6 +43,7 @@ import {
   noModifiers,
   normalizeKey,
   parseAnswerKey,
+  shiftOnly,
 } from "@/lib/practice-shortcuts";
 import { matchQuestionSearchProvider } from "@/lib/question-search";
 import { getHandbookHrefForQuestion } from "@/lib/handbook-refs";
@@ -239,6 +240,9 @@ export function RedoPractice({
   const handbookHref = current
     ? getHandbookHrefForQuestion(current.paperCode, current.question.ref)
     : null;
+  const englishHandbookHref = current
+    ? getHandbookHrefForQuestion(current.paperCode, current.question.ref, undefined, "en")
+    : null;
 
   useEffect(() => {
     const ids = items.map((item) => item.questionId);
@@ -397,6 +401,7 @@ export function RedoPractice({
     finished,
     isPersisting,
     handbookHref,
+    englishHandbookHref,
   });
   stateRef.current = {
     currentIdx,
@@ -406,6 +411,7 @@ export function RedoPractice({
     finished,
     isPersisting,
     handbookHref,
+    englishHandbookHref,
   };
 
   useEffect(() => {
@@ -497,6 +503,17 @@ export function RedoPractice({
           paper: state.current.paperCode || undefined,
         });
         window.open(provider.buildUrl(query), "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      if (
+        shiftOnly(event) &&
+        event.code === "KeyH" &&
+        state.englishHandbookHref &&
+        state.current
+      ) {
+        event.preventDefault();
+        window.open(state.englishHandbookHref, "_blank", "noopener,noreferrer");
         return;
       }
 
@@ -761,33 +778,50 @@ export function RedoPractice({
             <Badge variant="secondary">{current.paperCode}</Badge>
             <span className="font-medium">#{current.question.number}</span>
             {current.question.ref && (
-              handbookHref ? (
-                <a
-                  href={handbookHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="在新分頁開啟研習手冊對應章節 (H)"
-                >
+              <>
+                {handbookHref ? (
+                  <a
+                    href={handbookHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="在新分頁開啟研習手冊對應章節 (H)"
+                  >
+                    <Badge
+                      variant="outline"
+                      className="text-xs hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
+                    >
+                      {current.question.ref}
+                    </Badge>
+                  </a>
+                ) : (
                   <Badge
                     variant="outline"
-                    className="text-xs hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
+                    className="text-xs"
+                    title={
+                      current.paperCode
+                        ? getChapterInfo(current.paperCode, current.question.ref)?.path
+                        : undefined
+                    }
                   >
                     {current.question.ref}
                   </Badge>
-                </a>
-              ) : (
-                <Badge
-                  variant="outline"
-                  className="text-xs"
-                  title={
-                    current.paperCode
-                      ? getChapterInfo(current.paperCode, current.question.ref)?.path
-                      : undefined
-                  }
-                >
-                  {current.question.ref}
-                </Badge>
-              )
+                )}
+                {englishHandbookHref && (
+                  <a
+                    href={englishHandbookHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="在新分頁開啟英文研習手冊對應章節 (⇧H)"
+                  >
+                    <Badge
+                      variant="outline"
+                      className="text-xs hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
+                    >
+                      EN
+                    </Badge>
+                  </a>
+                )}
+              </>
             )}
             <span className="text-xs text-muted-foreground">
               {current.question.sourceLabel}

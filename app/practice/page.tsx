@@ -42,6 +42,7 @@ import {
   noModifiers,
   normalizeKey,
   parseAnswerKey,
+  shiftOnly,
 } from "@/lib/practice-shortcuts";
 import { matchQuestionSearchProvider } from "@/lib/question-search";
 
@@ -236,6 +237,9 @@ function PracticeInner() {
     currentQ && userAnswer != null && String(userAnswer).toLowerCase() === String(currentQ.answer).toLowerCase();
   const handbookHref = currentQ
     ? getHandbookHrefForQuestion(attempt?.paperCode, currentQ.ref)
+    : null;
+  const englishHandbookHref = currentQ
+    ? getHandbookHrefForQuestion(attempt?.paperCode, currentQ.ref, undefined, "en")
     : null;
 
   useEffect(() => {
@@ -493,6 +497,12 @@ function PracticeInner() {
         return;
       }
 
+      if (shiftOnly(event) && event.code === "KeyH" && englishHandbookHref) {
+        event.preventDefault();
+        window.open(englishHandbookHref, "_blank", "noopener,noreferrer");
+        return;
+      }
+
       if (!noModifiers(event)) return;
       const key = normalizeKey(event.key);
 
@@ -582,29 +592,42 @@ function PracticeInner() {
               第 {currentIdx + 1} / {questions.length} 題
             </span>
             {currentQ.ref && (
-              handbookHref ? (
-                <a
-                  href={handbookHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="在新分頁開啟研習手冊對應章節 (H)"
-                  className="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium text-foreground/80 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
-                >
-                  {currentQ.ref}
-                </a>
-              ) : (
-                <Badge
-                  variant="outline"
-                  className="text-xs"
-                  title={
-                    attempt?.paperCode
-                      ? getChapterInfo(attempt.paperCode, currentQ.ref)?.path
-                      : undefined
-                  }
-                >
-                  {currentQ.ref}
-                </Badge>
-              )
+              <>
+                {handbookHref ? (
+                  <a
+                    href={handbookHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="在新分頁開啟研習手冊對應章節 (H)"
+                    className="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium text-foreground/80 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
+                  >
+                    {currentQ.ref}
+                  </a>
+                ) : (
+                  <Badge
+                    variant="outline"
+                    className="text-xs"
+                    title={
+                      attempt?.paperCode
+                        ? getChapterInfo(attempt.paperCode, currentQ.ref)?.path
+                        : undefined
+                    }
+                  >
+                    {currentQ.ref}
+                  </Badge>
+                )}
+                {englishHandbookHref && (
+                  <a
+                    href={englishHandbookHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="在新分頁開啟英文研習手冊對應章節 (⇧H)"
+                    className="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium text-foreground/80 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
+                  >
+                    EN
+                  </a>
+                )}
+              </>
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -891,6 +914,9 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
   const handbookHref = question
     ? getHandbookHrefForQuestion(paperCode, question.ref)
     : null;
+  const englishHandbookHref = question
+    ? getHandbookHrefForQuestion(paperCode, question.ref, undefined, "en")
+    : null;
 
   // 載入題目
   useEffect(() => {
@@ -1008,6 +1034,12 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
         return;
       }
 
+      if (shiftOnly(event) && event.code === "KeyH" && englishHandbookHref) {
+        event.preventDefault();
+        window.open(englishHandbookHref, "_blank", "noopener,noreferrer");
+        return;
+      }
+
       if (!noModifiers(event)) return;
       const key = normalizeKey(event.key);
       const answer = !picked ? parseAnswerKey(key) : undefined;
@@ -1065,27 +1097,40 @@ function SinglePracticeInner({ questionId }: { questionId: string }) {
           {paperCode && <Badge variant="secondary">{paperCode}</Badge>}
           <span className="font-medium">#{question.number}</span>
           {question.ref && (
-            handbookHref ? (
-              <a
-                href={handbookHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="在新分頁開啟研習手冊對應章節 (H)"
-                className="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium text-foreground/80 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
-              >
-                {question.ref}
-              </a>
-            ) : (
-              <Badge
-                variant="outline"
-                className="text-xs"
-                title={
-                  paperCode ? getChapterInfo(paperCode, question.ref)?.path : undefined
-                }
-              >
-                {question.ref}
-              </Badge>
-            )
+            <>
+              {handbookHref ? (
+                <a
+                  href={handbookHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="在新分頁開啟研習手冊對應章節 (H)"
+                  className="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium text-foreground/80 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
+                >
+                  {question.ref}
+                </a>
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="text-xs"
+                  title={
+                    paperCode ? getChapterInfo(paperCode, question.ref)?.path : undefined
+                  }
+                >
+                  {question.ref}
+                </Badge>
+              )}
+              {englishHandbookHref && (
+                <a
+                  href={englishHandbookHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="在新分頁開啟英文研習手冊對應章節 (⇧H)"
+                  className="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium text-foreground/80 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 dark:hover:bg-blue-950/30 dark:hover:text-blue-300 dark:hover:border-blue-700 transition-colors"
+                >
+                  EN
+                </a>
+              )}
+            </>
           )}
           {question.sourceLabel && (
             <span className="text-xs text-muted-foreground">
